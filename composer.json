@@ -1,0 +1,46 @@
+{
+    "name": "laracrafts/laravel-chunk-uploader",
+    "description": "",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Raed Yak",
+            "email": "contact.raedyak@gmail.com"
+        },
+        {
+            "name": "László Görög",
+            "email": "contact@nergal.xyz"
+        }
+    ],
+    "require": {
+        "php": "^7.1.3",
+        "laravel/framework": "^5.7"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "LaraCrafts\\ChunkUploader\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "LaraCrafts\\ChunkUploader\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        },
+        "laravel": {
+            "providers": [
+                "LaraCrafts\\ChunkUploader\\ChunkUploaderServiceProvider"
+            ]
+        }
+    }
+}
