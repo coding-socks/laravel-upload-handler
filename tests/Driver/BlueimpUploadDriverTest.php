@@ -81,6 +81,11 @@ class BlueimpUploadDriverTest extends TestCase
 
         $response = $this->createTestResponse($this->handler->handle($request));
         $response->assertSuccessful();
+
+        $response->assertJson(['file' => [
+            'name' => '2494cefe4d234bd331aeb4514fe97d810efba29b.txt',
+            'size' => 100,
+        ]]);
     }
 
     public function testUploadFirstChunk()
