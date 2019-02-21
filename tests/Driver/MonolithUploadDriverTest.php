@@ -36,7 +36,7 @@ class MonolithUploadDriverTest extends TestCase
     public function testDownload()
     {
         Storage::fake('local');
-        $this->createFakeLocalFile('merged', 'local-test-file', 20);
+        $this->createFakeLocalFile('merged', 'local-test-file');
 
         $request = Request::create('', Request::METHOD_GET, [
             'file' => 'local-test-file',
@@ -74,7 +74,7 @@ class MonolithUploadDriverTest extends TestCase
     public function testDelete()
     {
         Storage::fake('local');
-        $this->createFakeLocalFile('merged', 'local-test-file', 20);
+        $this->createFakeLocalFile('merged', 'local-test-file');
 
         $request = Request::create('', Request::METHOD_DELETE, [
             'file' => 'local-test-file',

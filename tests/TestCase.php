@@ -19,9 +19,9 @@ class TestCase extends \Orchestra\Testbench\TestCase
      * @param $name
      * @param int $kilobytes
      */
-    protected function createFakeLocalFile($path, $name, int $kilobytes = 0)
+    protected function createFakeLocalFile($path, $name)
     {
-        $file = UploadedFile::fake()->create($name, $kilobytes);
+        $file = UploadedFile::fake()->create($name);
         $file->storeAs($path, $name, [
             'disk' => 'local',
         ]);

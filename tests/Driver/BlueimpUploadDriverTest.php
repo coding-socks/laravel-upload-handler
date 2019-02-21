@@ -53,7 +53,7 @@ class BlueimpUploadDriverTest extends TestCase
     public function testDownload()
     {
         Storage::fake('local');
-        $this->createFakeLocalFile('merged', 'local-test-file', 20);
+        $this->createFakeLocalFile('merged', 'local-test-file');
 
         $request = Request::create('', Request::METHOD_GET, [
             'file' => 'local-test-file',
@@ -73,10 +73,10 @@ class BlueimpUploadDriverTest extends TestCase
         Session::shouldReceive('getId')
             ->andReturn('frgYt7cPmNGtORpRCo4xvFIrWklzFqc2mnO6EE6b');
         Storage::fake('local');
-        $this->createFakeLocalFile('merged', 'local-test-file', 20);
+        $this->createFakeLocalFile('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt', '000-099');
 
         $request = Request::create('', Request::METHOD_GET, [
-            'file' => 'local-test-file',
+            'file' => '2494cefe4d234bd331aeb4514fe97d810efba29b.txt',
         ]);
 
         $response = $this->createTestResponse($this->handler->handle($request));
@@ -101,11 +101,11 @@ class BlueimpUploadDriverTest extends TestCase
         $response->assertJson(['done' => 50]);
 
         $this->assertCount(1, $response->getChunks());
-        $this->assertEquals('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt/000', $response->getChunks()[0]);
+        $this->assertEquals('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt/000-099', $response->getChunks()[0]);
         $this->assertFalse($response->isFinished());
         $this->assertNull($response->getMergedFile());
 
-        Storage::disk('local')->assertExists('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt/000');
+        Storage::disk('local')->assertExists('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt/000-099');
     }
 
     public function testUploadLastChunk()
@@ -113,8 +113,7 @@ class BlueimpUploadDriverTest extends TestCase
         Session::shouldReceive('getId')
             ->andReturn('frgYt7cPmNGtORpRCo4xvFIrWklzFqc2mnO6EE6b');
         Storage::fake('local');
-
-        $this->createFakeLocalFile('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt', '000', 100);
+        $this->createFakeLocalFile('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt', '000');
 
         $request = Request::create('', Request::METHOD_POST, [], [], [
             'file' => UploadedFile::fake()->create('test.txt', 100),
@@ -128,18 +127,18 @@ class BlueimpUploadDriverTest extends TestCase
         $response->assertJson(['done' => 100]);
 
         $this->assertCount(2, $response->getChunks());
-        $this->assertEquals('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt/100', $response->getChunks()[1]);
+        $this->assertEquals('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt/100-199', $response->getChunks()[1]);
         $this->assertTrue($response->isFinished());
         $this->assertNotNull($response->getMergedFile());
 
-        Storage::disk('local')->assertExists('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt/100');
+        Storage::disk('local')->assertExists('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt/100-199');
         Storage::disk('local')->assertExists('merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt');
     }
 
     public function testDelete()
     {
         Storage::fake('local');
-        $this->createFakeLocalFile('merged', 'local-test-file', 20);
+        $this->createFakeLocalFile('merged', 'local-test-file');
 
         $request = Request::create('', Request::METHOD_DELETE, [
             'file' => 'local-test-file',
