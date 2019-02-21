@@ -2,7 +2,9 @@
 
 namespace LaraCrafts\ChunkUploader\Driver;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use LaraCrafts\ChunkUploader\ContentRange;
@@ -80,7 +82,25 @@ class BlueimpUploadDriver extends UploadDriver
             return $this->fileResponse($filename, $config);
         }
 
+        $filename = $request->query($this->fileParam);
+        $directory = $this->getChunkDirectory($config).'/'.$filename;
+        $disk = Storage::disk($this->getDisk($config));
 
+        if (!$disk->exists($directory)) {
+            return new JsonResponse([
+                'file' => null,
+            ]);
+        }
+
+        $chunk = Arr::last($disk->files($directory));
+        $size = explode('-', basename($chunk))[1] + 1;
+
+        return new JsonResponse([
+            'file' => [
+                'name' => $filename,
+                'size' => $size,
+            ],
+        ]);
     }
 
     /**
@@ -95,10 +115,10 @@ class BlueimpUploadDriver extends UploadDriver
     {
         $contentRange = new ContentRange($request->headers);
 
-        $file = $request->file($this->fileParam, null);
+        $file = $request->file($this->fileParam);
 
         if (null === $file) {
-            $file = array_shift($request->file(Str::plural($this->fileParam), []));
+            $file = Arr::first($request->file(Str::plural($this->fileParam), []));
         }
 
         if (null === $file) {
