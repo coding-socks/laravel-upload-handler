@@ -83,10 +83,10 @@ class BlueimpUploadDriver extends UploadDriver
         }
 
         $filename = $request->query($this->fileParam);
-        $directory = $this->getChunkDirectory($config).'/'.$filename;
+        $directory = $this->getChunkDirectory($config) . '/' . $filename;
         $disk = Storage::disk($this->getDisk($config));
 
-        if (!$disk->exists($directory)) {
+        if (! $disk->exists($directory)) {
             return new JsonResponse([
                 'file' => null,
             ]);
@@ -137,7 +137,7 @@ class BlueimpUploadDriver extends UploadDriver
             str_pad($contentRange->getEnd(), $len, '0', STR_PAD_LEFT),
         ]);
 
-        $directory = $this->getChunkDirectory($config).'/'.$filename;
+        $directory = $this->getChunkDirectory($config) . '/' . $filename;
         $file->storeAs($directory, $chunkname, [
             'disk' => $this->getDisk($config),
         ]);
@@ -162,7 +162,7 @@ class BlueimpUploadDriver extends UploadDriver
     {
         $filename = $request->post($this->fileParam);
 
-        $path = $this->getMergedDirectory($config).'/'.$filename;
+        $path = $this->getMergedDirectory($config) . '/' . $filename;
         Storage::disk($this->getDisk($config))->delete($path);
 
         return new Response();

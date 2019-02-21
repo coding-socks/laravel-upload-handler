@@ -23,7 +23,7 @@ class ChunkUploaderServiceProvider extends ServiceProvider
      */
     protected function setupConfig()
     {
-        $source = realpath(__DIR__.'/../config/chunk-uploader.php');
+        $source = realpath(__DIR__ . '/../config/chunk-uploader.php');
         $this->publishes([$source => config_path('chunk-uploader.php')]);
 
         $this->mergeConfigFrom($source, 'chunk-uploader');
