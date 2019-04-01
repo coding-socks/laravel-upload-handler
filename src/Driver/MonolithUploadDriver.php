@@ -67,7 +67,7 @@ class MonolithUploadDriver extends UploadDriver
     {
         $filename = $request->post($this->fileParam, $request->route($this->fileParam));
 
-        $path = $this->getMergedDirectory($config).'/'.$filename;
+        $path = $this->getMergedDirectory($config) . '/' . $filename;
         Storage::disk($this->getDisk($config))->delete($path);
 
         return new Response();

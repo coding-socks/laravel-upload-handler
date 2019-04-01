@@ -37,13 +37,13 @@ abstract class UploadDriver
     public function fileResponse(string $filename, array $config): Response
     {
         $disk = Storage::disk($this->getDisk($config));
-        $prefix = $this->getMergedDirectory($config).'/';
+        $prefix = $this->getMergedDirectory($config) . '/';
 
-        if (! $disk->exists($prefix.$filename)) {
-            throw new NotFoundHttpException($filename.' file not found on server');
+        if (! $disk->exists($prefix . $filename)) {
+            throw new NotFoundHttpException($filename . ' file not found on server');
         }
 
-        $path = $disk->path($prefix.$filename);
+        $path = $disk->path($prefix . $filename);
 
         return new BinaryFileResponse($path);
     }
@@ -61,7 +61,7 @@ abstract class UploadDriver
 
         $mergedDirectory = $this->getMergedDirectory($config);
         $disk->makeDirectory($mergedDirectory);
-        $targetPath = $mergedDirectory.'/'.$targetFilename;
+        $targetPath = $mergedDirectory . '/' . $targetFilename;
 
         $chunk = array_shift($chunks);
         $disk->copy($chunk, $targetPath);

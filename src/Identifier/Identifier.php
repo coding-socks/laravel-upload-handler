@@ -11,7 +11,7 @@ abstract class Identifier
      *
      * @return string
      */
-    public abstract function generateIdentifier(string $data): string;
+    abstract public function generateIdentifier(string $data): string;
 
     /**
      * @param \Illuminate\Http\UploadedFile $file
@@ -26,7 +26,7 @@ abstract class Identifier
 
         // On windows you can not create a file whose name ends with a dot
         if ($file->getClientOriginalExtension()) {
-            $filename .= '.'.$file->getClientOriginalExtension();
+            $filename .= '.' . $file->getClientOriginalExtension();
         }
 
         return $filename;
