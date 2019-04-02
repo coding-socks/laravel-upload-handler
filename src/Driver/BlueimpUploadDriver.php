@@ -43,19 +43,19 @@ class BlueimpUploadDriver extends UploadDriver
     public function handle(Request $request, Identifier $identifier, StorageConfig $config): Response
     {
         if ($this->isRequestMethodIn($request, [Request::METHOD_HEAD, Request::METHOD_OPTIONS])) {
-            return $this->handleHead();
+            return $this->info();
         }
 
         if ($this->isRequestMethodIn($request, [Request::METHOD_GET])) {
-            return $this->handleGet($request, $identifier, $config);
+            return $this->download($request, $config);
         }
 
         if ($this->isRequestMethodIn($request, [Request::METHOD_POST, Request::METHOD_PUT, Request::METHOD_PATCH])) {
-            return $this->handlePost($request, $identifier, $config);
+            return $this->save($request, $identifier, $config);
         }
 
         if ($this->isRequestMethodIn($request, [Request::METHOD_DELETE])) {
-            return $this->handleDelete($request, $config);
+            return $this->delete($request, $config);
         }
 
         throw new MethodNotAllowedHttpException([
@@ -72,12 +72,12 @@ class BlueimpUploadDriver extends UploadDriver
     /**
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function handleHead(): Response
+    public function info(): Response
     {
         return new BlueimpInfoResponse();
     }
 
-    public function handleGet(Request $request, Identifier $identifier, StorageConfig $config)
+    public function download(Request $request, StorageConfig $config)
     {
         $download = $request->query('download', false);
         if ($download !== false) {
@@ -115,7 +115,7 @@ class BlueimpUploadDriver extends UploadDriver
      * @return \Symfony\Component\HttpFoundation\Response
      * @throws \HttpHeaderException
      */
-    public function handlePost(Request $request, Identifier $identifier, StorageConfig $config): Response
+    public function save(Request $request, Identifier $identifier, StorageConfig $config): Response
     {
         $range = new ContentRange($request->headers);
 
@@ -156,7 +156,7 @@ class BlueimpUploadDriver extends UploadDriver
      * @param StorageConfig $config
      * @return Response
      */
-    public function handleDelete(Request $request, StorageConfig $config)
+    public function delete(Request $request, StorageConfig $config)
     {
         $filename = $request->post($this->fileParam);
 

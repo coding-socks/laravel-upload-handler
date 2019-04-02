@@ -26,21 +26,21 @@ class MonolithUploadDriver extends UploadDriver
     public function handle(Request $request, Identifier $identifier, StorageConfig $config): Response
     {
         if ($request->isMethod(Request::METHOD_POST)) {
-            return $this->handlePost($request, $identifier, $config);
+            return $this->save($request, $identifier, $config);
         }
 
         if ($request->isMethod(Request::METHOD_GET)) {
-            return $this->handleGet($request, $config);
+            return $this->download($request, $config);
         }
 
         if ($request->isMethod(Request::METHOD_DELETE)) {
-            return $this->handleDelete($request, $config);
+            return $this->delete($request, $config);
         }
 
         throw new MethodNotAllowedHttpException([Request::METHOD_POST, Request::METHOD_GET, Request::METHOD_DELETE]);
     }
 
-    public function handlePost(Request $request, Identifier $identifier, StorageConfig $config): Response
+    public function save(Request $request, Identifier $identifier, StorageConfig $config): Response
     {
         $file = $request->file($this->fileParam);
 
@@ -57,14 +57,14 @@ class MonolithUploadDriver extends UploadDriver
         return new MonolithUploadResponse([], $path);
     }
 
-    public function handleGet(Request $request, StorageConfig $config): Response
+    public function download(Request $request, StorageConfig $config): Response
     {
         $filename = $request->query($this->fileParam, $request->route($this->fileParam));
 
         return $this->fileResponse($filename, $config);
     }
 
-    public function handleDelete(Request $request, StorageConfig $config)
+    public function delete(Request $request, StorageConfig $config)
     {
         $filename = $request->post($this->fileParam, $request->route($this->fileParam));
 
