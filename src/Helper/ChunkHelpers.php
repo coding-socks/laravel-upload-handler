@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LaraCrafts\ChunkUploader\Helper;
-
 
 use Illuminate\Http\File;
 use Illuminate\Http\UploadedFile;

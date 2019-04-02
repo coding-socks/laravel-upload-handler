@@ -1,8 +1,6 @@
 <?php
 
-
 namespace LaraCrafts\ChunkUploader\Range;
-
 
 interface Range
 {
