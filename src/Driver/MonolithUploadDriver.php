@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use LaraCrafts\ChunkUploader\Exception\UploadHttpException;
 use LaraCrafts\ChunkUploader\Identifier\Identifier;
 use LaraCrafts\ChunkUploader\Response\MonolithUploadResponse;
+use LaraCrafts\ChunkUploader\StorageConfig;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -22,7 +23,7 @@ class MonolithUploadDriver extends UploadDriver
         $this->fileParam = $config['param'];
     }
 
-    public function handle(Request $request, Identifier $identifier, array $config): Response
+    public function handle(Request $request, Identifier $identifier, StorageConfig $config): Response
     {
         if ($request->isMethod(Request::METHOD_POST)) {
             return $this->handlePost($request, $identifier, $config);
@@ -39,7 +40,7 @@ class MonolithUploadDriver extends UploadDriver
         throw new MethodNotAllowedHttpException([Request::METHOD_POST, Request::METHOD_GET, Request::METHOD_DELETE]);
     }
 
-    public function handlePost(Request $request, Identifier $identifier, array $config): Response
+    public function handlePost(Request $request, Identifier $identifier, StorageConfig $config): Response
     {
         $file = $request->file($this->fileParam);
 
@@ -49,26 +50,26 @@ class MonolithUploadDriver extends UploadDriver
 
         $filename = $identifier->generateUploadedFileIdentifierName($file);
 
-        $path = $file->storeAs($this->getMergedDirectory($config), $filename, [
-            'disk' => $this->getDisk($config),
+        $path = $file->storeAs($config->getMergedDirectory(), $filename, [
+            'disk' => $config->getDisk(),
         ]);
 
         return new MonolithUploadResponse([], $path);
     }
 
-    public function handleGet(Request $request, array $config): Response
+    public function handleGet(Request $request, StorageConfig $config): Response
     {
         $filename = $request->query($this->fileParam, $request->route($this->fileParam));
 
         return $this->fileResponse($filename, $config);
     }
 
-    public function handleDelete(Request $request, array $config)
+    public function handleDelete(Request $request, StorageConfig $config)
     {
         $filename = $request->post($this->fileParam, $request->route($this->fileParam));
 
-        $path = $this->getMergedDirectory($config) . '/' . $filename;
-        Storage::disk($this->getDisk($config))->delete($path);
+        $path = $config->getMergedDirectory() . '/' . $filename;
+        Storage::disk($config->getDisk())->delete($path);
 
         return new Response();
     }

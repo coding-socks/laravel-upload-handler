@@ -1,13 +1,13 @@
 <?php
 
-namespace LaraCrafts\ChunkUploader;
+namespace LaraCrafts\ChunkUploader\Range;
 
 use Illuminate\Http\Response;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class ContentRange
+class ContentRange implements Range
 {
     /**
      * @var float

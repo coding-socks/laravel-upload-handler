@@ -18,7 +18,7 @@ class BlueimpUploadDriverTest extends TestCase
      */
     private $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

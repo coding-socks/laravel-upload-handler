@@ -18,7 +18,7 @@ class UploadHandler
     protected $driver;
 
     /**
-     * @var mixed
+     * @var StorageConfig
      */
     protected $config;
 
@@ -32,9 +32,9 @@ class UploadHandler
      *
      * @param \LaraCrafts\ChunkUploader\Driver\UploadDriver $driver
      * @param \LaraCrafts\ChunkUploader\Identifier\Identifier $identifier
-     * @param array $config
+     * @param StorageConfig $config
      */
-    public function __construct(UploadDriver $driver, Identifier $identifier, array $config)
+    public function __construct(UploadDriver $driver, Identifier $identifier, StorageConfig $config)
     {
         $this->driver = $driver;
         $this->config = $config;

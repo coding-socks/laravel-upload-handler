@@ -55,9 +55,9 @@ class ChunkUploaderServiceProvider extends ServiceProvider
             /** @var \Illuminate\Support\Manager $identityManager */
             $identityManager = $this->app['chunk-uploader.identity-manager'];
 
-            $config = $this->app->make('config')->get('chunk-uploader');
+            $storageConfig = new StorageConfig($this->app->make('config')->get('chunk-uploader'));
 
-            return new UploadHandler($uploadManager->driver(), $identityManager->driver(), $config);
+            return new UploadHandler($uploadManager->driver(), $identityManager->driver(), $storageConfig);
         });
     }
 

@@ -7,17 +7,21 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use LaraCrafts\ChunkUploader\ContentRange;
+use LaraCrafts\ChunkUploader\Range\ContentRange;
 use LaraCrafts\ChunkUploader\Exception\UploadHttpException;
+use LaraCrafts\ChunkUploader\Helper\ChunkHelpers;
 use LaraCrafts\ChunkUploader\Identifier\Identifier;
 use LaraCrafts\ChunkUploader\Response\BlueimpInfoResponse;
 use LaraCrafts\ChunkUploader\Response\BlueimpUploadResponse;
+use LaraCrafts\ChunkUploader\StorageConfig;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class BlueimpUploadDriver extends UploadDriver
 {
+    use ChunkHelpers;
+
     /**
      * @var string
      */
@@ -31,12 +35,12 @@ class BlueimpUploadDriver extends UploadDriver
     /**
      * @param \Illuminate\Http\Request $request
      * @param \LaraCrafts\ChunkUploader\Identifier\Identifier $identifier
-     * @param array $config
+     * @param StorageConfig $config
      *
      * @return \Symfony\Component\HttpFoundation\Response
      * @throws \HttpHeaderException
      */
-    public function handle(Request $request, Identifier $identifier, array $config): Response
+    public function handle(Request $request, Identifier $identifier, StorageConfig $config): Response
     {
         if ($this->isRequestMethodIn($request, [Request::METHOD_HEAD, Request::METHOD_OPTIONS])) {
             return $this->handleHead();
@@ -73,7 +77,7 @@ class BlueimpUploadDriver extends UploadDriver
         return new BlueimpInfoResponse();
     }
 
-    public function handleGet(Request $request, Identifier $identifier, array $config)
+    public function handleGet(Request $request, Identifier $identifier, StorageConfig $config)
     {
         $download = $request->query('download', false);
         if ($download !== false) {
@@ -83,8 +87,8 @@ class BlueimpUploadDriver extends UploadDriver
         }
 
         $filename = $request->query($this->fileParam);
-        $directory = $this->getChunkDirectory($config) . '/' . $filename;
-        $disk = Storage::disk($this->getDisk($config));
+        $directory = $config->getChunkDirectory() . '/' . $filename;
+        $disk = Storage::disk($config->getDisk());
 
         if (! $disk->exists($directory)) {
             return new JsonResponse([
@@ -106,14 +110,14 @@ class BlueimpUploadDriver extends UploadDriver
     /**
      * @param \Illuminate\Http\Request $request
      * @param \LaraCrafts\ChunkUploader\Identifier\Identifier $identifier
-     * @param array $config
+     * @param StorageConfig $config
      *
      * @return \Symfony\Component\HttpFoundation\Response
      * @throws \HttpHeaderException
      */
-    public function handlePost(Request $request, Identifier $identifier, array $config): Response
+    public function handlePost(Request $request, Identifier $identifier, StorageConfig $config): Response
     {
-        $contentRange = new ContentRange($request->headers);
+        $range = new ContentRange($request->headers);
 
         $file = $request->file($this->fileParam);
 
@@ -131,39 +135,33 @@ class BlueimpUploadDriver extends UploadDriver
 
         $filename = $identifier->generateUploadedFileIdentifierName($file);
 
-        $len = strlen($contentRange->getTotal());
-        $chunkname = implode('-', [
-            str_pad($contentRange->getStart(), $len, '0', STR_PAD_LEFT),
-            str_pad($contentRange->getEnd(), $len, '0', STR_PAD_LEFT),
-        ]);
+        $chunks = $this->storeChunk($config, $range, $file, $filename);
 
-        $directory = $this->getChunkDirectory($config) . '/' . $filename;
-        $file->storeAs($directory, $chunkname, [
-            'disk' => $this->getDisk($config),
-        ]);
-
-        $chunks = Storage::disk($this->getDisk($config))->files($directory);
-
-        if (! $contentRange->isLast()) {
-            return new BlueimpUploadResponse($contentRange->getPercentage(), $chunks);
+        if (! $range->isLast()) {
+            return new BlueimpUploadResponse($range->getPercentage(), $chunks);
         }
 
         $path = $this->mergeChunks($config, $chunks, $filename);
 
-        if (! empty($this->sweep($config))) {
-            Storage::disk($this->getDisk($config))->deleteDirectory($filename);
+        if (! empty($config->sweep())) {
+            Storage::disk($config->getDisk())->deleteDirectory($filename);
             $chunks = [];
         }
 
         return new BlueimpUploadResponse(100, $chunks, $path);
     }
 
-    public function handleDelete(Request $request, array $config)
+    /**
+     * @param Request $request
+     * @param StorageConfig $config
+     * @return Response
+     */
+    public function handleDelete(Request $request, StorageConfig $config)
     {
         $filename = $request->post($this->fileParam);
 
-        $path = $this->getMergedDirectory($config) . '/' . $filename;
-        Storage::disk($this->getDisk($config))->delete($path);
+        $path = $config->getMergedDirectory() . '/' . $filename;
+        Storage::disk($config->getDisk())->delete($path);
 
         return new Response();
     }
