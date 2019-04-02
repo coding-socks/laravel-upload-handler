@@ -20,7 +20,7 @@ class BlueimpUploadResponse extends JsonResponse
      * @param string[] $chunks
      * @param string|null $mergedFile
      */
-    public function __construct(int $percentage, array $chunks, ?string $mergedFile = null)
+    public function __construct(int $percentage, array $chunks, string $mergedFile = null)
     {
         parent::__construct([
             'done' => $percentage,

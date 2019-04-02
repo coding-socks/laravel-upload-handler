@@ -25,7 +25,7 @@ trait Response
     /**
      * @return \Illuminate\Http\File|null
      */
-    public function getMergedFile(): ?string
+    public function getMergedFile()
     {
         return $this->mergedFile;
     }

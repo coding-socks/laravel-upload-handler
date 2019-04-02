@@ -12,7 +12,7 @@ class MonolithUploadResponse extends \Illuminate\Http\Response
      * @param string[] $chunks
      * @param string $mergedFile
      */
-    public function __construct(array $chunks, ?string $mergedFile = null)
+    public function __construct(array $chunks, string $mergedFile = null)
     {
         parent::__construct();
 
