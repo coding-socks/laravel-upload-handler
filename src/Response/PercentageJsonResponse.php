@@ -4,7 +4,7 @@ namespace LaraCrafts\ChunkUploader\Response;
 
 use Illuminate\Http\JsonResponse;
 
-class BlueimpUploadResponse extends JsonResponse
+class PercentageJsonResponse extends JsonResponse
 {
     use Response;
 

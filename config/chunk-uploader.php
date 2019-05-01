@@ -12,7 +12,7 @@ return [
     | throughout your application here. By default, the module is setup for
     | monolith upload.
     |
-    | Supported: "monolith", "blueimp"
+    | Supported: "monolith", "blueimp", "dropzone"
     |
     */
 
@@ -98,6 +98,21 @@ return [
     */
 
     'blueimp' => [
+
+        'param' => 'file',
+
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Dropzone Options
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure the options for the Dropzone driver.
+    |
+    */
+
+    'dropzone' => [
 
         'param' => 'file',
 

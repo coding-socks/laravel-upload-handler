@@ -12,7 +12,7 @@ use LaraCrafts\ChunkUploader\Helper\ChunkHelpers;
 use LaraCrafts\ChunkUploader\Identifier\Identifier;
 use LaraCrafts\ChunkUploader\Range\ContentRange;
 use LaraCrafts\ChunkUploader\Response\BlueimpInfoResponse;
-use LaraCrafts\ChunkUploader\Response\BlueimpUploadResponse;
+use LaraCrafts\ChunkUploader\Response\PercentageJsonResponse;
 use LaraCrafts\ChunkUploader\StorageConfig;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -138,7 +138,7 @@ class BlueimpUploadDriver extends UploadDriver
         $chunks = $this->storeChunk($config, $range, $file, $filename);
 
         if (! $range->isLast()) {
-            return new BlueimpUploadResponse($range->getPercentage(), $chunks);
+            return new PercentageJsonResponse($range->getPercentage(), $chunks);
         }
 
         $path = $this->mergeChunks($config, $chunks, $filename);
@@ -148,7 +148,7 @@ class BlueimpUploadDriver extends UploadDriver
             $chunks = [];
         }
 
-        return new BlueimpUploadResponse(100, $chunks, $path);
+        return new PercentageJsonResponse(100, $chunks, $path);
     }
 
     /**
