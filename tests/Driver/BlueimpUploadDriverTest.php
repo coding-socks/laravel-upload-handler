@@ -4,9 +4,11 @@ namespace LaraCrafts\ChunkUploader\Tests\Driver;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use LaraCrafts\ChunkUploader\Driver\BlueimpUploadDriver;
+use LaraCrafts\ChunkUploader\Event\FileUploaded;
 use LaraCrafts\ChunkUploader\Tests\TestCase;
 use LaraCrafts\ChunkUploader\UploadHandler;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -38,9 +40,7 @@ class BlueimpUploadDriverTest extends TestCase
     {
         $request = Request::create('', Request::METHOD_HEAD);
 
-        $response = $this->handler->handle($request);
-
-        $response = $this->createTestResponse($response);
+        $response = $this->createTestResponse($this->handler->handle($request));
         $response->assertSuccessful();
 
         $response->assertHeader('Pragma', 'no-cache');
@@ -94,6 +94,8 @@ class BlueimpUploadDriverTest extends TestCase
             ->andReturn('frgYt7cPmNGtORpRCo4xvFIrWklzFqc2mnO6EE6b');
         Storage::fake('local');
 
+        Event::fake();
+
         $request = Request::create('', Request::METHOD_POST, [], [], [
             'file' => UploadedFile::fake()->create('test.txt', 100),
         ], [
@@ -105,12 +107,41 @@ class BlueimpUploadDriverTest extends TestCase
         $response->assertSuccessful();
         $response->assertJson(['done' => 50]);
 
-        $this->assertCount(1, $response->getChunks());
-        $this->assertEquals('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt/000-099', $response->getChunks()[0]);
-        $this->assertFalse($response->isFinished());
-        $this->assertNull($response->getMergedFile());
-
         Storage::disk('local')->assertExists('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt/000-099');
+
+        Event::assertNotDispatched(FileUploaded::class, function ($event) {
+            return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
+        });
+    }
+
+    public function testUploadFirstChunkWithCallback()
+    {
+        Session::shouldReceive('getId')
+            ->andReturn('frgYt7cPmNGtORpRCo4xvFIrWklzFqc2mnO6EE6b');
+        Storage::fake('local');
+
+        Event::fake();
+
+        $request = Request::create('', Request::METHOD_POST, [], [], [
+            'file' => UploadedFile::fake()->create('test.txt', 100),
+        ], [
+            'HTTP_CONTENT_RANGE' => 'bytes 0-99/200',
+        ]);
+
+        /** @var \Closure|\PHPUnit\Framework\MockObject\MockObject $callback */
+        $callback = $this->getMockBuilder(\stdClass::class)
+            ->setMethods(['__invoke'])
+            ->getMock();
+        $callback->expects($this->never())
+            ->method('__invoke');
+
+        $this->createTestResponse($this->handler->handle($request, function () use ($callback) {
+            return $callback(...func_get_args());
+        }));
+
+        Event::assertNotDispatched(FileUploaded::class, function ($event) {
+            return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
+        });
     }
 
     public function testUploadLastChunk()
@@ -119,6 +150,8 @@ class BlueimpUploadDriverTest extends TestCase
             ->andReturn('frgYt7cPmNGtORpRCo4xvFIrWklzFqc2mnO6EE6b');
         Storage::fake('local');
         $this->createFakeLocalFile('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt', '000');
+
+        Event::fake();
 
         $request = Request::create('', Request::METHOD_POST, [], [], [
             'file' => UploadedFile::fake()->create('test.txt', 100),
@@ -131,13 +164,45 @@ class BlueimpUploadDriverTest extends TestCase
         $response->assertSuccessful();
         $response->assertJson(['done' => 100]);
 
-        $this->assertCount(2, $response->getChunks());
-        $this->assertEquals('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt/100-199', $response->getChunks()[1]);
-        $this->assertTrue($response->isFinished());
-        $this->assertNotNull($response->getMergedFile());
-
         Storage::disk('local')->assertExists('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt/100-199');
         Storage::disk('local')->assertExists('merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt');
+
+        Event::assertDispatched(FileUploaded::class, function ($event) {
+            return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
+        });
+    }
+
+    public function testUploadLastChunkWithCallback()
+    {
+        Session::shouldReceive('getId')
+            ->andReturn('frgYt7cPmNGtORpRCo4xvFIrWklzFqc2mnO6EE6b');
+        Storage::fake('local');
+        $this->createFakeLocalFile('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt', '000');
+
+        Event::fake();
+
+        $request = Request::create('', Request::METHOD_POST, [], [], [
+            'file' => UploadedFile::fake()->create('test.txt', 100),
+        ], [
+            'HTTP_CONTENT_RANGE' => 'bytes 100-199/200',
+        ]);
+
+        /** @var \Closure|\PHPUnit\Framework\MockObject\MockObject $callback */
+        $callback = $this->getMockBuilder(\stdClass::class)
+            ->setMethods(['__invoke'])
+            ->getMock();
+        $callback->expects($this->once())
+            ->method('__invoke')
+            ->with('local', 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt');
+
+        // https://github.com/sebastianbergmann/phpunit-mock-objects/issues/257
+        $this->createTestResponse($this->handler->handle($request, function () use ($callback) {
+            return $callback(...func_get_args());
+        }));
+
+        Event::assertDispatched(FileUploaded::class, function ($event) {
+            return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
+        });
     }
 
     public function testDelete()
