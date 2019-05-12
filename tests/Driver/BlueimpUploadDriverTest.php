@@ -128,16 +128,9 @@ class BlueimpUploadDriverTest extends TestCase
             'HTTP_CONTENT_RANGE' => 'bytes 0-99/200',
         ]);
 
-        /** @var \Closure|\PHPUnit\Framework\MockObject\MockObject $callback */
-        $callback = $this->getMockBuilder(\stdClass::class)
-            ->setMethods(['__invoke'])
-            ->getMock();
-        $callback->expects($this->never())
-            ->method('__invoke');
+        $callback = $this->createClosureMock($this->never());
 
-        $this->createTestResponse($this->handler->handle($request, function () use ($callback) {
-            return $callback(...func_get_args());
-        }));
+        $this->handler->handle($request, $callback);
 
         Event::assertNotDispatched(FileUploaded::class, function ($event) {
             return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
@@ -187,18 +180,13 @@ class BlueimpUploadDriverTest extends TestCase
             'HTTP_CONTENT_RANGE' => 'bytes 100-199/200',
         ]);
 
-        /** @var \Closure|\PHPUnit\Framework\MockObject\MockObject $callback */
-        $callback = $this->getMockBuilder(\stdClass::class)
-            ->setMethods(['__invoke'])
-            ->getMock();
-        $callback->expects($this->once())
-            ->method('__invoke')
-            ->with('local', 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt');
+        $callback = $this->createClosureMock(
+            $this->once(),
+            'local',
+            'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt'
+        );
 
-        // https://github.com/sebastianbergmann/phpunit-mock-objects/issues/257
-        $this->createTestResponse($this->handler->handle($request, function () use ($callback) {
-            return $callback(...func_get_args());
-        }));
+        $this->handler->handle($request, $callback);
 
         Event::assertDispatched(FileUploaded::class, function ($event) {
             return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
