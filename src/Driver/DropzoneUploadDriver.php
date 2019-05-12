@@ -2,6 +2,7 @@
 
 namespace LaraCrafts\ChunkUploader\Driver;
 
+use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -30,18 +31,12 @@ class DropzoneUploadDriver extends UploadDriver
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param Identifier $identifier
-     * @param StorageConfig $config
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * {@inheritDoc}
      */
-    public function handle(Request $request, Identifier $identifier, StorageConfig $config): Response
+    public function handle(Request $request, Identifier $identifier, StorageConfig $config, Closure $fileUploaded = null): Response
     {
         if ($this->isRequestMethodIn($request, [Request::METHOD_POST])) {
-            return $this->save($request, $identifier, $config);
+            return $this->save($request, $identifier, $config, $fileUploaded);
         }
 
         throw new MethodNotAllowedHttpException([
@@ -53,10 +48,11 @@ class DropzoneUploadDriver extends UploadDriver
      * @param \Illuminate\Http\Request $request
      * @param \LaraCrafts\ChunkUploader\Identifier\Identifier $identifier
      * @param StorageConfig $config
+     * @param \Closure|null $fileUploaded
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function save(Request $request, Identifier $identifier, StorageConfig $config): Response
+    public function save(Request $request, Identifier $identifier, StorageConfig $config, Closure $fileUploaded = null): Response
     {
         $file = $request->file($this->fileParam);
 
@@ -69,12 +65,12 @@ class DropzoneUploadDriver extends UploadDriver
         }
 
         if ($this->isMonolithRequest($request)) {
-            return $this->saveMonolith($file, $identifier, $config);
+            return $this->saveMonolith($file, $identifier, $config, $fileUploaded);
         }
 
         $this->validateChunkRequest($request);
 
-        return $this->saveChunk($file, $request, $config);
+        return $this->saveChunk($file, $request, $config, $fileUploaded);
     }
 
     /**
@@ -111,10 +107,11 @@ class DropzoneUploadDriver extends UploadDriver
      * @param UploadedFile $file
      * @param Identifier $identifier
      * @param StorageConfig $config
+     * @param \Closure|null $fileUploaded
      *
      * @return Response
      */
-    private function saveMonolith(UploadedFile $file, Identifier $identifier, StorageConfig $config): Response
+    private function saveMonolith(UploadedFile $file, Identifier $identifier, StorageConfig $config, Closure $fileUploaded = null): Response
     {
         $filename = $identifier->generateUploadedFileIdentifierName($file);
 
@@ -122,17 +119,20 @@ class DropzoneUploadDriver extends UploadDriver
             'disk' => $config->getDisk(),
         ]);
 
-        return new PercentageJsonResponse(100, [], $path);
+        $this->triggerFileUploadedEvent($config->getDisk(), $path, $fileUploaded);
+
+        return new PercentageJsonResponse(100);
     }
 
     /**
      * @param UploadedFile $file
      * @param Request $request
      * @param StorageConfig $config
+     * @param \Closure|null $fileUploaded
      *
      * @return Response
      */
-    private function saveChunk(UploadedFile $file, Request $request, StorageConfig $config): Response
+    private function saveChunk(UploadedFile $file, Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
     {
         $numberOfChunks = $request->post('dztotalchunkcount');
 
@@ -153,17 +153,18 @@ class DropzoneUploadDriver extends UploadDriver
         $chunks = $this->storeChunk($config, $range, $file, $filename);
 
         if (!$this->isFinished($numberOfChunks, $chunks)) {
-            return new PercentageJsonResponse($this->getPercentage($chunks, $numberOfChunks), $chunks);
+            return new PercentageJsonResponse($this->getPercentage($chunks, $numberOfChunks));
         }
 
         $path = $this->mergeChunks($config, $chunks, $filename);
 
         if (!empty($config->sweep())) {
             Storage::disk($config->getDisk())->deleteDirectory($filename);
-            $chunks = [];
         }
 
-        return new PercentageJsonResponse(100, $chunks, $path);
+        $this->triggerFileUploadedEvent($config->getDisk(), $path, $fileUploaded);
+
+        return new PercentageJsonResponse(100);
     }
 
     /**

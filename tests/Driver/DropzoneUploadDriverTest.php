@@ -4,10 +4,12 @@ namespace LaraCrafts\ChunkUploader\Tests\Driver;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use LaraCrafts\ChunkUploader\Driver\DropzoneUploadDriver;
+use LaraCrafts\ChunkUploader\Event\FileUploaded;
 use LaraCrafts\ChunkUploader\Exception\UploadHttpException;
 use LaraCrafts\ChunkUploader\Tests\TestCase;
 use LaraCrafts\ChunkUploader\UploadHandler;
@@ -27,6 +29,9 @@ class DropzoneUploadDriverTest extends TestCase
         $this->app->make('config')->set('chunk-uploader.uploader', 'dropzone');
         $this->app->make('config')->set('chunk-uploader.sweep', false);
         $this->handler = $this->app->make(UploadHandler::class);
+
+        Storage::fake('local');
+        Event::fake();
     }
 
     public function testDriverInstance()
@@ -38,8 +43,6 @@ class DropzoneUploadDriverTest extends TestCase
 
     public function testFileParameterValidationWhenFileParameterIsEmpty()
     {
-        Storage::fake('local');
-
         $request = Request::create('', Request::METHOD_POST);
 
         $this->expectException(BadRequestHttpException::class);
@@ -49,8 +52,6 @@ class DropzoneUploadDriverTest extends TestCase
 
     public function testFileParameterValidationWhenFileParameterIsInvalid()
     {
-        Storage::fake('local');
-
         $file = \Mockery::mock(UploadedFile::class)->makePartial();
         $file->shouldReceive('isValid')
             ->andReturn(false);
@@ -68,7 +69,6 @@ class DropzoneUploadDriverTest extends TestCase
     {
         Session::shouldReceive('getId')
             ->andReturn('frgYt7cPmNGtORpRCo4xvFIrWklzFqc2mnO6EE6b');
-        Storage::fake('local');
 
         $request = Request::create('', Request::METHOD_POST, [], [], [
             'file' => UploadedFile::fake()->create('test.txt', 100),
@@ -79,11 +79,33 @@ class DropzoneUploadDriverTest extends TestCase
         $response->assertSuccessful();
         $response->assertJson(['done' => 100]);
 
-        $this->assertEmpty($response->getChunks());
-        $this->assertTrue($response->isFinished());
-        $this->assertNotNull($response->getMergedFile());
-
         Storage::disk('local')->assertExists('merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt');
+
+        Event::assertDispatched(FileUploaded::class, function ($event) {
+            return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
+        });
+    }
+
+    public function testUploadMonolithWithCallback()
+    {
+        Session::shouldReceive('getId')
+            ->andReturn('frgYt7cPmNGtORpRCo4xvFIrWklzFqc2mnO6EE6b');
+
+        $request = Request::create('', Request::METHOD_POST, [], [], [
+            'file' => UploadedFile::fake()->create('test.txt', 100),
+        ]);
+
+        $callback = $this->createClosureMock(
+            $this->once(),
+            'local',
+            'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt'
+        );
+
+        $this->handler->handle($request, $callback);
+
+        Event::assertDispatched(FileUploaded::class, function ($event) {
+            return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
+        });
     }
 
     public function excludedPostParameterProvider()
@@ -103,8 +125,6 @@ class DropzoneUploadDriverTest extends TestCase
      */
     public function testPostParameterValidation($exclude)
     {
-        Storage::fake('local');
-
         $arr = [
             'dzuuid' => '2494cefe4d234bd331aeb4514fe97d810efba29b',
             'dzchunkindex' => 0,
@@ -127,8 +147,6 @@ class DropzoneUploadDriverTest extends TestCase
 
     public function testUploadFirstChunk()
     {
-        Storage::fake('local');
-
         $request = Request::create('', Request::METHOD_POST, [
             'dzuuid' => '2494cefe4d234bd331aeb4514fe97d810efba29b',
             'dzchunkindex' => 0,
@@ -145,17 +163,37 @@ class DropzoneUploadDriverTest extends TestCase
         $response->assertSuccessful();
         $response->assertJson(['done' => 50]);
 
-        $this->assertCount(1, $response->getChunks());
-        $this->assertEquals('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt/000-099', $response->getChunks()[0]);
-        $this->assertFalse($response->isFinished());
-        $this->assertNull($response->getMergedFile());
-
         Storage::disk('local')->assertExists('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt/000-099');
+
+        Event::assertNotDispatched(FileUploaded::class, function ($event) {
+            return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
+        });
+    }
+
+    public function testUploadFirstChunkWithCallback()
+    {
+        $request = Request::create('', Request::METHOD_POST, [
+            'dzuuid' => '2494cefe4d234bd331aeb4514fe97d810efba29b',
+            'dzchunkindex' => 0,
+            'dztotalfilesize' => 200,
+            'dzchunksize' => 100,
+            'dztotalchunkcount' => 2,
+            'dzchunkbyteoffset' => 100,
+        ], [], [
+            'file' => UploadedFile::fake()->create('test.txt', 100),
+        ]);
+
+        $callback = $this->createClosureMock($this->never());
+
+        $this->handler->handle($request, $callback);
+
+        Event::assertNotDispatched(FileUploaded::class, function ($event) {
+            return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
+        });
     }
 
     public function testUploadLastChunk()
     {
-        Storage::fake('local');
         $this->createFakeLocalFile('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt', '000');
 
         $request = Request::create('', Request::METHOD_POST, [
@@ -174,12 +212,39 @@ class DropzoneUploadDriverTest extends TestCase
         $response->assertSuccessful();
         $response->assertJson(['done' => 100]);
 
-        $this->assertCount(2, $response->getChunks());
-        $this->assertEquals('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt/100-199', $response->getChunks()[1]);
-        $this->assertTrue($response->isFinished());
-        $this->assertNotNull($response->getMergedFile());
-
         Storage::disk('local')->assertExists('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt/100-199');
         Storage::disk('local')->assertExists('merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt');
+
+        Event::assertDispatched(FileUploaded::class, function ($event) {
+            return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
+        });
+    }
+
+    public function testUploadLastChunkWithCallback()
+    {
+        $this->createFakeLocalFile('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt', '000');
+
+        $request = Request::create('', Request::METHOD_POST, [
+            'dzuuid' => '2494cefe4d234bd331aeb4514fe97d810efba29b',
+            'dzchunkindex' => 1,
+            'dztotalfilesize' => 200,
+            'dzchunksize' => 100,
+            'dztotalchunkcount' => 2,
+            'dzchunkbyteoffset' => 100,
+        ], [], [
+            'file' => UploadedFile::fake()->create('test.txt', 100),
+        ]);
+
+        $callback = $this->createClosureMock(
+            $this->once(),
+            'local',
+            'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt'
+        );
+
+        $this->handler->handle($request, $callback);
+
+        Event::assertDispatched(FileUploaded::class, function ($event) {
+            return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
+        });
     }
 }
