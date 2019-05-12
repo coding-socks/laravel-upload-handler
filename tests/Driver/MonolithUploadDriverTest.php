@@ -77,7 +77,6 @@ class MonolithUploadDriverTest extends TestCase
 
     public function testUploadWithCallback()
     {
-
         Session::shouldReceive('getId')
             ->andReturn('frgYt7cPmNGtORpRCo4xvFIrWklzFqc2mnO6EE6b');
         Storage::fake('local');
