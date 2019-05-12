@@ -19,6 +19,7 @@ Chunk Uploader Package For Laravel
 - [Drivers](#drivers)
     - [Monolith](#monolith-driver)
     - [Blueimp](#blueimp-driver)
+    - [DropzoneJS](#dropzonejs-driver)
 - [Identifiers](#identifiers)
     - [Session identifier](#session-identifier)
 - [Contribution](#contribution)
@@ -99,10 +100,11 @@ a pull request.
 
 Below is a list of available drivers along with their individual specs:
 
-Service                      | Driver name | Chunk upload | Resumable
------------------------------|-------------|--------------|-----------
-[Monolith](#monolith-driver) | `monolith`  | no           | no
-[Blueimp](#blueimp-driver)   | `blueimp`   | yes          | yes
+Service                          | Driver name | Chunk upload | Resumable
+---------------------------------|-------------|--------------|-----------
+[Monolith](#monolith-driver)     | `monolith`  | no           | no
+[Blueimp](#blueimp-driver)       | `blueimp`   | yes          | yes
+[DropzoneJS](#dropzonejs-driver) | `dropzone`  | yes          | no
 
 ### Monolith driver
 
@@ -113,6 +115,12 @@ This driver is a fallback driver as it can handle normal file request. Save and 
 [website](https://blueimp.github.io/jQuery-File-Upload/)
 
 This driver handles requests made by the Blueimp jQuery File Upload client library.
+
+### DropzoneJS driver
+
+[website](https://www.dropzonejs.com/)
+
+This driver handles requests made by the DropzoneJS client library.
 
 ## Identifiers
 
