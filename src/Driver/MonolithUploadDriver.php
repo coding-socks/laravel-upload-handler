@@ -2,11 +2,12 @@
 
 namespace LaraCrafts\ChunkUploader\Driver;
 
+use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use LaraCrafts\ChunkUploader\Exception\UploadHttpException;
 use LaraCrafts\ChunkUploader\Identifier\Identifier;
-use LaraCrafts\ChunkUploader\Response\MonolithUploadResponse;
+use LaraCrafts\ChunkUploader\Response\PercentageJsonResponse;
 use LaraCrafts\ChunkUploader\StorageConfig;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -23,10 +24,13 @@ class MonolithUploadDriver extends UploadDriver
         $this->fileParam = $config['param'];
     }
 
-    public function handle(Request $request, Identifier $identifier, StorageConfig $config): Response
+    /**
+     * {@inheritDoc}
+     */
+    public function handle(Request $request, Identifier $identifier, StorageConfig $config, Closure $fileUploaded = null): Response
     {
         if ($request->isMethod(Request::METHOD_POST)) {
-            return $this->save($request, $identifier, $config);
+            return $this->save($request, $identifier, $config, $fileUploaded);
         }
 
         if ($request->isMethod(Request::METHOD_GET)) {
@@ -40,7 +44,15 @@ class MonolithUploadDriver extends UploadDriver
         throw new MethodNotAllowedHttpException([Request::METHOD_POST, Request::METHOD_GET, Request::METHOD_DELETE]);
     }
 
-    public function save(Request $request, Identifier $identifier, StorageConfig $config): Response
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @param \LaraCrafts\ChunkUploader\Identifier\Identifier $identifier
+     * @param \LaraCrafts\ChunkUploader\StorageConfig $config
+     * @param \Closure|null $fileUploaded
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function save(Request $request, Identifier $identifier, StorageConfig $config, Closure $fileUploaded = null): Response
     {
         $file = $request->file($this->fileParam);
 
@@ -54,9 +66,17 @@ class MonolithUploadDriver extends UploadDriver
             'disk' => $config->getDisk(),
         ]);
 
-        return new MonolithUploadResponse([], $path);
+        $this->triggerFileUploadedEvent($config->getDisk(), $path, $fileUploaded);
+
+        return new PercentageJsonResponse(100);
     }
 
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @param \LaraCrafts\ChunkUploader\StorageConfig $config
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function download(Request $request, StorageConfig $config): Response
     {
         $filename = $request->query($this->fileParam, $request->route($this->fileParam));
@@ -64,6 +84,12 @@ class MonolithUploadDriver extends UploadDriver
         return $this->fileResponse($filename, $config);
     }
 
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @param \LaraCrafts\ChunkUploader\StorageConfig $config
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function delete(Request $request, StorageConfig $config)
     {
         $filename = $request->post($this->fileParam, $request->route($this->fileParam));

@@ -2,9 +2,10 @@
 
 namespace LaraCrafts\ChunkUploader\Driver;
 
-use Illuminate\Http\File;
+use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use LaraCrafts\ChunkUploader\Event\FileUploaded;
 use LaraCrafts\ChunkUploader\Identifier\Identifier;
 use LaraCrafts\ChunkUploader\StorageConfig;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -18,12 +19,12 @@ abstract class UploadDriver
      * @param \Illuminate\Http\Request $request
      * @param Identifier $identifier
      * @param StorageConfig $config
+     * @param \Closure|null $fileUploaded
      *
      * @return \Symfony\Component\HttpFoundation\Response
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
-    abstract public function handle(Request $request, Identifier $identifier, StorageConfig $config): Response;
+    abstract public function handle(Request $request, Identifier $identifier, StorageConfig $config, Closure $fileUploaded = null): Response;
 
     /**
      * @param string $filename
@@ -33,6 +34,7 @@ abstract class UploadDriver
      */
     public function fileResponse(string $filename, StorageConfig $config): Response
     {
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
         $disk = Storage::disk($config->getDisk());
         $prefix = $config->getMergedDirectory() . '/';
 
@@ -54,5 +56,14 @@ abstract class UploadDriver
         }
 
         return false;
+    }
+
+    protected function triggerFileUploadedEvent($disk, $path, Closure $fileUploaded = null)
+    {
+        if ($fileUploaded !== null) {
+            $fileUploaded($disk, $path);
+        }
+
+        event(new FileUploaded($disk, $path));
     }
 }

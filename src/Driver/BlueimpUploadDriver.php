@@ -2,6 +2,7 @@
 
 namespace LaraCrafts\ChunkUploader\Driver;
 
+use Closure;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -11,7 +12,6 @@ use LaraCrafts\ChunkUploader\Exception\UploadHttpException;
 use LaraCrafts\ChunkUploader\Helper\ChunkHelpers;
 use LaraCrafts\ChunkUploader\Identifier\Identifier;
 use LaraCrafts\ChunkUploader\Range\ContentRange;
-use LaraCrafts\ChunkUploader\Response\BlueimpInfoResponse;
 use LaraCrafts\ChunkUploader\Response\PercentageJsonResponse;
 use LaraCrafts\ChunkUploader\StorageConfig;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,14 +33,11 @@ class BlueimpUploadDriver extends UploadDriver
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \LaraCrafts\ChunkUploader\Identifier\Identifier $identifier
-     * @param StorageConfig $config
+     * {@inheritDoc}
      *
-     * @return \Symfony\Component\HttpFoundation\Response
      * @throws \HttpHeaderException
      */
-    public function handle(Request $request, Identifier $identifier, StorageConfig $config): Response
+    public function handle(Request $request, Identifier $identifier, StorageConfig $config, Closure $fileUploaded = null): Response
     {
         if ($this->isRequestMethodIn($request, [Request::METHOD_HEAD, Request::METHOD_OPTIONS])) {
             return $this->info();
@@ -51,7 +48,7 @@ class BlueimpUploadDriver extends UploadDriver
         }
 
         if ($this->isRequestMethodIn($request, [Request::METHOD_POST, Request::METHOD_PUT, Request::METHOD_PATCH])) {
-            return $this->save($request, $identifier, $config);
+            return $this->save($request, $identifier, $config, $fileUploaded);
         }
 
         if ($this->isRequestMethodIn($request, [Request::METHOD_DELETE])) {
@@ -74,7 +71,13 @@ class BlueimpUploadDriver extends UploadDriver
      */
     public function info(): Response
     {
-        return new BlueimpInfoResponse();
+        return new JsonResponse([], Response::HTTP_OK, [
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'no-store, no-cache, must-revalidate',
+            'Content-Disposition' => 'inline; filename="files.json"',
+            'X-Content-Type-Options' => 'nosniff',
+            'Vary' => 'Accept',
+        ]);
     }
 
     public function download(Request $request, StorageConfig $config)
@@ -88,6 +91,7 @@ class BlueimpUploadDriver extends UploadDriver
 
         $filename = $request->query($this->fileParam);
         $directory = $config->getChunkDirectory() . '/' . $filename;
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
         $disk = Storage::disk($config->getDisk());
 
         if (! $disk->exists($directory)) {
@@ -111,11 +115,12 @@ class BlueimpUploadDriver extends UploadDriver
      * @param \Illuminate\Http\Request $request
      * @param \LaraCrafts\ChunkUploader\Identifier\Identifier $identifier
      * @param StorageConfig $config
+     * @param \Closure|null $fileUploaded
      *
      * @return \Symfony\Component\HttpFoundation\Response
      * @throws \HttpHeaderException
      */
-    public function save(Request $request, Identifier $identifier, StorageConfig $config): Response
+    public function save(Request $request, Identifier $identifier, StorageConfig $config, Closure $fileUploaded = null): Response
     {
         $range = new ContentRange($request->headers);
 
@@ -138,17 +143,18 @@ class BlueimpUploadDriver extends UploadDriver
         $chunks = $this->storeChunk($config, $range, $file, $filename);
 
         if (! $range->isLast()) {
-            return new PercentageJsonResponse($range->getPercentage(), $chunks);
+            return new PercentageJsonResponse($range->getPercentage());
         }
 
         $path = $this->mergeChunks($config, $chunks, $filename);
 
         if (! empty($config->sweep())) {
             Storage::disk($config->getDisk())->deleteDirectory($filename);
-            $chunks = [];
         }
 
-        return new PercentageJsonResponse(100, $chunks, $path);
+        $this->triggerFileUploadedEvent($config->getDisk(), $path, $fileUploaded);
+
+        return new PercentageJsonResponse(100);
     }
 
     /**
