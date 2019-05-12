@@ -60,7 +60,7 @@ class DropzoneUploadDriver extends UploadDriver
     {
         $file = $request->file($this->fileParam);
 
-        if (null === $file) {
+        if (!$request->hasFile($this->fileParam)) {
             throw new BadRequestHttpException('File not found in request body');
         }
 
