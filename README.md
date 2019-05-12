@@ -13,6 +13,7 @@ Chunk Uploader Package For Laravel
 - [Installation](#installation)
     - [Requirements](#requirements)
 - [Usage](#usage)
+    - [Events](#events)
     - [Changing the driver](#changing-the-driver)
     - [Adding your own drivers](#adding-your-own-drivers)
 - [Drivers](#drivers)
@@ -63,6 +64,14 @@ The handler exposes the following methods:
 Method         | Description
 ---------------|-------------------------------------
 `handle`       | Handle the given request
+
+### Events
+
+Once a file upload is finished a `\LaraCrafts\ChunkUploader\Event\FileUploaded` is triggered. This event contains
+the disk and the path of the uploaded file.
+
+You can also add a `Closure` as the second parameter of the `handle` method to add an inline listener. The listener
+is called with the disk and the path of the uploaded file. 
 
 ### Changing the driver
 
