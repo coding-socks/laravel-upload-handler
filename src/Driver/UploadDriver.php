@@ -6,7 +6,6 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use LaraCrafts\ChunkUploader\Event\FileUploaded;
-use LaraCrafts\ChunkUploader\Identifier\Identifier;
 use LaraCrafts\ChunkUploader\StorageConfig;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,14 +16,13 @@ abstract class UploadDriver
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param Identifier $identifier
      * @param StorageConfig $config
      * @param \Closure|null $fileUploaded
      *
      * @return \Symfony\Component\HttpFoundation\Response
      *
      */
-    abstract public function handle(Request $request, Identifier $identifier, StorageConfig $config, Closure $fileUploaded = null): Response;
+    abstract public function handle(Request $request, StorageConfig $config, Closure $fileUploaded = null): Response;
 
     /**
      * @param string $filename
@@ -44,7 +42,7 @@ abstract class UploadDriver
 
         $path = $disk->path($prefix . $filename);
 
-        return new BinaryFileResponse($path);
+        return new BinaryFileResponse($path, 200, [], true, 'attachment');
     }
 
     public function isRequestMethodIn(Request $request, array $methods): bool

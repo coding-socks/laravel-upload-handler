@@ -2,9 +2,10 @@
 
 namespace LaraCrafts\ChunkUploader\Range;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\HeaderBag;
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ContentRange implements Range
@@ -27,23 +28,30 @@ class ContentRange implements Range
     /**
      * ContentRange constructor.
      *
-     * @param string|HeaderBag $contentRange
-     *
-     * @throws \HttpHeaderException
+     * @param string|\Symfony\Component\HttpFoundation\HeaderBag|\Illuminate\Http\Request $contentRange
      */
     public function __construct($contentRange)
     {
-        if ($contentRange instanceof ParameterBag) {
+        if ($contentRange instanceof Request) {
+            $contentRange = $contentRange->header('content-range');
+        } elseif ($contentRange instanceof HeaderBag) {
             $contentRange = $contentRange->get('content-range');
         }
 
-        if (preg_match("/bytes (\d+)-(\d+)\/(\d+)/", $contentRange, $matches) === false) {
-            throw new \HttpHeaderException("Content Range header is missing or invalid");
+        if (preg_match('#bytes (\d+)-(\d+)/(\d+)#', $contentRange, $matches) !== 1) {
+            throw new InvalidArgumentException('Content Range header is missing or invalid');
         }
 
         $this->start = $this->numericValue($matches[1]);
         $this->end = $this->numericValue($matches[2]);
         $this->total = $this->numericValue($matches[3]);
+
+        if ($this->end < $this->start) {
+            throw new InvalidArgumentException('Range end must be greater than or equal to range start');
+        }
+        if ($this->total <= $this->end) {
+            throw new InvalidArgumentException('Size must be greater than range end');
+        }
     }
 
     /**
@@ -66,7 +74,7 @@ class ContentRange implements Range
     }
 
     /**
-     * @return float
+     * {@inheritDoc}
      */
     public function getStart(): float
     {
@@ -74,7 +82,7 @@ class ContentRange implements Range
     }
 
     /**
-     * @return float
+     * {@inheritDoc}
      */
     public function getEnd(): float
     {
@@ -82,7 +90,7 @@ class ContentRange implements Range
     }
 
     /**
-     * @return float
+     * {@inheritDoc}
      */
     public function getTotal(): float
     {
@@ -90,15 +98,15 @@ class ContentRange implements Range
     }
 
     /**
-     * @return bool
+     * {@inheritDoc}
      */
     public function isFirst(): bool
     {
-        return $this->start === 0;
+        return $this->start === 0.0;
     }
 
     /**
-     * @return bool
+     * {@inheritDoc}
      */
     public function isLast(): bool
     {

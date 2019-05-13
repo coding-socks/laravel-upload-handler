@@ -5,13 +5,16 @@ namespace LaraCrafts\ChunkUploader\Tests\Driver;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use LaraCrafts\ChunkUploader\Driver\MonolithUploadDriver;
 use LaraCrafts\ChunkUploader\Event\FileUploaded;
+use LaraCrafts\ChunkUploader\Exception\InternalServerErrorHttpException;
 use LaraCrafts\ChunkUploader\Tests\TestCase;
 use LaraCrafts\ChunkUploader\UploadHandler;
+use Mockery;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class MonolithUploadDriverTest extends TestCase
 {
@@ -26,6 +29,10 @@ class MonolithUploadDriverTest extends TestCase
 
         $this->app->make('config')->set('chunk-uploader.uploader', 'monolith');
         $this->handler = $this->app->make(UploadHandler::class);
+
+        Storage::fake('local');
+
+        Event::fake();
     }
 
     public function testDriverInstance()
@@ -37,7 +44,6 @@ class MonolithUploadDriverTest extends TestCase
 
     public function testDownload()
     {
-        Storage::fake('local');
         $this->createFakeLocalFile('merged', 'local-test-file');
 
         $request = Request::create('', Request::METHOD_GET, [
@@ -52,57 +58,81 @@ class MonolithUploadDriverTest extends TestCase
         $this->assertEquals('local-test-file', $response->getFile()->getFilename());
     }
 
-    public function testUpload()
+    public function testDownloadWhenFileNotFound()
     {
-        Session::shouldReceive('getId')
-            ->andReturn('frgYt7cPmNGtORpRCo4xvFIrWklzFqc2mnO6EE6b');
-        Storage::fake('local');
-
-        Event::fake();
-
-        $request = Request::create('', Request::METHOD_POST, [], [], [
-            'file' => UploadedFile::fake()->create('test.txt', 20),
+        $request = Request::create('', Request::METHOD_GET, [
+            'file' => 'local-test-file',
         ]);
 
-        /** @var \Illuminate\Foundation\Testing\TestResponse|\LaraCrafts\ChunkUploader\Response\Response $response */
+        $this->expectException(NotFoundHttpException::class);
+
+        $this->handler->handle($request);
+    }
+
+    public function testUploadWhenFileParameterIsEmpty()
+    {
+        $request = Request::create('', Request::METHOD_POST);
+
+        $this->expectException(BadRequestHttpException::class);
+
+        $this->handler->handle($request);
+    }
+
+    public function testUploadWhenFileParameterIsInvalid()
+    {
+        $file = Mockery::mock(UploadedFile::class)->makePartial();
+        $file->shouldReceive('isValid')
+            ->andReturn(false);
+
+        $request = Request::create('', Request::METHOD_POST, [], [], [
+            'file' => $file,
+        ]);
+
+        $this->expectException(InternalServerErrorHttpException::class);
+
+        $this->handler->handle($request);
+    }
+
+    public function testUpload()
+    {
+        $file = UploadedFile::fake()->create('test.txt', 20);
+        $request = Request::create('', Request::METHOD_POST, [], [], [
+            'file' => $file,
+        ]);
+
+        /** @var \Illuminate\Foundation\Testing\TestResponse $response */
         $response = $this->createTestResponse($this->handler->handle($request));
         $response->assertSuccessful();
 
-        Storage::disk('local')->assertExists('merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt');
+        Storage::disk('local')->assertExists($file->hashName('merged'));
 
-        Event::assertDispatched(FileUploaded::class, function ($event) {
-            return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
+        Event::assertDispatched(FileUploaded::class, function ($event) use ($file) {
+            return $event->file = $file->hashName('merged');
         });
     }
 
     public function testUploadWithCallback()
     {
-        Session::shouldReceive('getId')
-            ->andReturn('frgYt7cPmNGtORpRCo4xvFIrWklzFqc2mnO6EE6b');
-        Storage::fake('local');
-
-        Event::fake();
-
+        $file = UploadedFile::fake()->create('test.txt', 20);
         $request = Request::create('', Request::METHOD_POST, [], [], [
-            'file' => UploadedFile::fake()->create('test.txt', 20),
+            'file' => $file,
         ]);
 
         $callback = $this->createClosureMock(
             $this->once(),
             'local',
-            'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt'
+            $file->hashName('merged')
         );
 
         $this->handler->handle($request, $callback);
 
-        Event::assertDispatched(FileUploaded::class, function ($event) {
-            return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
+        Event::assertDispatched(FileUploaded::class, function ($event) use ($file) {
+            return $event->file = $file->hashName('merged');
         });
     }
 
     public function testDelete()
     {
-        Storage::fake('local');
         $this->createFakeLocalFile('merged', 'local-test-file');
 
         $request = Request::create('', Request::METHOD_DELETE, [
