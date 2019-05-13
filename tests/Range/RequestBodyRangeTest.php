@@ -10,7 +10,6 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 
 class RequestBodyRangeTest extends TestCase
 {
-
     public function invalidArgumentProvider()
     {
         return [

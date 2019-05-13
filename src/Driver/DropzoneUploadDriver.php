@@ -133,7 +133,6 @@ class DropzoneUploadDriver extends UploadDriver
      */
     private function saveChunk(UploadedFile $file, Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
     {
-
         try {
             $range = new RequestBodyRange(
                 $request,

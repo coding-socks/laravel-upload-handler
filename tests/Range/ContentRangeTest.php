@@ -10,7 +10,6 @@ use Symfony\Component\HttpFoundation\HeaderBag;
 
 class ContentRangeTest extends TestCase
 {
-
     public function invalidArgumentProvider()
     {
         return [

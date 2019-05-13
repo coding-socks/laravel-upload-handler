@@ -105,7 +105,7 @@ class BlueimpUploadDriverTest extends TestCase
             'file' => [
                 'name' => '2494cefe4d234bd331aeb4514fe97d810efba29b.txt',
                 'size' => 100,
-            ]
+            ],
         ]);
     }
 
