@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraCrafts\ChunkUploader\Exception;
+namespace LaraCrafts\ChunkUploader\Exceptions;
 
 use Symfony\Component\HttpKernel\Exception\HttpException;
 

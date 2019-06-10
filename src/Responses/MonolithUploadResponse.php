@@ -1,10 +1,12 @@
 <?php
 
-namespace LaraCrafts\ChunkUploader\Response;
+namespace LaraCrafts\ChunkUploader\Responses;
+
+use LaraCrafts\ChunkUploader\Concerns\ManagesFileResponses;
 
 class MonolithUploadResponse extends \Illuminate\Http\Response
 {
-    use Response;
+    use ManagesFileResponses;
 
     /**
      * ChunkedFile constructor.

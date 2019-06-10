@@ -1,26 +1,26 @@
 <?php
 
-namespace LaraCrafts\ChunkUploader\Driver;
+namespace LaraCrafts\ChunkUploader\Drivers;
 
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use LaraCrafts\ChunkUploader\Exception\UploadHttpException;
-use LaraCrafts\ChunkUploader\Helper\ChunkHelpers;
-use LaraCrafts\ChunkUploader\Identifier\Identifier;
-use LaraCrafts\ChunkUploader\Range\ContentRange;
-use LaraCrafts\ChunkUploader\Response\BlueimpInfoResponse;
-use LaraCrafts\ChunkUploader\Response\BlueimpUploadResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
 use LaraCrafts\ChunkUploader\StorageConfig;
 use Symfony\Component\HttpFoundation\Response;
+use LaraCrafts\ChunkUploader\Ranges\ContentRange;
+use LaraCrafts\ChunkUploader\Identifiers\Identifier;
+use LaraCrafts\ChunkUploader\Concerns\InteractsWithChunks;
+use LaraCrafts\ChunkUploader\Responses\BlueimpInfoResponse;
+use LaraCrafts\ChunkUploader\Exceptions\UploadHttpException;
+use LaraCrafts\ChunkUploader\Responses\BlueimpUploadResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class BlueimpUploadDriver extends UploadDriver
 {
-    use ChunkHelpers;
+    use InteractsWithChunks;
 
     /**
      * @var string
@@ -34,7 +34,7 @@ class BlueimpUploadDriver extends UploadDriver
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param \LaraCrafts\ChunkUploader\Identifier\Identifier $identifier
+     * @param \LaraCrafts\ChunkUploader\Identifiers\Identifier $identifier
      * @param StorageConfig $config
      *
      * @return \Symfony\Component\HttpFoundation\Response
@@ -109,7 +109,7 @@ class BlueimpUploadDriver extends UploadDriver
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param \LaraCrafts\ChunkUploader\Identifier\Identifier $identifier
+     * @param \LaraCrafts\ChunkUploader\Identifiers\Identifier $identifier
      * @param StorageConfig $config
      *
      * @return \Symfony\Component\HttpFoundation\Response

@@ -1,12 +1,13 @@
 <?php
 
-namespace LaraCrafts\ChunkUploader\Response;
+namespace LaraCrafts\ChunkUploader\Responses;
 
 use Illuminate\Http\JsonResponse;
+use LaraCrafts\ChunkUploader\Concerns\ManagesFileResponses;
 
 class BlueimpUploadResponse extends JsonResponse
 {
-    use Response;
+    use ManagesFileResponses;
 
     /**
      * @var int

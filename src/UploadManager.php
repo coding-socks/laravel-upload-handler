@@ -3,8 +3,8 @@
 namespace LaraCrafts\ChunkUploader;
 
 use Illuminate\Support\Manager;
-use LaraCrafts\ChunkUploader\Driver\BlueimpUploadDriver;
-use LaraCrafts\ChunkUploader\Driver\MonolithUploadDriver;
+use LaraCrafts\ChunkUploader\Drivers\BlueimpUploadDriver;
+use LaraCrafts\ChunkUploader\Drivers\MonolithUploadDriver;
 
 class UploadManager extends Manager
 {

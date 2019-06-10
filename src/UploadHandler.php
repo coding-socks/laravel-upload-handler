@@ -4,8 +4,8 @@ namespace LaraCrafts\ChunkUploader;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Traits\Macroable;
-use LaraCrafts\ChunkUploader\Driver\UploadDriver;
-use LaraCrafts\ChunkUploader\Identifier\Identifier;
+use LaraCrafts\ChunkUploader\Drivers\UploadDriver;
+use LaraCrafts\ChunkUploader\Identifiers\Identifier;
 use Symfony\Component\HttpFoundation\Response;
 
 class UploadHandler
@@ -13,7 +13,7 @@ class UploadHandler
     use Macroable;
 
     /**
-     * @var \LaraCrafts\ChunkUploader\Driver\UploadDriver
+     * @var \LaraCrafts\ChunkUploader\Drivers\UploadDriver
      */
     protected $driver;
 
@@ -23,15 +23,15 @@ class UploadHandler
     protected $config;
 
     /**
-     * @var \LaraCrafts\ChunkUploader\Identifier\Identifier
+     * @var \LaraCrafts\ChunkUploader\Identifiers\Identifier
      */
     protected $identifier;
 
     /**
      * UploadHandler constructor.
      *
-     * @param \LaraCrafts\ChunkUploader\Driver\UploadDriver $driver
-     * @param \LaraCrafts\ChunkUploader\Identifier\Identifier $identifier
+     * @param \LaraCrafts\ChunkUploader\Drivers\UploadDriver $driver
+     * @param \LaraCrafts\ChunkUploader\Identifiers\Identifier $identifier
      * @param StorageConfig $config
      */
     public function __construct(UploadDriver $driver, Identifier $identifier, StorageConfig $config)

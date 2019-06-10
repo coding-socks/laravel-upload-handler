@@ -3,7 +3,7 @@
 namespace LaraCrafts\ChunkUploader;
 
 use Illuminate\Support\Manager;
-use LaraCrafts\ChunkUploader\Identifier\SessionIdentifier;
+use LaraCrafts\ChunkUploader\Identifiers\SessionIdentifier;
 
 class IdentityManager extends Manager
 {

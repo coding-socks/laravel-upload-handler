@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
-use LaraCrafts\ChunkUploader\Driver\MonolithUploadDriver;
+use LaraCrafts\ChunkUploader\Drivers\MonolithUploadDriver;
 use LaraCrafts\ChunkUploader\Tests\TestCase;
 use LaraCrafts\ChunkUploader\UploadHandler;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -60,7 +60,7 @@ class MonolithUploadDriverTest extends TestCase
             'file' => UploadedFile::fake()->create('test.txt', 20),
         ]);
 
-        /** @var \Illuminate\Foundation\Testing\TestResponse|\LaraCrafts\ChunkUploader\Response\Response $response */
+        /** @var \Illuminate\Foundation\Testing\TestResponse|\LaraCrafts\ChunkUploader\Responses\Response $response */
         $response = $this->createTestResponse($this->handler->handle($request));
         $response->assertSuccessful();
 

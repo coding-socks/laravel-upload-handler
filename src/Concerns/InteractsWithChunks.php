@@ -1,14 +1,14 @@
 <?php
 
-namespace LaraCrafts\ChunkUploader\Helper;
+namespace LaraCrafts\ChunkUploader\Concerns;
 
 use Illuminate\Http\File;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use LaraCrafts\ChunkUploader\Range\Range;
 use LaraCrafts\ChunkUploader\StorageConfig;
+use LaraCrafts\ChunkUploader\Contracts\Range;
 
-trait ChunkHelpers
+trait InteractsWithChunks
 {
     /**
      * @var int

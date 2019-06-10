@@ -1,11 +1,10 @@
 <?php
 
-namespace LaraCrafts\ChunkUploader\Driver;
+namespace LaraCrafts\ChunkUploader\Drivers;
 
-use Illuminate\Http\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use LaraCrafts\ChunkUploader\Identifier\Identifier;
+use LaraCrafts\ChunkUploader\Identifiers\Identifier;
 use LaraCrafts\ChunkUploader\StorageConfig;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;

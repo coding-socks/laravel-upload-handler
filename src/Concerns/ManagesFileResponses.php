@@ -1,8 +1,8 @@
 <?php
 
-namespace LaraCrafts\ChunkUploader\Response;
+namespace LaraCrafts\ChunkUploader\Concerns;
 
-trait Response
+trait ManagesFileResponses
 {
     /**
      * @var \Illuminate\Http\File[]
