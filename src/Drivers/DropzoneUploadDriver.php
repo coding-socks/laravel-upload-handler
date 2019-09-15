@@ -1,24 +1,26 @@
 <?php
 
-namespace LaraCrafts\ChunkUploader\Driver;
+namespace LaraCrafts\ChunkUploader\Drivers;
 
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use LaraCrafts\ChunkUploader\Exception\UploadHttpException;
-use LaraCrafts\ChunkUploader\Helper\ChunkHelpers;
-use LaraCrafts\ChunkUploader\Identifier\Identifier;
-use LaraCrafts\ChunkUploader\Range\RequestRange;
-use LaraCrafts\ChunkUploader\Response\PercentageJsonResponse;
 use LaraCrafts\ChunkUploader\StorageConfig;
 use Symfony\Component\HttpFoundation\Response;
+use LaraCrafts\ChunkUploader\Ranges\RequestRange;
+use LaraCrafts\ChunkUploader\Identifiers\Identifier;
+use LaraCrafts\ChunkUploader\Concerns\InteractsWithChunks;
+use LaraCrafts\ChunkUploader\Concerns\ManagesFileResponses;
+use LaraCrafts\ChunkUploader\Exceptions\UploadHttpException;
+use LaraCrafts\ChunkUploader\Responses\PercentageJsonResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class DropzoneUploadDriver extends UploadDriver
 {
-    use ChunkHelpers;
+    use ManagesFileResponses;
+    use InteractsWithChunks;
 
     /**
      * @var string
@@ -46,7 +48,7 @@ class DropzoneUploadDriver extends UploadDriver
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param \LaraCrafts\ChunkUploader\Identifier\Identifier $identifier
+     * @param \LaraCrafts\ChunkUploader\Identifiers\Identifier $identifier
      * @param StorageConfig $config
      * @param \Closure|null $fileUploaded
      *

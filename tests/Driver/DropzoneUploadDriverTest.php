@@ -8,9 +8,9 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
-use LaraCrafts\ChunkUploader\Driver\DropzoneUploadDriver;
-use LaraCrafts\ChunkUploader\Event\FileUploaded;
-use LaraCrafts\ChunkUploader\Exception\UploadHttpException;
+use LaraCrafts\ChunkUploader\Drivers\DropzoneUploadDriver;
+use LaraCrafts\ChunkUploader\Events\FileUploadedEvent;
+use LaraCrafts\ChunkUploader\Exceptions\UploadHttpException;
 use LaraCrafts\ChunkUploader\Tests\TestCase;
 use LaraCrafts\ChunkUploader\UploadHandler;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -74,14 +74,14 @@ class DropzoneUploadDriverTest extends TestCase
             'file' => UploadedFile::fake()->create('test.txt', 100),
         ]);
 
-        /** @var \Illuminate\Foundation\Testing\TestResponse|\LaraCrafts\ChunkUploader\Response\Response $response */
+        /** @var \Illuminate\Foundation\Testing\TestResponse|\LaraCrafts\ChunkUploader\Responses\Response $response */
         $response = $this->createTestResponse($this->handler->handle($request));
         $response->assertSuccessful();
         $response->assertJson(['done' => 100]);
 
         Storage::disk('local')->assertExists('merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt');
 
-        Event::assertDispatched(FileUploaded::class, function ($event) {
+        Event::assertDispatched(FileUploadedEvent::class, function ($event) {
             return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
         });
     }
@@ -103,7 +103,7 @@ class DropzoneUploadDriverTest extends TestCase
 
         $this->handler->handle($request, $callback);
 
-        Event::assertDispatched(FileUploaded::class, function ($event) {
+        Event::assertDispatched(FileUploadedEvent::class, function ($event) {
             return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
         });
     }
@@ -158,14 +158,14 @@ class DropzoneUploadDriverTest extends TestCase
             'file' => UploadedFile::fake()->create('test.txt', 100),
         ]);
 
-        /** @var \Illuminate\Foundation\Testing\TestResponse|\LaraCrafts\ChunkUploader\Response\Response $response */
+        /** @var \Illuminate\Foundation\Testing\TestResponse|\LaraCrafts\ChunkUploader\Responses\Response $response */
         $response = $this->createTestResponse($this->handler->handle($request));
         $response->assertSuccessful();
         $response->assertJson(['done' => 50]);
 
         Storage::disk('local')->assertExists('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt/000-099');
 
-        Event::assertNotDispatched(FileUploaded::class, function ($event) {
+        Event::assertNotDispatched(FileUploadedEvent::class, function ($event) {
             return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
         });
     }
@@ -187,7 +187,7 @@ class DropzoneUploadDriverTest extends TestCase
 
         $this->handler->handle($request, $callback);
 
-        Event::assertNotDispatched(FileUploaded::class, function ($event) {
+        Event::assertNotDispatched(FileUploadedEvent::class, function ($event) {
             return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
         });
     }
@@ -207,7 +207,7 @@ class DropzoneUploadDriverTest extends TestCase
             'file' => UploadedFile::fake()->create('test.txt', 100),
         ]);
 
-        /** @var \Illuminate\Foundation\Testing\TestResponse|\LaraCrafts\ChunkUploader\Response\Response $response */
+        /** @var \Illuminate\Foundation\Testing\TestResponse|\LaraCrafts\ChunkUploader\Responses\Response $response */
         $response = $this->createTestResponse($this->handler->handle($request));
         $response->assertSuccessful();
         $response->assertJson(['done' => 100]);
@@ -215,7 +215,7 @@ class DropzoneUploadDriverTest extends TestCase
         Storage::disk('local')->assertExists('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt/100-199');
         Storage::disk('local')->assertExists('merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt');
 
-        Event::assertDispatched(FileUploaded::class, function ($event) {
+        Event::assertDispatched(FileUploadedEvent::class, function ($event) {
             return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
         });
     }
@@ -243,7 +243,7 @@ class DropzoneUploadDriverTest extends TestCase
 
         $this->handler->handle($request, $callback);
 
-        Event::assertDispatched(FileUploaded::class, function ($event) {
+        Event::assertDispatched(FileUploadedEvent::class, function ($event) {
             return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
         });
     }

@@ -5,8 +5,8 @@ namespace LaraCrafts\ChunkUploader\Drivers;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use LaraCrafts\ChunkUploader\Event\FileUploaded;
-use LaraCrafts\ChunkUploader\Identifier\Identifier;
+use LaraCrafts\ChunkUploader\Events\FileUploadedEvent;
+use LaraCrafts\ChunkUploader\Identifiers\Identifier;
 use LaraCrafts\ChunkUploader\StorageConfig;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -64,6 +64,6 @@ abstract class UploadDriver
             $fileUploaded($disk, $path);
         }
 
-        event(new FileUploaded($disk, $path));
+        event(new FileUploadedEvent($disk, $path));
     }
 }

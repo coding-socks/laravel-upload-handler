@@ -7,8 +7,8 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
-use LaraCrafts\ChunkUploader\Driver\MonolithUploadDriver;
-use LaraCrafts\ChunkUploader\Event\FileUploaded;
+use LaraCrafts\ChunkUploader\Drivers\MonolithUploadDriver;
+use LaraCrafts\ChunkUploader\Events\FileUploadedEvent;
 use LaraCrafts\ChunkUploader\Tests\TestCase;
 use LaraCrafts\ChunkUploader\UploadHandler;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -70,7 +70,7 @@ class MonolithUploadDriverTest extends TestCase
 
         Storage::disk('local')->assertExists('merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt');
 
-        Event::assertDispatched(FileUploaded::class, function ($event) {
+        Event::assertDispatched(FileUploadedEvent::class, function ($event) {
             return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
         });
     }
@@ -95,7 +95,7 @@ class MonolithUploadDriverTest extends TestCase
 
         $this->handler->handle($request, $callback);
 
-        Event::assertDispatched(FileUploaded::class, function ($event) {
+        Event::assertDispatched(FileUploadedEvent::class, function ($event) {
             return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
         });
     }

@@ -1,8 +1,8 @@
 <?php
 
-namespace LaraCrafts\ChunkUploader\Event;
+namespace LaraCrafts\ChunkUploader\Events;
 
-class FileUploaded
+class FileUploadedEvent
 {
     /**
      * @var string

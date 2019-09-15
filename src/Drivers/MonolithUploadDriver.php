@@ -5,9 +5,9 @@ namespace LaraCrafts\ChunkUploader\Drivers;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use LaraCrafts\ChunkUploader\Exception\UploadHttpException;
-use LaraCrafts\ChunkUploader\Identifier\Identifier;
-use LaraCrafts\ChunkUploader\Response\PercentageJsonResponse;
+use LaraCrafts\ChunkUploader\Exceptions\UploadHttpException;
+use LaraCrafts\ChunkUploader\Identifiers\Identifier;
+use LaraCrafts\ChunkUploader\Responses\PercentageJsonResponse;
 use LaraCrafts\ChunkUploader\StorageConfig;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -46,7 +46,7 @@ class MonolithUploadDriver extends UploadDriver
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param \LaraCrafts\ChunkUploader\Identifier\Identifier $identifier
+     * @param \LaraCrafts\ChunkUploader\Identifiers\Identifier $identifier
      * @param \LaraCrafts\ChunkUploader\StorageConfig $config
      * @param \Closure|null $fileUploaded
      *

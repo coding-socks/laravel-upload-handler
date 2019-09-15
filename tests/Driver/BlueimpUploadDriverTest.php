@@ -7,8 +7,8 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
-use LaraCrafts\ChunkUploader\Driver\BlueimpUploadDriver;
-use LaraCrafts\ChunkUploader\Event\FileUploaded;
+use LaraCrafts\ChunkUploader\Drivers\BlueimpUploadDriver;
+use LaraCrafts\ChunkUploader\Events\FileUploadedEvent;
 use LaraCrafts\ChunkUploader\Tests\TestCase;
 use LaraCrafts\ChunkUploader\UploadHandler;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -109,7 +109,7 @@ class BlueimpUploadDriverTest extends TestCase
 
         Storage::disk('local')->assertExists('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt/000-099');
 
-        Event::assertNotDispatched(FileUploaded::class, function ($event) {
+        Event::assertNotDispatched(FileUploadedEvent::class, function ($event) {
             return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
         });
     }
@@ -132,7 +132,7 @@ class BlueimpUploadDriverTest extends TestCase
 
         $this->handler->handle($request, $callback);
 
-        Event::assertNotDispatched(FileUploaded::class, function ($event) {
+        Event::assertNotDispatched(FileUploadedEvent::class, function ($event) {
             return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
         });
     }
@@ -160,7 +160,7 @@ class BlueimpUploadDriverTest extends TestCase
         Storage::disk('local')->assertExists('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt/100-199');
         Storage::disk('local')->assertExists('merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt');
 
-        Event::assertDispatched(FileUploaded::class, function ($event) {
+        Event::assertDispatched(FileUploadedEvent::class, function ($event) {
             return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
         });
     }
@@ -188,7 +188,7 @@ class BlueimpUploadDriverTest extends TestCase
 
         $this->handler->handle($request, $callback);
 
-        Event::assertDispatched(FileUploaded::class, function ($event) {
+        Event::assertDispatched(FileUploadedEvent::class, function ($event) {
             return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
         });
     }
