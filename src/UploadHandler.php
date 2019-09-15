@@ -2,6 +2,7 @@
 
 namespace LaraCrafts\ChunkUploader;
 
+use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Traits\Macroable;
 use LaraCrafts\ChunkUploader\Drivers\UploadDriver;
@@ -46,10 +47,12 @@ class UploadHandler
      *
      * @param \Illuminate\Http\Request $request
      *
+     * @param \Closure $fileUploaded
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function handle(Request $request): Response
+    public function handle(Request $request, Closure $fileUploaded = null): Response
     {
-        return $this->driver->handle($request, $this->identifier, $this->config);
+        return $this->driver->handle($request, $this->identifier, $this->config, $fileUploaded);
     }
 }

@@ -4,9 +4,11 @@ namespace LaraCrafts\ChunkUploader\Tests\Driver;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
-use LaraCrafts\ChunkUploader\Drivers\MonolithUploadDriver;
+use LaraCrafts\ChunkUploader\Driver\MonolithUploadDriver;
+use LaraCrafts\ChunkUploader\Event\FileUploaded;
 use LaraCrafts\ChunkUploader\Tests\TestCase;
 use LaraCrafts\ChunkUploader\UploadHandler;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -56,6 +58,8 @@ class MonolithUploadDriverTest extends TestCase
             ->andReturn('frgYt7cPmNGtORpRCo4xvFIrWklzFqc2mnO6EE6b');
         Storage::fake('local');
 
+        Event::fake();
+
         $request = Request::create('', Request::METHOD_POST, [], [], [
             'file' => UploadedFile::fake()->create('test.txt', 20),
         ]);
@@ -64,11 +68,36 @@ class MonolithUploadDriverTest extends TestCase
         $response = $this->createTestResponse($this->handler->handle($request));
         $response->assertSuccessful();
 
-        $this->assertCount(0, $response->getChunks());
-        $this->assertTrue($response->isFinished());
-        $this->assertNotNull($response->getMergedFile());
-
         Storage::disk('local')->assertExists('merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt');
+
+        Event::assertDispatched(FileUploaded::class, function ($event) {
+            return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
+        });
+    }
+
+    public function testUploadWithCallback()
+    {
+        Session::shouldReceive('getId')
+            ->andReturn('frgYt7cPmNGtORpRCo4xvFIrWklzFqc2mnO6EE6b');
+        Storage::fake('local');
+
+        Event::fake();
+
+        $request = Request::create('', Request::METHOD_POST, [], [], [
+            'file' => UploadedFile::fake()->create('test.txt', 20),
+        ]);
+
+        $callback = $this->createClosureMock(
+            $this->once(),
+            'local',
+            'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt'
+        );
+
+        $this->handler->handle($request, $callback);
+
+        Event::assertDispatched(FileUploaded::class, function ($event) {
+            return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
+        });
     }
 
     public function testDelete()
