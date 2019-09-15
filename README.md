@@ -68,7 +68,7 @@ Method         | Description
 
 ### Events
 
-Once a file upload is finished a `\LaraCrafts\ChunkUploader\Event\FileUploaded` is triggered. This event contains
+Once a file upload is finished a `\LaraCrafts\ChunkUploader\Events\FileUploadedEvent` is triggered. This event contains
 the disk and the path of the uploaded file.
 
 You can also add a `Closure` as the second parameter of the `handle` method to add an inline listener. The listener
