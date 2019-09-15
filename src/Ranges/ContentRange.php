@@ -3,10 +3,10 @@
 namespace LaraCrafts\ChunkUploader\Ranges;
 
 use Illuminate\Http\Response;
+use LaraCrafts\ChunkUploader\Contracts\Range as RangeContract;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use LaraCrafts\ChunkUploader\Contracts\Range as RangeContract;
 
 class ContentRange implements RangeContract
 {

@@ -6,14 +6,14 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use LaraCrafts\ChunkUploader\StorageConfig;
-use Symfony\Component\HttpFoundation\Response;
-use LaraCrafts\ChunkUploader\Ranges\RequestRange;
-use LaraCrafts\ChunkUploader\Identifiers\Identifier;
 use LaraCrafts\ChunkUploader\Concerns\InteractsWithChunks;
 use LaraCrafts\ChunkUploader\Concerns\ManagesFileResponses;
 use LaraCrafts\ChunkUploader\Exceptions\UploadHttpException;
+use LaraCrafts\ChunkUploader\Identifiers\Identifier;
+use LaraCrafts\ChunkUploader\Ranges\RequestRange;
 use LaraCrafts\ChunkUploader\Responses\PercentageJsonResponse;
+use LaraCrafts\ChunkUploader\StorageConfig;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 

@@ -3,18 +3,18 @@
 namespace LaraCrafts\ChunkUploader\Drivers;
 
 use Closure;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
-use LaraCrafts\ChunkUploader\StorageConfig;
-use Symfony\Component\HttpFoundation\Response;
-use LaraCrafts\ChunkUploader\Ranges\ContentRange;
-use LaraCrafts\ChunkUploader\Identifiers\Identifier;
+use Illuminate\Support\Str;
 use LaraCrafts\ChunkUploader\Concerns\InteractsWithChunks;
 use LaraCrafts\ChunkUploader\Exceptions\UploadHttpException;
+use LaraCrafts\ChunkUploader\Identifiers\Identifier;
+use LaraCrafts\ChunkUploader\Ranges\ContentRange;
 use LaraCrafts\ChunkUploader\Responses\PercentageJsonResponse;
+use LaraCrafts\ChunkUploader\StorageConfig;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
