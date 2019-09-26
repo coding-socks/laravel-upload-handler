@@ -33,10 +33,10 @@ class DropzoneUploadDriver extends UploadDriver
     /**
      * {@inheritDoc}
      */
-    public function handle(Request $request, Identifier $identifier, StorageConfig $config, Closure $fileUploaded = null): Response
+    public function handle(Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
     {
         if ($this->isRequestMethodIn($request, [Request::METHOD_POST])) {
-            return $this->save($request, $identifier, $config, $fileUploaded);
+            return $this->save($request, $config, $fileUploaded);
         }
 
         throw new MethodNotAllowedHttpException([
@@ -52,7 +52,7 @@ class DropzoneUploadDriver extends UploadDriver
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function save(Request $request, Identifier $identifier, StorageConfig $config, Closure $fileUploaded = null): Response
+    public function save(Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
     {
         $file = $request->file($this->fileParam);
 
@@ -65,7 +65,7 @@ class DropzoneUploadDriver extends UploadDriver
         }
 
         if ($this->isMonolithRequest($request)) {
-            return $this->saveMonolith($file, $identifier, $config, $fileUploaded);
+            return $this->saveMonolith($file, $config, $fileUploaded);
         }
 
         $this->validateChunkRequest($request);
@@ -111,11 +111,9 @@ class DropzoneUploadDriver extends UploadDriver
      *
      * @return Response
      */
-    private function saveMonolith(UploadedFile $file, Identifier $identifier, StorageConfig $config, Closure $fileUploaded = null): Response
+    private function saveMonolith(UploadedFile $file, StorageConfig $config, Closure $fileUploaded = null): Response
     {
-        $filename = $identifier->generateUploadedFileIdentifierName($file);
-
-        $path = $file->storeAs($config->getMergedDirectory(), $filename, [
+        $path = $file->store($config->getMergedDirectory(), [
             'disk' => $config->getDisk(),
         ]);
 

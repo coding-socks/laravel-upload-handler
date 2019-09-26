@@ -52,12 +52,10 @@ class ChunkUploaderServiceProvider extends ServiceProvider
         $this->app->singleton(UploadHandler::class, function () {
             /** @var \Illuminate\Support\Manager $uploadManager */
             $uploadManager = $this->app['chunk-uploader.upload-manager'];
-            /** @var \Illuminate\Support\Manager $identityManager */
-            $identityManager = $this->app['chunk-uploader.identity-manager'];
 
             $storageConfig = new StorageConfig($this->app->make('config')->get('chunk-uploader'));
 
-            return new UploadHandler($uploadManager->driver(), $identityManager->driver(), $storageConfig);
+            return new UploadHandler($uploadManager->driver(), $storageConfig);
         });
     }
 

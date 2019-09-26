@@ -27,10 +27,10 @@ class MonolithUploadDriver extends UploadDriver
     /**
      * {@inheritDoc}
      */
-    public function handle(Request $request, Identifier $identifier, StorageConfig $config, Closure $fileUploaded = null): Response
+    public function handle(Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
     {
         if ($request->isMethod(Request::METHOD_POST)) {
-            return $this->save($request, $identifier, $config, $fileUploaded);
+            return $this->save($request, $config, $fileUploaded);
         }
 
         if ($request->isMethod(Request::METHOD_GET)) {
@@ -41,7 +41,11 @@ class MonolithUploadDriver extends UploadDriver
             return $this->delete($request, $config);
         }
 
-        throw new MethodNotAllowedHttpException([Request::METHOD_POST, Request::METHOD_GET, Request::METHOD_DELETE]);
+        throw new MethodNotAllowedHttpException([
+            Request::METHOD_POST,
+            Request::METHOD_GET,
+            Request::METHOD_DELETE,
+        ]);
     }
 
     /**
@@ -52,7 +56,7 @@ class MonolithUploadDriver extends UploadDriver
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function save(Request $request, Identifier $identifier, StorageConfig $config, Closure $fileUploaded = null): Response
+    public function save(Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
     {
         $file = $request->file($this->fileParam);
 
@@ -60,9 +64,7 @@ class MonolithUploadDriver extends UploadDriver
             throw new UploadHttpException($file->getErrorMessage());
         }
 
-        $filename = $identifier->generateUploadedFileIdentifierName($file);
-
-        $path = $file->storeAs($config->getMergedDirectory(), $filename, [
+        $path = $file->store($config->getMergedDirectory(), [
             'disk' => $config->getDisk(),
         ]);
 
