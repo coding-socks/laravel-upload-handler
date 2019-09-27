@@ -10,9 +10,10 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use LaraCrafts\ChunkUploader\Driver\DropzoneUploadDriver;
 use LaraCrafts\ChunkUploader\Event\FileUploaded;
-use LaraCrafts\ChunkUploader\Exception\UploadHttpException;
+use LaraCrafts\ChunkUploader\Exception\InternalServerErrorHttpException;
 use LaraCrafts\ChunkUploader\Tests\TestCase;
 use LaraCrafts\ChunkUploader\UploadHandler;
+use Mockery;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class DropzoneUploadDriverTest extends TestCase
@@ -41,7 +42,7 @@ class DropzoneUploadDriverTest extends TestCase
         $this->assertInstanceOf(DropzoneUploadDriver::class, $manager->driver());
     }
 
-    public function testFileParameterValidationWhenFileParameterIsEmpty()
+    public function testUploadWhenFileParameterIsEmpty()
     {
         $request = Request::create('', Request::METHOD_POST);
 
@@ -50,9 +51,9 @@ class DropzoneUploadDriverTest extends TestCase
         $this->handler->handle($request);
     }
 
-    public function testFileParameterValidationWhenFileParameterIsInvalid()
+    public function testUploadWhenFileParameterIsInvalid()
     {
-        $file = \Mockery::mock(UploadedFile::class)->makePartial();
+        $file = Mockery::mock(UploadedFile::class)->makePartial();
         $file->shouldReceive('isValid')
             ->andReturn(false);
 
@@ -60,7 +61,7 @@ class DropzoneUploadDriverTest extends TestCase
             'file' => $file,
         ]);
 
-        $this->expectException(UploadHttpException::class);
+        $this->expectException(InternalServerErrorHttpException::class);
 
         $this->handler->handle($request);
     }
@@ -74,7 +75,7 @@ class DropzoneUploadDriverTest extends TestCase
             'file' => UploadedFile::fake()->create('test.txt', 100),
         ]);
 
-        /** @var \Illuminate\Foundation\Testing\TestResponse|\LaraCrafts\ChunkUploader\Response\Response $response */
+        /** @var \Illuminate\Foundation\Testing\TestResponse $response */
         $response = $this->createTestResponse($this->handler->handle($request));
         $response->assertSuccessful();
         $response->assertJson(['done' => 100]);
@@ -158,7 +159,7 @@ class DropzoneUploadDriverTest extends TestCase
             'file' => UploadedFile::fake()->create('test.txt', 100),
         ]);
 
-        /** @var \Illuminate\Foundation\Testing\TestResponse|\LaraCrafts\ChunkUploader\Response\Response $response */
+        /** @var \Illuminate\Foundation\Testing\TestResponse $response */
         $response = $this->createTestResponse($this->handler->handle($request));
         $response->assertSuccessful();
         $response->assertJson(['done' => 50]);
@@ -207,7 +208,7 @@ class DropzoneUploadDriverTest extends TestCase
             'file' => UploadedFile::fake()->create('test.txt', 100),
         ]);
 
-        /** @var \Illuminate\Foundation\Testing\TestResponse|\LaraCrafts\ChunkUploader\Response\Response $response */
+        /** @var \Illuminate\Foundation\Testing\TestResponse $response */
         $response = $this->createTestResponse($this->handler->handle($request));
         $response->assertSuccessful();
         $response->assertJson(['done' => 100]);

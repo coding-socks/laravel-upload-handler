@@ -4,12 +4,15 @@ namespace LaraCrafts\ChunkUploader\Driver;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use LaraCrafts\ChunkUploader\Event\FileUploaded;
+use LaraCrafts\ChunkUploader\Exception\InternalServerErrorHttpException;
 use LaraCrafts\ChunkUploader\Identifier\Identifier;
 use LaraCrafts\ChunkUploader\StorageConfig;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 abstract class UploadDriver
@@ -65,5 +68,24 @@ abstract class UploadDriver
         }
 
         event(new FileUploaded($disk, $path));
+    }
+
+    /**
+     * Validate an uploaded file. An exception is thrown when it is invalid.
+     *
+     * @param \Illuminate\Http\UploadedFile|null $file
+     *
+     * @throws BadRequestHttpException when given file is null.
+     * @throws InternalServerErrorHttpException when given file is invalid.
+     */
+    protected function validateUploadedFile(UploadedFile $file = null)
+    {
+        if (null === $file) {
+            throw new BadRequestHttpException('File not found in request body');
+        }
+
+        if (! $file->isValid()) {
+            throw new InternalServerErrorHttpException($file->getErrorMessage());
+        }
     }
 }

@@ -8,14 +8,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use LaraCrafts\ChunkUploader\Exception\UploadHttpException;
 use LaraCrafts\ChunkUploader\Helper\ChunkHelpers;
 use LaraCrafts\ChunkUploader\Identifier\Identifier;
 use LaraCrafts\ChunkUploader\Range\ContentRange;
 use LaraCrafts\ChunkUploader\Response\PercentageJsonResponse;
 use LaraCrafts\ChunkUploader\StorageConfig;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class BlueimpUploadDriver extends UploadDriver
@@ -122,21 +120,15 @@ class BlueimpUploadDriver extends UploadDriver
      */
     public function save(Request $request, Identifier $identifier, StorageConfig $config, Closure $fileUploaded = null): Response
     {
-        $range = new ContentRange($request->headers);
-
         $file = $request->file($this->fileParam);
 
         if (null === $file) {
             $file = Arr::first($request->file(Str::plural($this->fileParam), []));
         }
 
-        if (null === $file) {
-            throw new BadRequestHttpException('File not found in request body');
-        }
+        $this->validateUploadedFile($file);
 
-        if (! $file->isValid()) {
-            throw new UploadHttpException($file->getErrorMessage());
-        }
+        $range = new ContentRange($request->headers);
 
         $filename = $identifier->generateUploadedFileIdentifierName($file);
 

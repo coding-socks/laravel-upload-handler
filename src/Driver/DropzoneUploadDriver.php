@@ -6,14 +6,12 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use LaraCrafts\ChunkUploader\Exception\UploadHttpException;
 use LaraCrafts\ChunkUploader\Helper\ChunkHelpers;
 use LaraCrafts\ChunkUploader\Identifier\Identifier;
 use LaraCrafts\ChunkUploader\Range\RequestRange;
 use LaraCrafts\ChunkUploader\Response\PercentageJsonResponse;
 use LaraCrafts\ChunkUploader\StorageConfig;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class DropzoneUploadDriver extends UploadDriver
@@ -56,13 +54,7 @@ class DropzoneUploadDriver extends UploadDriver
     {
         $file = $request->file($this->fileParam);
 
-        if (null === $file) {
-            throw new BadRequestHttpException('File not found in request body');
-        }
-
-        if (!$file->isValid()) {
-            throw new UploadHttpException($file->getErrorMessage());
-        }
+        $this->validateUploadedFile($file);
 
         if ($this->isMonolithRequest($request)) {
             return $this->saveMonolith($file, $identifier, $config, $fileUploaded);
