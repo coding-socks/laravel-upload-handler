@@ -20,8 +20,8 @@ abstract class UploadDriver
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param Identifier $identifier
-     * @param StorageConfig $config
+     * @param \LaraCrafts\ChunkUploader\Identifier\Identifier $identifier
+     * @param \LaraCrafts\ChunkUploader\StorageConfig $config
      * @param \Closure|null $fileUploaded
      *
      * @return \Symfony\Component\HttpFoundation\Response
@@ -75,8 +75,8 @@ abstract class UploadDriver
      *
      * @param \Illuminate\Http\UploadedFile|null $file
      *
-     * @throws BadRequestHttpException when given file is null.
-     * @throws InternalServerErrorHttpException when given file is invalid.
+     * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException when given file is null.
+     * @throws \LaraCrafts\ChunkUploader\Exception\InternalServerErrorHttpException when given file is invalid.
      */
     protected function validateUploadedFile(UploadedFile $file = null)
     {
