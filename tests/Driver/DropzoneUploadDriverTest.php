@@ -5,7 +5,6 @@ namespace LaraCrafts\ChunkUploader\Tests\Driver;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use LaraCrafts\ChunkUploader\Driver\DropzoneUploadDriver;
@@ -68,11 +67,9 @@ class DropzoneUploadDriverTest extends TestCase
 
     public function testUploadMonolith()
     {
-        Session::shouldReceive('getId')
-            ->andReturn('frgYt7cPmNGtORpRCo4xvFIrWklzFqc2mnO6EE6b');
-
+        $file = UploadedFile::fake()->create('test.txt', 100);
         $request = Request::create('', Request::METHOD_POST, [], [], [
-            'file' => UploadedFile::fake()->create('test.txt', 100),
+            'file' => $file,
         ]);
 
         /** @var \Illuminate\Foundation\Testing\TestResponse $response */
@@ -80,32 +77,30 @@ class DropzoneUploadDriverTest extends TestCase
         $response->assertSuccessful();
         $response->assertJson(['done' => 100]);
 
-        Storage::disk('local')->assertExists('merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt');
+        Storage::disk('local')->assertExists($file->hashName('merged'));
 
-        Event::assertDispatched(FileUploaded::class, function ($event) {
-            return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
+        Event::assertDispatched(FileUploaded::class, function ($event) use ($file) {
+            return $event->file = $file->hashName('merged');
         });
     }
 
     public function testUploadMonolithWithCallback()
     {
-        Session::shouldReceive('getId')
-            ->andReturn('frgYt7cPmNGtORpRCo4xvFIrWklzFqc2mnO6EE6b');
-
+        $file = UploadedFile::fake()->create('test.txt', 100);
         $request = Request::create('', Request::METHOD_POST, [], [], [
-            'file' => UploadedFile::fake()->create('test.txt', 100),
+            'file' => $file,
         ]);
 
         $callback = $this->createClosureMock(
             $this->once(),
             'local',
-            'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt'
+            $file->hashName('merged')
         );
 
         $this->handler->handle($request, $callback);
 
-        Event::assertDispatched(FileUploaded::class, function ($event) {
-            return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
+        Event::assertDispatched(FileUploaded::class, function ($event) use ($file) {
+            return $event->file = $file->hashName('merged');
         });
     }
 

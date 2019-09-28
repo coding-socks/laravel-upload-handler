@@ -16,7 +16,10 @@ class UploadManager extends Manager
 
     public function createBlueimpDriver()
     {
-        return new BlueimpUploadDriver($this->app['config']['chunk-uploader.blueimp']);
+        /** @var \Illuminate\Support\Manager $identityManager */
+        $identityManager = $this->app['chunk-uploader.identity-manager'];
+
+        return new BlueimpUploadDriver($this->app['config']['chunk-uploader.blueimp'], $identityManager->driver());
     }
 
     public function createDropzoneDriver()

@@ -20,14 +20,13 @@ abstract class UploadDriver
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param \LaraCrafts\ChunkUploader\Identifier\Identifier $identifier
      * @param \LaraCrafts\ChunkUploader\StorageConfig $config
      * @param \Closure|null $fileUploaded
      *
      * @return \Symfony\Component\HttpFoundation\Response
      *
      */
-    abstract public function handle(Request $request, Identifier $identifier, StorageConfig $config, Closure $fileUploaded = null): Response;
+    abstract public function handle(Request $request, StorageConfig $config, Closure $fileUploaded = null): Response;
 
     /**
      * @param string $filename

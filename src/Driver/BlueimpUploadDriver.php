@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
+use LaraCrafts\ChunkUploader\Exception\UploadHttpException;
 use LaraCrafts\ChunkUploader\Helper\ChunkHelpers;
 use LaraCrafts\ChunkUploader\Identifier\Identifier;
 use LaraCrafts\ChunkUploader\Range\ContentRange;
@@ -25,17 +27,21 @@ class BlueimpUploadDriver extends UploadDriver
      */
     private $fileParam;
 
-    public function __construct($config)
+    /**
+     * @var \LaraCrafts\ChunkUploader\Identifier\Identifier
+     */
+    private $identifier;
+
+    public function __construct($config, Identifier $identifier)
     {
         $this->fileParam = $config['param'];
+        $this->identifier = $identifier;
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws \HttpHeaderException
      */
-    public function handle(Request $request, Identifier $identifier, StorageConfig $config, Closure $fileUploaded = null): Response
+    public function handle(Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
     {
         if ($this->isRequestMethodIn($request, [Request::METHOD_HEAD, Request::METHOD_OPTIONS])) {
             return $this->info();
@@ -46,7 +52,7 @@ class BlueimpUploadDriver extends UploadDriver
         }
 
         if ($this->isRequestMethodIn($request, [Request::METHOD_POST, Request::METHOD_PUT, Request::METHOD_PATCH])) {
-            return $this->save($request, $identifier, $config, $fileUploaded);
+            return $this->save($request, $config, $fileUploaded);
         }
 
         if ($this->isRequestMethodIn($request, [Request::METHOD_DELETE])) {
@@ -116,9 +122,8 @@ class BlueimpUploadDriver extends UploadDriver
      * @param \Closure|null $fileUploaded
      *
      * @return \Symfony\Component\HttpFoundation\Response
-     * @throws \HttpHeaderException
      */
-    public function save(Request $request, Identifier $identifier, StorageConfig $config, Closure $fileUploaded = null): Response
+    public function save(Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
     {
         $file = $request->file($this->fileParam);
 
@@ -128,9 +133,13 @@ class BlueimpUploadDriver extends UploadDriver
 
         $this->validateUploadedFile($file);
 
-        $range = new ContentRange($request->headers);
+        try {
+            $range = new ContentRange($request->headers);
+        } catch (InvalidArgumentException $e) {
+            throw new BadRequestHttpException($e->getMessage());
+        }
 
-        $filename = $identifier->generateUploadedFileIdentifierName($file);
+        $filename = $this->identifier->generateUploadedFileIdentifierName($file);
 
         $chunks = $this->storeChunk($config, $range, $file, $filename);
 

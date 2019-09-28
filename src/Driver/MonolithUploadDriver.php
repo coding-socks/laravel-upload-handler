@@ -26,10 +26,10 @@ class MonolithUploadDriver extends UploadDriver
     /**
      * {@inheritDoc}
      */
-    public function handle(Request $request, Identifier $identifier, StorageConfig $config, Closure $fileUploaded = null): Response
+    public function handle(Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
     {
         if ($request->isMethod(Request::METHOD_POST)) {
-            return $this->save($request, $identifier, $config, $fileUploaded);
+            return $this->save($request, $config, $fileUploaded);
         }
 
         if ($request->isMethod(Request::METHOD_GET)) {
@@ -55,15 +55,13 @@ class MonolithUploadDriver extends UploadDriver
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function save(Request $request, Identifier $identifier, StorageConfig $config, Closure $fileUploaded = null): Response
+    public function save(Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
     {
         $file = $request->file($this->fileParam);
 
         $this->validateUploadedFile($file);
 
-        $filename = $identifier->generateUploadedFileIdentifierName($file);
-
-        $path = $file->storeAs($config->getMergedDirectory(), $filename, [
+        $path = $file->store($config->getMergedDirectory(), [
             'disk' => $config->getDisk(),
         ]);
 
