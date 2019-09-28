@@ -14,7 +14,7 @@ class RequestBodyRangeTest extends TestCase
     {
         return [
             'Number of chunks size equal to zero' => [4, 0, 20, 190, '`numberOfChunks` must be greater than to zero'],
-            'Number of chunks size smaller than zero' => [4, -1, 20, 190, '`numberOfChunks` must be greater than to zero'],
+            'Number of chunks size smaller than zero' => [4, -1, 20, 190, '`numberOfChunks` must be greater than zero'],
             'Index smaller than zero' => [-1, 10, 20, 190, '`index` must be greater than or equal to zero'],
             'Index equal to the number of chunks' => [10, 10, 20, 190, '`index` must be smaller than `numberOfChunks`'],
             'Index greater than the number of chunks' => [14, 10, 20, 190, '`index` must be smaller than `numberOfChunks`'],
