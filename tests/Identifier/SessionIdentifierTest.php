@@ -14,7 +14,7 @@ class SessionIdentifierTest extends TestCase
      */
     private $identifier;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

@@ -12,6 +12,7 @@ use LaraCrafts\ChunkUploader\Exception\InternalServerErrorHttpException;
 use LaraCrafts\ChunkUploader\Tests\TestCase;
 use LaraCrafts\ChunkUploader\UploadHandler;
 use Mockery;
+use PHPUnit\Framework\Constraint\StringContains;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -23,7 +24,7 @@ class MonolithUploadDriverTest extends TestCase
      */
     private $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -52,7 +53,9 @@ class MonolithUploadDriverTest extends TestCase
         /** @var \Illuminate\Foundation\Testing\TestResponse|\Symfony\Component\HttpFoundation\BinaryFileResponse $response */
         $response = $this->createTestResponse($this->handler->handle($request));
         $response->assertSuccessful();
+        $response->assertStatus(200);
 
+        $this->assertThat($response->headers->get('Content-Disposition'), new StringContains('attachment'));
         $this->assertInstanceOf(BinaryFileResponse::class, $response->baseResponse);
         $this->assertEquals('local-test-file', $response->getFile()->getFilename());
     }
