@@ -9,13 +9,13 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use LaraCrafts\ChunkUploader\Exception\UploadHttpException;
 use LaraCrafts\ChunkUploader\Helper\ChunkHelpers;
 use LaraCrafts\ChunkUploader\Identifier\Identifier;
 use LaraCrafts\ChunkUploader\Range\ContentRange;
 use LaraCrafts\ChunkUploader\Response\PercentageJsonResponse;
 use LaraCrafts\ChunkUploader\StorageConfig;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class BlueimpUploadDriver extends UploadDriver

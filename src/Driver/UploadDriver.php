@@ -8,7 +8,6 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use LaraCrafts\ChunkUploader\Event\FileUploaded;
 use LaraCrafts\ChunkUploader\Exception\InternalServerErrorHttpException;
-use LaraCrafts\ChunkUploader\Identifier\Identifier;
 use LaraCrafts\ChunkUploader\StorageConfig;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;

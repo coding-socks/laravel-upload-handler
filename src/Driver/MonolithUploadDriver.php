@@ -5,7 +5,6 @@ namespace LaraCrafts\ChunkUploader\Driver;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use LaraCrafts\ChunkUploader\Identifier\Identifier;
 use LaraCrafts\ChunkUploader\Response\PercentageJsonResponse;
 use LaraCrafts\ChunkUploader\StorageConfig;
 use Symfony\Component\HttpFoundation\Response;
