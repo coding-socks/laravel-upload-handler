@@ -12,6 +12,7 @@ use LaraCrafts\ChunkUploader\Event\FileUploaded;
 use LaraCrafts\ChunkUploader\Tests\TestCase;
 use LaraCrafts\ChunkUploader\UploadHandler;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class BlueimpUploadDriverTest extends TestCase
 {
@@ -63,6 +64,8 @@ class BlueimpUploadDriverTest extends TestCase
         /** @var \Illuminate\Foundation\Testing\TestResponse|\Symfony\Component\HttpFoundation\BinaryFileResponse $response */
         $response = $this->createTestResponse($this->handler->handle($request));
         $response->assertSuccessful();
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Disposition', 'attachment; filename="local-test-file"');
 
         $this->assertInstanceOf(BinaryFileResponse::class, $response->baseResponse);
         $this->assertEquals('local-test-file', $response->getFile()->getFilename());
