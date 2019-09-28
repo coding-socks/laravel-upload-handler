@@ -64,8 +64,8 @@ class BlueimpUploadDriverTest extends TestCase
         $response = $this->createTestResponse($this->handler->handle($request));
         $response->assertSuccessful();
         $response->assertStatus(200);
-        $response->assertHeader('Content-Disposition', 'attachment; filename="local-test-file"');
 
+        $this->assertContains('attachment', $response->headers->get('Content-Disposition'));
         $this->assertInstanceOf(BinaryFileResponse::class, $response->baseResponse);
         $this->assertEquals('local-test-file', $response->getFile()->getFilename());
     }
