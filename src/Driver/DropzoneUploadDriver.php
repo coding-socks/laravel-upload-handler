@@ -7,14 +7,12 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
-use LaraCrafts\ChunkUploader\Exception\UploadHttpException;
 use LaraCrafts\ChunkUploader\Helper\ChunkHelpers;
 use LaraCrafts\ChunkUploader\Identifier\Identifier;
 use LaraCrafts\ChunkUploader\Range\RequestBodyRange;
 use LaraCrafts\ChunkUploader\Response\PercentageJsonResponse;
 use LaraCrafts\ChunkUploader\StorageConfig;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class DropzoneUploadDriver extends UploadDriver
@@ -34,10 +32,10 @@ class DropzoneUploadDriver extends UploadDriver
     /**
      * {@inheritDoc}
      */
-    public function handle(Request $request, Identifier $identifier, StorageConfig $config, Closure $fileUploaded = null): Response
+    public function handle(Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
     {
         if ($this->isRequestMethodIn($request, [Request::METHOD_POST])) {
-            return $this->save($request, $identifier, $config, $fileUploaded);
+            return $this->save($request, $config, $fileUploaded);
         }
 
         throw new MethodNotAllowedHttpException([
@@ -53,20 +51,14 @@ class DropzoneUploadDriver extends UploadDriver
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function save(Request $request, Identifier $identifier, StorageConfig $config, Closure $fileUploaded = null): Response
+    public function save(Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
     {
         $file = $request->file($this->fileParam);
 
-        if (null === $file) {
-            throw new BadRequestHttpException('File not found in request body');
-        }
-
-        if (!$file->isValid()) {
-            throw new UploadHttpException($file->getErrorMessage());
-        }
+        $this->validateUploadedFile($file);
 
         if ($this->isMonolithRequest($request)) {
-            return $this->saveMonolith($file, $identifier, $config, $fileUploaded);
+            return $this->saveMonolith($file, $config, $fileUploaded);
         }
 
         $this->validateChunkRequest($request);
@@ -112,11 +104,9 @@ class DropzoneUploadDriver extends UploadDriver
      *
      * @return Response
      */
-    private function saveMonolith(UploadedFile $file, Identifier $identifier, StorageConfig $config, Closure $fileUploaded = null): Response
+    private function saveMonolith(UploadedFile $file, StorageConfig $config, Closure $fileUploaded = null): Response
     {
-        $filename = $identifier->generateUploadedFileIdentifierName($file);
-
-        $path = $file->storeAs($config->getMergedDirectory(), $filename, [
+        $path = $file->store($config->getMergedDirectory(), [
             'disk' => $config->getDisk(),
         ]);
 
