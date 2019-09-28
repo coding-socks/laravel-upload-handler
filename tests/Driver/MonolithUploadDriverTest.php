@@ -10,6 +10,7 @@ use LaraCrafts\ChunkUploader\Driver\MonolithUploadDriver;
 use LaraCrafts\ChunkUploader\Event\FileUploaded;
 use LaraCrafts\ChunkUploader\Tests\TestCase;
 use LaraCrafts\ChunkUploader\UploadHandler;
+use PHPUnit\Framework\Constraint\StringContains;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class MonolithUploadDriverTest extends TestCase
@@ -19,7 +20,7 @@ class MonolithUploadDriverTest extends TestCase
      */
     private $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -48,7 +49,7 @@ class MonolithUploadDriverTest extends TestCase
         $response->assertSuccessful();
         $response->assertStatus(200);
 
-        $this->assertContains('attachment', $response->headers->get('Content-Disposition'));
+        $this->assertThat($response->headers->get('Content-Disposition'), new StringContains('attachment'));
         $this->assertInstanceOf(BinaryFileResponse::class, $response->baseResponse);
         $this->assertEquals('local-test-file', $response->getFile()->getFilename());
     }
