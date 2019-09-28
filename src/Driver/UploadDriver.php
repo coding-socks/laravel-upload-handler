@@ -9,6 +9,7 @@ use LaraCrafts\ChunkUploader\Event\FileUploaded;
 use LaraCrafts\ChunkUploader\StorageConfig;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 abstract class UploadDriver
@@ -42,7 +43,7 @@ abstract class UploadDriver
 
         $path = $disk->path($prefix . $filename);
 
-        return new BinaryFileResponse($path);
+        return new BinaryFileResponse($path, 200, [], true, ResponseHeaderBag::DISPOSITION_ATTACHMENT);
     }
 
     public function isRequestMethodIn(Request $request, array $methods): bool
