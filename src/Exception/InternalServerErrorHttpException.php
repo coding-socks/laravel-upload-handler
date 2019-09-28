@@ -4,7 +4,7 @@ namespace LaraCrafts\ChunkUploader\Exception;
 
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class UploadHttpException extends HttpException
+class InternalServerErrorHttpException extends HttpException
 {
     public function __construct(string $message, \Exception $previous = null, int $code = 0)
     {

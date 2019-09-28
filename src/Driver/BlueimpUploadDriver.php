@@ -9,7 +9,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use LaraCrafts\ChunkUploader\Exception\UploadHttpException;
 use LaraCrafts\ChunkUploader\Helper\ChunkHelpers;
 use LaraCrafts\ChunkUploader\Identifier\Identifier;
 use LaraCrafts\ChunkUploader\Range\ContentRange;
@@ -132,13 +131,7 @@ class BlueimpUploadDriver extends UploadDriver
             $file = Arr::first($request->file(Str::plural($this->fileParam), []));
         }
 
-        if (null === $file) {
-            throw new BadRequestHttpException('File not found in request body');
-        }
-
-        if (! $file->isValid()) {
-            throw new UploadHttpException($file->getErrorMessage());
-        }
+        $this->validateUploadedFile($file);
 
         try {
             $range = new ContentRange($request->headers);

@@ -5,8 +5,6 @@ namespace LaraCrafts\ChunkUploader\Driver;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use LaraCrafts\ChunkUploader\Exception\UploadHttpException;
-use LaraCrafts\ChunkUploader\Identifier\Identifier;
 use LaraCrafts\ChunkUploader\Response\PercentageJsonResponse;
 use LaraCrafts\ChunkUploader\StorageConfig;
 use Symfony\Component\HttpFoundation\Response;
@@ -60,9 +58,7 @@ class MonolithUploadDriver extends UploadDriver
     {
         $file = $request->file($this->fileParam);
 
-        if (! $file->isValid()) {
-            throw new UploadHttpException($file->getErrorMessage());
-        }
+        $this->validateUploadedFile($file);
 
         $path = $file->store($config->getMergedDirectory(), [
             'disk' => $config->getDisk(),

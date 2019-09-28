@@ -8,10 +8,14 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use LaraCrafts\ChunkUploader\Driver\MonolithUploadDriver;
 use LaraCrafts\ChunkUploader\Event\FileUploaded;
+use LaraCrafts\ChunkUploader\Exception\InternalServerErrorHttpException;
 use LaraCrafts\ChunkUploader\Tests\TestCase;
 use LaraCrafts\ChunkUploader\UploadHandler;
+use Mockery;
 use PHPUnit\Framework\Constraint\StringContains;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class MonolithUploadDriverTest extends TestCase
 {
@@ -26,6 +30,9 @@ class MonolithUploadDriverTest extends TestCase
 
         $this->app->make('config')->set('chunk-uploader.uploader', 'monolith');
         $this->handler = $this->app->make(UploadHandler::class);
+
+        Storage::fake('local');
+        Event::fake();
     }
 
     public function testDriverInstance()
@@ -37,7 +44,6 @@ class MonolithUploadDriverTest extends TestCase
 
     public function testDownload()
     {
-        Storage::fake('local');
         $this->createFakeLocalFile('merged', 'local-test-file');
 
         $request = Request::create('', Request::METHOD_GET, [
@@ -54,12 +60,43 @@ class MonolithUploadDriverTest extends TestCase
         $this->assertEquals('local-test-file', $response->getFile()->getFilename());
     }
 
+    public function testDownloadWhenFileNotFound()
+    {
+        $request = Request::create('', Request::METHOD_GET, [
+            'file' => 'local-test-file',
+        ]);
+
+        $this->expectException(NotFoundHttpException::class);
+
+        $this->handler->handle($request);
+    }
+
+    public function testUploadWhenFileParameterIsEmpty()
+    {
+        $request = Request::create('', Request::METHOD_POST);
+
+        $this->expectException(BadRequestHttpException::class);
+
+        $this->handler->handle($request);
+    }
+
+    public function testUploadWhenFileParameterIsInvalid()
+    {
+        $file = Mockery::mock(UploadedFile::class)->makePartial();
+        $file->shouldReceive('isValid')
+            ->andReturn(false);
+
+        $request = Request::create('', Request::METHOD_POST, [], [], [
+            'file' => $file,
+        ]);
+
+        $this->expectException(InternalServerErrorHttpException::class);
+
+        $this->handler->handle($request);
+    }
+
     public function testUpload()
     {
-        Storage::fake('local');
-
-        Event::fake();
-
         $file = UploadedFile::fake()->create('test.txt', 20);
         $request = Request::create('', Request::METHOD_POST, [], [], [
             'file' => $file,
@@ -78,10 +115,6 @@ class MonolithUploadDriverTest extends TestCase
 
     public function testUploadWithCallback()
     {
-        Storage::fake('local');
-
-        Event::fake();
-
         $file = UploadedFile::fake()->create('test.txt', 20);
         $request = Request::create('', Request::METHOD_POST, [], [], [
             'file' => $file,
@@ -102,7 +135,6 @@ class MonolithUploadDriverTest extends TestCase
 
     public function testDelete()
     {
-        Storage::fake('local');
         $this->createFakeLocalFile('merged', 'local-test-file');
 
         $request = Request::create('', Request::METHOD_DELETE, [

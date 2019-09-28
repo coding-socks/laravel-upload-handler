@@ -9,10 +9,14 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use LaraCrafts\ChunkUploader\Driver\BlueimpUploadDriver;
 use LaraCrafts\ChunkUploader\Event\FileUploaded;
+use LaraCrafts\ChunkUploader\Exception\InternalServerErrorHttpException;
 use LaraCrafts\ChunkUploader\Tests\TestCase;
 use LaraCrafts\ChunkUploader\UploadHandler;
+use Mockery;
 use PHPUnit\Framework\Constraint\StringContains;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class BlueimpUploadDriverTest extends TestCase
 {
@@ -28,6 +32,12 @@ class BlueimpUploadDriverTest extends TestCase
         $this->app->make('config')->set('chunk-uploader.uploader', 'blueimp');
         $this->app->make('config')->set('chunk-uploader.sweep', false);
         $this->handler = $this->app->make(UploadHandler::class);
+
+        Session::shouldReceive('getId')
+            ->andReturn('frgYt7cPmNGtORpRCo4xvFIrWklzFqc2mnO6EE6b');
+
+        Storage::fake('local');
+        Event::fake();
     }
 
     public function testDriverInstance()
@@ -51,9 +61,20 @@ class BlueimpUploadDriverTest extends TestCase
         $response->assertHeader('Vary', 'Accept');
     }
 
+    public function testDownloadWhenFileNotFound()
+    {
+        $request = Request::create('', Request::METHOD_GET, [
+            'file' => 'local-test-file',
+            'download' => 1,
+        ]);
+
+        $this->expectException(NotFoundHttpException::class);
+
+        $this->handler->handle($request);
+    }
+
     public function testDownload()
     {
-        Storage::fake('local');
         $this->createFakeLocalFile('merged', 'local-test-file');
 
         $request = Request::create('', Request::METHOD_GET, [
@@ -73,9 +94,6 @@ class BlueimpUploadDriverTest extends TestCase
 
     public function testResume()
     {
-        Session::shouldReceive('getId')
-            ->andReturn('frgYt7cPmNGtORpRCo4xvFIrWklzFqc2mnO6EE6b');
-        Storage::fake('local');
         $this->createFakeLocalFile('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt', '000-099');
 
         $request = Request::create('', Request::METHOD_GET, [
@@ -85,27 +103,47 @@ class BlueimpUploadDriverTest extends TestCase
         $response = $this->createTestResponse($this->handler->handle($request));
         $response->assertSuccessful();
 
-        $response->assertJson(['file' => [
-            'name' => '2494cefe4d234bd331aeb4514fe97d810efba29b.txt',
-            'size' => 100,
-        ]]);
+        $response->assertJson([
+            'file' => [
+                'name' => '2494cefe4d234bd331aeb4514fe97d810efba29b.txt',
+                'size' => 100,
+            ],
+        ]);
+    }
+
+    public function testUploadWhenFileParameterIsEmpty()
+    {
+        $request = Request::create('', Request::METHOD_POST);
+
+        $this->expectException(BadRequestHttpException::class);
+
+        $this->handler->handle($request);
+    }
+
+    public function testUploadWhenFileParameterIsInvalid()
+    {
+        $file = Mockery::mock(UploadedFile::class)->makePartial();
+        $file->shouldReceive('isValid')
+            ->andReturn(false);
+
+        $request = Request::create('', Request::METHOD_POST, [], [], [
+            'file' => $file,
+        ]);
+
+        $this->expectException(InternalServerErrorHttpException::class);
+
+        $this->handler->handle($request);
     }
 
     public function testUploadFirstChunk()
     {
-        Session::shouldReceive('getId')
-            ->andReturn('frgYt7cPmNGtORpRCo4xvFIrWklzFqc2mnO6EE6b');
-        Storage::fake('local');
-
-        Event::fake();
-
         $request = Request::create('', Request::METHOD_POST, [], [], [
             'file' => UploadedFile::fake()->create('test.txt', 100),
         ], [
             'HTTP_CONTENT_RANGE' => 'bytes 0-99/200',
         ]);
 
-        /** @var \Illuminate\Foundation\Testing\TestResponse|\LaraCrafts\ChunkUploader\Response\Response $response */
+        /** @var \Illuminate\Foundation\Testing\TestResponse $response */
         $response = $this->createTestResponse($this->handler->handle($request));
         $response->assertSuccessful();
         $response->assertJson(['done' => 50]);
@@ -119,12 +157,6 @@ class BlueimpUploadDriverTest extends TestCase
 
     public function testUploadFirstChunkWithCallback()
     {
-        Session::shouldReceive('getId')
-            ->andReturn('frgYt7cPmNGtORpRCo4xvFIrWklzFqc2mnO6EE6b');
-        Storage::fake('local');
-
-        Event::fake();
-
         $request = Request::create('', Request::METHOD_POST, [], [], [
             'file' => UploadedFile::fake()->create('test.txt', 100),
         ], [
@@ -142,12 +174,7 @@ class BlueimpUploadDriverTest extends TestCase
 
     public function testUploadLastChunk()
     {
-        Session::shouldReceive('getId')
-            ->andReturn('frgYt7cPmNGtORpRCo4xvFIrWklzFqc2mnO6EE6b');
-        Storage::fake('local');
         $this->createFakeLocalFile('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt', '000');
-
-        Event::fake();
 
         $request = Request::create('', Request::METHOD_POST, [], [], [
             'file' => UploadedFile::fake()->create('test.txt', 100),
@@ -155,7 +182,7 @@ class BlueimpUploadDriverTest extends TestCase
             'HTTP_CONTENT_RANGE' => 'bytes 100-199/200',
         ]);
 
-        /** @var \Illuminate\Foundation\Testing\TestResponse|\LaraCrafts\ChunkUploader\Response\Response $response */
+        /** @var \Illuminate\Foundation\Testing\TestResponse $response */
         $response = $this->createTestResponse($this->handler->handle($request));
         $response->assertSuccessful();
         $response->assertJson(['done' => 100]);
@@ -170,12 +197,7 @@ class BlueimpUploadDriverTest extends TestCase
 
     public function testUploadLastChunkWithCallback()
     {
-        Session::shouldReceive('getId')
-            ->andReturn('frgYt7cPmNGtORpRCo4xvFIrWklzFqc2mnO6EE6b');
-        Storage::fake('local');
         $this->createFakeLocalFile('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt', '000');
-
-        Event::fake();
 
         $request = Request::create('', Request::METHOD_POST, [], [], [
             'file' => UploadedFile::fake()->create('test.txt', 100),
@@ -198,7 +220,6 @@ class BlueimpUploadDriverTest extends TestCase
 
     public function testDelete()
     {
-        Storage::fake('local');
         $this->createFakeLocalFile('merged', 'local-test-file');
 
         $request = Request::create('', Request::METHOD_DELETE, [
