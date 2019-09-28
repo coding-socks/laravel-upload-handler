@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use LaraCrafts\ChunkUploader\Exception\UploadHttpException;
 use LaraCrafts\ChunkUploader\Helper\ChunkHelpers;
 use LaraCrafts\ChunkUploader\Identifier\Identifier;
@@ -122,12 +123,9 @@ class BlueimpUploadDriver extends UploadDriver
      * @param \Closure|null $fileUploaded
      *
      * @return \Symfony\Component\HttpFoundation\Response
-     * @throws \HttpHeaderException
      */
     public function save(Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
     {
-        $range = new ContentRange($request->headers);
-
         $file = $request->file($this->fileParam);
 
         if (null === $file) {
@@ -140,6 +138,12 @@ class BlueimpUploadDriver extends UploadDriver
 
         if (! $file->isValid()) {
             throw new UploadHttpException($file->getErrorMessage());
+        }
+
+        try {
+            $range = new ContentRange($request->headers);
+        } catch (InvalidArgumentException $e) {
+            throw new BadRequestHttpException($e->getMessage());
         }
 
         $filename = $this->identifier->generateUploadedFileIdentifierName($file);
