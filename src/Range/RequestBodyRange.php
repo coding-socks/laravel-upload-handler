@@ -36,7 +36,7 @@ class RequestBodyRange implements Range
         $this->totalSize = $request->get($totalSizeKey);
 
         if ($this->numberOfChunks <= 0) {
-            throw new InvalidArgumentException(sprintf('`%s` must be greater than to zero', $numberOfChunksKey));
+            throw new InvalidArgumentException(sprintf('`%s` must be greater than zero', $numberOfChunksKey));
         }
         if ($this->index < 0) {
             throw new InvalidArgumentException(sprintf('`%s` must be greater than or equal to zero', $indexKey));
