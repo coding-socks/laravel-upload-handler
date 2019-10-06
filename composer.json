@@ -5,12 +5,16 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Raed Yak",
-            "email": "contact.raedyak@gmail.com"
-        },
-        {
             "name": "László Görög",
             "email": "contact@nergal.xyz"
+        },
+        {
+            "name": "Choraimy Kroonstuiver",
+            "email": "choraimy@live.nl"
+        },
+        {
+            "name": "Raed Yak",
+            "email": "contact.raedyak@gmail.com"
         }
     ],
     "require": {
