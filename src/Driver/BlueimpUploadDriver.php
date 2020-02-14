@@ -136,7 +136,7 @@ class BlueimpUploadDriver extends UploadDriver
         try {
             $range = new ContentRange($request->headers);
         } catch (InvalidArgumentException $e) {
-            throw new BadRequestHttpException($e->getMessage());
+            throw new BadRequestHttpException($e->getMessage(), $e);
         }
 
         $filename = $this->identifier->generateUploadedFileIdentifierName($file);

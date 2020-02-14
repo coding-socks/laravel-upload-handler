@@ -6,12 +6,14 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use InvalidArgumentException;
 use LaraCrafts\ChunkUploader\Helper\ChunkHelpers;
 use LaraCrafts\ChunkUploader\Identifier\Identifier;
-use LaraCrafts\ChunkUploader\Range\RequestRange;
+use LaraCrafts\ChunkUploader\Range\RequestBodyRange;
 use LaraCrafts\ChunkUploader\Response\PercentageJsonResponse;
 use LaraCrafts\ChunkUploader\StorageConfig;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class DropzoneUploadDriver extends UploadDriver
@@ -124,14 +126,17 @@ class DropzoneUploadDriver extends UploadDriver
      */
     private function saveChunk(UploadedFile $file, Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
     {
-        $numberOfChunks = $request->post('dztotalchunkcount');
-
-        $range = new RequestRange(
-            $request->post('dzchunkindex'),
-            $numberOfChunks,
-            $request->post('dzchunksize'),
-            $request->post('dztotalfilesize')
-        );
+        try {
+            $range = new RequestBodyRange(
+                $request,
+                'dzchunkindex',
+                'dztotalchunkcount',
+                'dzchunksize',
+                'dztotalfilesize'
+            );
+        } catch (InvalidArgumentException $e) {
+            throw new BadRequestHttpException($e->getMessage(), $e);
+        }
 
         $filename = $request->post('dzuuid');
 
@@ -142,8 +147,8 @@ class DropzoneUploadDriver extends UploadDriver
 
         $chunks = $this->storeChunk($config, $range, $file, $filename);
 
-        if (!$this->isFinished($numberOfChunks, $chunks)) {
-            return new PercentageJsonResponse($this->getPercentage($chunks, $numberOfChunks));
+        if (!$range->isFinished($chunks)) {
+            return new PercentageJsonResponse($range->getPercentage($chunks));
         }
 
         $path = $this->mergeChunks($config, $chunks, $filename);
@@ -155,27 +160,5 @@ class DropzoneUploadDriver extends UploadDriver
         $this->triggerFileUploadedEvent($config->getDisk(), $path, $fileUploaded);
 
         return new PercentageJsonResponse(100);
-    }
-
-    /**
-     * @param $numberOfChunks
-     * @param $chunks
-     *
-     * @return bool
-     */
-    private function isFinished($numberOfChunks, $chunks)
-    {
-        return $numberOfChunks === count($chunks);
-    }
-
-    /**
-     * @param array $chunks
-     * @param $numberOfChunks
-     *
-     * @return float|int
-     */
-    private function getPercentage(array $chunks, $numberOfChunks)
-    {
-        return floor(count($chunks) / $numberOfChunks * 100);
     }
 }
