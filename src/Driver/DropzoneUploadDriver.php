@@ -13,6 +13,7 @@ use LaraCrafts\ChunkUploader\Range\RequestBodyRange;
 use LaraCrafts\ChunkUploader\Response\PercentageJsonResponse;
 use LaraCrafts\ChunkUploader\StorageConfig;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class DropzoneUploadDriver extends UploadDriver
@@ -134,7 +135,7 @@ class DropzoneUploadDriver extends UploadDriver
                 'dztotalfilesize'
             );
         } catch (InvalidArgumentException $e) {
-            throw new BadRequestHttpException($e->getMessage());
+            throw new BadRequestHttpException($e->getMessage(), $e);
         }
 
         $filename = $request->post('dzuuid');
