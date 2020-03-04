@@ -5,9 +5,7 @@ cache:
     - $HOME/.composer/cache
 
 php:
-  - 7.1
   - 7.2
-  - 7.3
 
 env:
   - ILLUMINATE_VERSION=5.5.*
@@ -15,11 +13,9 @@ env:
   - ILLUMINATE_VERSION=5.6.*
   - ILLUMINATE_VERSION=5.8.*
   - ILLUMINATE_VERSION=^6.0
+  - ILLUMINATE_VERSION=^7.0
 
-matrix:    # Laravel 6.0 does not support PHP 7.1
-  exclude:
-    - php: 7.1
-      env: ILLUMINATE_VERSION=^6.0
+dist: xenial
 
 before_install:
   - composer require illuminate/support:${ILLUMINATE_VERSION} illuminate/http:${ILLUMINATE_VERSION} --no-update
