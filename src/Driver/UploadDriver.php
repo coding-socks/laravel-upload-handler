@@ -30,7 +30,7 @@ abstract class UploadDriver
 
     /**
      * @param string $filename
-     * @param array $config
+     * @param StorageConfig $config
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */

@@ -6,6 +6,7 @@ use Illuminate\Support\Manager;
 use LaraCrafts\ChunkUploader\Driver\BlueimpUploadDriver;
 use LaraCrafts\ChunkUploader\Driver\DropzoneUploadDriver;
 use LaraCrafts\ChunkUploader\Driver\MonolithUploadDriver;
+use LaraCrafts\ChunkUploader\Driver\ResumableJsUploadDriver;
 
 class UploadManager extends Manager
 {
@@ -25,6 +26,11 @@ class UploadManager extends Manager
     public function createDropzoneDriver()
     {
         return new DropzoneUploadDriver($this->app['config']['chunk-uploader.dropzone']);
+    }
+
+    public function createResumableJsDriver()
+    {
+        return new ResumableJsUploadDriver($this->app['config']['chunk-uploader.resumable-js']);
     }
 
     /**

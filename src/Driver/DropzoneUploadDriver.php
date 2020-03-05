@@ -5,10 +5,8 @@ namespace LaraCrafts\ChunkUploader\Driver;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
 use LaraCrafts\ChunkUploader\Helper\ChunkHelpers;
-use LaraCrafts\ChunkUploader\Identifier\Identifier;
 use LaraCrafts\ChunkUploader\Range\RequestBodyRange;
 use LaraCrafts\ChunkUploader\Response\PercentageJsonResponse;
 use LaraCrafts\ChunkUploader\StorageConfig;
@@ -46,7 +44,6 @@ class DropzoneUploadDriver extends UploadDriver
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param \LaraCrafts\ChunkUploader\Identifier\Identifier $identifier
      * @param StorageConfig $config
      * @param \Closure|null $fileUploaded
      *
@@ -99,7 +96,6 @@ class DropzoneUploadDriver extends UploadDriver
 
     /**
      * @param UploadedFile $file
-     * @param Identifier $identifier
      * @param StorageConfig $config
      * @param \Closure|null $fileUploaded
      *
@@ -153,8 +149,8 @@ class DropzoneUploadDriver extends UploadDriver
 
         $path = $this->mergeChunks($config, $chunks, $filename);
 
-        if (!empty($config->sweep())) {
-            Storage::disk($config->getDisk())->deleteDirectory($filename);
+        if ($config->sweep()) {
+            $this->deleteChunkDirectory($config, $filename);
         }
 
         $this->triggerFileUploadedEvent($config->getDisk(), $path, $fileUploaded);

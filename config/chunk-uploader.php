@@ -12,7 +12,7 @@ return [
     | throughout your application here. By default, the module is setup for
     | monolith upload.
     |
-    | Supported: "monolith", "blueimp", "dropzone"
+    | Supported: "monolith", "blueimp", "dropzone", "resumable-js"
     |
     */
 
@@ -115,6 +115,51 @@ return [
     'dropzone' => [
 
         'param' => 'file',
+
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Resumable.js Options
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure the options for the Resumable.js driver.
+    |
+    */
+
+    'resumable-js' => [
+
+        // The name of the multipart request parameter to use for the file chunk
+        'param' => 'file',
+
+        //  HTTP method for chunk test request.
+        'test-method' => \Illuminate\Http\Request::METHOD_GET,
+        //  HTTP method to use when sending chunks to the server (POST, PUT, PATCH).
+        'upload-method' => \Illuminate\Http\Request::METHOD_POST,
+
+        // Extra prefix added before the name of each parameter included in the multipart POST or in the test GET.
+        'parameter-namespace' => '',
+
+        'parameter-names' => [
+            // The name of the chunk index (base-1) in the current upload POST parameter to use for the file chunk.
+            'chunk-number' => 'resumableChunkNumber',
+            // The name of the total number of chunks POST parameter to use for the file chunk.
+            'total-chunks' => 'resumableTotalChunks',
+            // The name of the general chunk size POST parameter to use for the file chunk.
+            'chunk-size' => 'resumableChunkSize',
+            // The name of the total file size number POST parameter to use for the file chunk.
+            'total-size' => 'resumableTotalSize',
+            // The name of the unique identifier POST parameter to use for the file chunk.
+            'identifier' => 'resumableIdentifier',
+            // The name of the original file name POST parameter to use for the file chunk.
+            'file-name' => 'resumableFilename',
+            // The name of the file's relative path POST parameter to use for the file chunk.
+            'relative-path' => 'resumableRelativePath',
+            // The name of the current chunk size POST parameter to use for the file chunk.
+            'current-chunk-size' => 'resumableCurrentChunkSize',
+            // The name of the file type POST parameter to use for the file chunk.
+            'type' => 'resumableType',
+        ],
 
     ],
 

@@ -93,18 +93,16 @@ class BlueimpUploadDriver extends UploadDriver
             return $this->fileResponse($filename, $config);
         }
 
+        $request->validate([$this->fileParam => 'required']);
         $filename = $request->query($this->fileParam);
-        $directory = $config->getChunkDirectory() . '/' . $filename;
-        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
-        $disk = Storage::disk($config->getDisk());
 
-        if (! $disk->exists($directory)) {
+        if (! $this->chunkExists($config, $filename)) {
             return new JsonResponse([
                 'file' => null,
             ]);
         }
 
-        $chunk = Arr::last($disk->files($directory));
+        $chunk = Arr::last($this->chunks($config, $filename));
         $size = explode('-', basename($chunk))[1] + 1;
 
         return new JsonResponse([
@@ -117,7 +115,6 @@ class BlueimpUploadDriver extends UploadDriver
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param \LaraCrafts\ChunkUploader\Identifier\Identifier $identifier
      * @param StorageConfig $config
      * @param \Closure|null $fileUploaded
      *
@@ -149,8 +146,8 @@ class BlueimpUploadDriver extends UploadDriver
 
         $path = $this->mergeChunks($config, $chunks, $filename);
 
-        if (! empty($config->sweep())) {
-            Storage::disk($config->getDisk())->deleteDirectory($filename);
+        if ($config->sweep()) {
+            $this->deleteChunkDirectory($config, $filename);
         }
 
         $this->triggerFileUploadedEvent($config->getDisk(), $path, $fileUploaded);
