@@ -135,10 +135,10 @@ class RequestBodyRangeTest extends TestCase
     private function createRequestBodyRange($index, $numberOfChunks, $chunkSize, $totalSize)
     {
         $request = new ParameterBag([
-            'index' => $index,
-            'numberOfChunks' => $numberOfChunks,
-            'chunkSize' => $chunkSize,
-            'totalSize' => $totalSize,
+            'index' => (string) $index,
+            'numberOfChunks' => (string) $numberOfChunks,
+            'chunkSize' => (string) $chunkSize,
+            'totalSize' => (string) $totalSize,
         ]);
 
         return new RequestBodyRange($request, 'index', 'numberOfChunks', 'chunkSize', 'totalSize');

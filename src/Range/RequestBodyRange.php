@@ -30,10 +30,11 @@ class RequestBodyRange implements Range
             $request = $request->request;
         }
 
-        $this->index = $request->get($indexKey);
-        $this->numberOfChunks = $request->get($numberOfChunksKey);
-        $this->chunkSize = $request->get($chunkSizeKey);
-        $this->totalSize = $request->get($totalSizeKey);
+        $this->index = (int) $request->get($indexKey);
+        $this->numberOfChunks = (int) $request->get($numberOfChunksKey);
+        $this->chunkSize = (int) $request->get($chunkSizeKey);
+        // Must be double (which is an alias for float) for 32 bit systems
+        $this->totalSize = (double) $request->get($totalSizeKey);
 
         if ($this->numberOfChunks <= 0) {
             throw new InvalidArgumentException(sprintf('`%s` must be greater than zero', $numberOfChunksKey));
