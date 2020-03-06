@@ -9,6 +9,12 @@ filter:
 checks:
   php: true
 
-tools:
-  external_code_coverage:
-    timeout: 600
+build:
+  nodes:
+    coverage:
+      tests:
+        override:
+          - command: ./vendor/bin/phpunit --coverage-clover=coverage.clover
+            coverage:
+              file: coverage.clover
+              format: clover
