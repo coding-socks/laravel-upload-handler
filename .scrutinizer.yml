@@ -1,14 +1,14 @@
 filter:
   paths:
-    - 'src/*'
+    - 'src/'
   excluded_paths:
-    - 'tests/*'
-    - 'vendor/*'
+    - 'tests/'
+  dependency_paths:
+    - 'vendor/'
 
 checks:
   php: true
 
 tools:
   external_code_coverage:
-    runs: 1
-    timeout: 1200
+    timeout: 600

@@ -72,10 +72,8 @@ jobs:
           composer require "illuminate/support:${{ matrix.laravel }}" "illuminate/http:${{ matrix.laravel }}" --no-interaction --no-update
           composer update --prefer-dist --no-interaction --no-suggest
 
-      - name: Run test with coverage
-        run: ./vendor/bin/phpunit --coverage-clover=coverage.clover --verbose
-
       - name: External Code Coverage
         run: |
+          ./vendor/bin/phpunit --coverage-clover=coverage.clover --verbose
           wget https://scrutinizer-ci.com/ocular.phar
           php ocular.phar code-coverage:upload --format=php-clover coverage.clover
