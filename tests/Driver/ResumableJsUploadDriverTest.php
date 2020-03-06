@@ -14,6 +14,7 @@ use LaraCrafts\ChunkUploader\Tests\TestCase;
 use LaraCrafts\ChunkUploader\UploadHandler;
 use Mockery;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ResumableJsUploadDriverTest extends TestCase
@@ -40,6 +41,33 @@ class ResumableJsUploadDriverTest extends TestCase
         $manager = $this->app->make('chunk-uploader.upload-manager');
 
         $this->assertInstanceOf(ResumableJsUploadDriver::class, $manager->driver());
+    }
+
+    public function notAllowedRequestMethods()
+    {
+        return [
+            'HEAD' => [Request::METHOD_HEAD],
+            'PUT' => [Request::METHOD_PUT],
+            'PATCH' => [Request::METHOD_PATCH],
+            'DELETE' => [Request::METHOD_DELETE],
+            'PURGE' => [Request::METHOD_PURGE],
+            'OPTIONS' => [Request::METHOD_OPTIONS],
+            'TRACE' => [Request::METHOD_TRACE],
+            'CONNECT' => [Request::METHOD_CONNECT],
+        ];
+    }
+
+    /**
+     * @dataProvider notAllowedRequestMethods
+     */
+
+    public function testMethodNotAllowed($requestMethod)
+    {
+        $request = Request::create('', $requestMethod);
+
+        $this->expectException(MethodNotAllowedHttpException::class);
+
+        $this->createTestResponse($this->handler->handle($request));
     }
 
     public function testResumeWhenChunkDoesNotExists()
