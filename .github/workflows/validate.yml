@@ -10,15 +10,46 @@ on:
 
 jobs:
   build:
-
+    name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
       matrix:
-        php: [ '7.2', '7.3', '7.4' ]
-        laravel: [ '5.5.*', '5.6.*', '5.7.*', '5.8.*', '^6.0', '^7.0' ]
+      php: [ '7.2', '7.3', '7.4' ]
+      laravel: [ '5.5.*', '5.6.*', '5.7.*', '5.8.*', '^6.0', '^7.0' ]
 
-    name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache/files
+          key: laravel-${{ matrix.laravel }}-php-${{ matrix.php }}-composer-${{ hashFiles('composer.json') }}
+
+      - uses: shivammathur/setup-php@v1
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+
+      - name: Validate composer.json
+        run: composer validate
+
+      - name: Install dependencies
+        run: |
+          composer require "illuminate/support:${{ matrix.laravel }}" "illuminate/http:${{ matrix.laravel }}" --no-interaction --no-update
+          composer update --prefer-dist --no-interaction --no-suggest
+
+      - name: Run test
+        run: ./vendor/bin/phpunit --verbose
+
+  coverage:
+    name: Code Coverage
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        php: [ '7.4' ]
+        laravel: [ '^7.0' ]
 
     steps:
       - uses: actions/checkout@v2
@@ -33,7 +64,7 @@ jobs:
           php-version: ${{ matrix.php }}
           coverage: xdebug
 
-      - name: Validate composer.json and composer.lock
+      - name: Validate composer.json
         run: composer validate
 
       - name: Install dependencies
@@ -41,7 +72,7 @@ jobs:
           composer require "illuminate/support:${{ matrix.laravel }}" "illuminate/http:${{ matrix.laravel }}" --no-interaction --no-update
           composer update --prefer-dist --no-interaction --no-suggest
 
-      - name: Run test
+      - name: Run test with coverage
         run: ./vendor/bin/phpunit --coverage-clover=coverage.clover --verbose
 
       - name: External Code Coverage
