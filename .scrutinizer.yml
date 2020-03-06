@@ -1,14 +1,20 @@
 filter:
   paths:
-    - 'src/*'
+    - 'src/'
   excluded_paths:
-    - 'tests/*'
-    - 'vendor/*'
+    - 'tests/'
+  dependency_paths:
+    - 'vendor/'
 
 checks:
   php: true
 
-tools:
-  external_code_coverage:
-    runs: 3
-    timeout: 1200
+build:
+  nodes:
+    coverage:
+      tests:
+        override:
+          - command: ./vendor/bin/phpunit --coverage-clover=coverage.clover
+            coverage:
+              file: coverage.clover
+              format: clover
