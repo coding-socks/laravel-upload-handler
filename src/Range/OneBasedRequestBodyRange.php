@@ -2,7 +2,6 @@
 
 namespace LaraCrafts\ChunkUploader\Range;
 
-use Illuminate\Http\Request;
 use InvalidArgumentException;
 
 class OneBasedRequestBodyRange extends RequestBodyRange
@@ -37,7 +36,8 @@ class OneBasedRequestBodyRange extends RequestBodyRange
      * @param string $chunkSizeKey
      * @param string $totalSizeKey
      */
-    protected function validateTotalSize(string $indexKey, string $numberOfChunksKey, string $chunkSizeKey, string $totalSizeKey): void {
+    protected function validateTotalSize(string $indexKey, string $numberOfChunksKey, string $chunkSizeKey, string $totalSizeKey): void
+    {
         if ($this->totalSize < 1) {
             throw new InvalidArgumentException(sprintf('`%s` must be greater than zero', $totalSizeKey));
         } elseif ($this->totalSize <= ($this->index - 1) * $this->chunkSize) {
