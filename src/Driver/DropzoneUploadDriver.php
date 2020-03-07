@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use InvalidArgumentException;
 use LaraCrafts\ChunkUploader\Helper\ChunkHelpers;
-use LaraCrafts\ChunkUploader\Range\RequestBodyRange;
+use LaraCrafts\ChunkUploader\Range\ZeroBasedRequestBodyRange;
 use LaraCrafts\ChunkUploader\Response\PercentageJsonResponse;
 use LaraCrafts\ChunkUploader\StorageConfig;
 use Symfony\Component\HttpFoundation\Response;
@@ -123,7 +123,7 @@ class DropzoneUploadDriver extends UploadDriver
     private function saveChunk(UploadedFile $file, Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
     {
         try {
-            $range = new RequestBodyRange(
+            $range = new ZeroBasedRequestBodyRange(
                 $request,
                 'dzchunkindex',
                 'dztotalchunkcount',

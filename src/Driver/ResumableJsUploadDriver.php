@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use InvalidArgumentException;
 use LaraCrafts\ChunkUploader\Helper\ChunkHelpers;
-use LaraCrafts\ChunkUploader\Range\RequestBodyRange;
+use LaraCrafts\ChunkUploader\Range\OneBasedRequestBodyRange;
 use LaraCrafts\ChunkUploader\Response\PercentageJsonResponse;
 use LaraCrafts\ChunkUploader\StorageConfig;
 use Symfony\Component\HttpFoundation\Response;
@@ -86,13 +86,12 @@ class ResumableJsUploadDriver extends UploadDriver
         $this->validateChunkRequest($request);
 
         try {
-            $range = new RequestBodyRange(
+            $range = new OneBasedRequestBodyRange(
                 $request->query,
                 $this->buildParameterName('chunk-number'),
                 $this->buildParameterName('total-chunks'),
                 $this->buildParameterName('chunk-size'),
-                $this->buildParameterName('total-size'),
-                1
+                $this->buildParameterName('total-size')
             );
         } catch (InvalidArgumentException $e) {
             throw new BadRequestHttpException($e->getMessage(), $e);
@@ -151,13 +150,12 @@ class ResumableJsUploadDriver extends UploadDriver
     private function saveChunk(UploadedFile $file, Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
     {
         try {
-            $range = new RequestBodyRange(
+            $range = new OneBasedRequestBodyRange(
                 $request,
                 $this->buildParameterName('chunk-number'),
                 $this->buildParameterName('total-chunks'),
                 $this->buildParameterName('chunk-size'),
-                $this->buildParameterName('total-size'),
-                1
+                $this->buildParameterName('total-size')
             );
         } catch (InvalidArgumentException $e) {
             throw new BadRequestHttpException($e->getMessage(), $e);
