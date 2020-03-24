@@ -87,7 +87,8 @@ class MyController extends Controller
     public function myFunction(Request $request)
     {
         $handler = app()->make(UploadHandler::class);
-        return $handler->handle($request);}
+        return $handler->handle($request);
+    }
 }
 ```
 
