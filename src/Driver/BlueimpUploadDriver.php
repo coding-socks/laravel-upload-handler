@@ -96,7 +96,7 @@ class BlueimpUploadDriver extends UploadDriver
         $request->validate([$this->fileParam => 'required']);
         $filename = $request->query($this->fileParam);
 
-        if (! $this->chunkExists($config, $filename)) {
+        if (!$this->chunkExists($config, $filename)) {
             return new JsonResponse([
                 'file' => null,
             ]);
@@ -136,18 +136,20 @@ class BlueimpUploadDriver extends UploadDriver
             throw new BadRequestHttpException($e->getMessage(), $e);
         }
 
-        $filename = $this->identifier->generateUploadedFileIdentifierName($file);
+        $uuid = $this->identifier->generateUploadedFileIdentifierName($file);
 
-        $chunks = $this->storeChunk($config, $range, $file, $filename);
+        $chunks = $this->storeChunk($config, $range, $file, $uuid);
 
-        if (! $range->isLast()) {
+        if (!$range->isLast()) {
             return new PercentageJsonResponse($range->getPercentage());
         }
 
-        $path = $this->mergeChunks($config, $chunks, $filename);
+        $targetFilename = $file->hashName();
+
+        $path = $this->mergeChunks($config, $chunks, $targetFilename);
 
         if ($config->sweep()) {
-            $this->deleteChunkDirectory($config, $filename);
+            $this->deleteChunkDirectory($config, $uuid);
         }
 
         $this->triggerFileUploadedEvent($config->getDisk(), $path, $fileUploaded);
@@ -158,6 +160,7 @@ class BlueimpUploadDriver extends UploadDriver
     /**
      * @param Request $request
      * @param StorageConfig $config
+     *
      * @return Response
      */
     public function delete(Request $request, StorageConfig $config)

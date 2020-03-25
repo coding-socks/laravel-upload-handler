@@ -182,6 +182,7 @@ class ResumableJsUploadDriverTest extends TestCase
 
     public function testUploadFirstChunk()
     {
+        $file = UploadedFile::fake()->create('test.txt', 100);
         $request = Request::create('', Request::METHOD_POST, [
             'resumableChunkNumber' => 1,
             'resumableTotalChunks' => 2,
@@ -193,7 +194,7 @@ class ResumableJsUploadDriverTest extends TestCase
             'resumableCurrentChunkSize' => 100,
             'resumableType' => 'text/plain',
         ], [], [
-            'file' => UploadedFile::fake()->create('test.txt', 100),
+            'file' => $file,
         ]);
 
         /** @var \Illuminate\Foundation\Testing\TestResponse $response */
@@ -203,13 +204,14 @@ class ResumableJsUploadDriverTest extends TestCase
 
         Storage::disk('local')->assertExists('chunks/200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt/000-099');
 
-        Event::assertNotDispatched(FileUploaded::class, function ($event) {
-            return $event->file = 'merged/200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt.txt';
+        Event::assertNotDispatched(FileUploaded::class, function ($event) use ($file) {
+            return $event->file = $file->hashName('merged');
         });
     }
 
     public function testUploadFirstChunkWithCallback()
     {
+        $file = UploadedFile::fake()->create('test.txt', 100);
         $request = Request::create('', Request::METHOD_POST, [
             'resumableChunkNumber' => 1,
             'resumableTotalChunks' => 2,
@@ -221,15 +223,15 @@ class ResumableJsUploadDriverTest extends TestCase
             'resumableCurrentChunkSize' => 100,
             'resumableType' => 'text/plain',
         ], [], [
-            'file' => UploadedFile::fake()->create('test.txt', 100),
+            'file' => $file,
         ]);
 
         $callback = $this->createClosureMock($this->never());
 
         $this->handler->handle($request, $callback);
 
-        Event::assertNotDispatched(FileUploaded::class, function ($event) {
-            return $event->file = 'merged/200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt.txt';
+        Event::assertNotDispatched(FileUploaded::class, function ($event) use ($file) {
+            return $event->file = $file->hashName('merged');
         });
     }
 
@@ -237,6 +239,7 @@ class ResumableJsUploadDriverTest extends TestCase
     {
         $this->createFakeLocalFile('chunks/200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt', '000-099');
 
+        $file = UploadedFile::fake()->create('test.txt', 100);
         $request = Request::create('', Request::METHOD_POST, [
             'resumableChunkNumber' => 2,
             'resumableTotalChunks' => 2,
@@ -248,8 +251,7 @@ class ResumableJsUploadDriverTest extends TestCase
             'resumableCurrentChunkSize' => 100,
             'resumableType' => 'text/plain',
         ], [], [
-            'file' => UploadedFile::fake()
-                ->create('test.txt', 100),
+            'file' => $file,
         ]);
 
         /** @var \Illuminate\Foundation\Testing\TestResponse $response */
@@ -258,10 +260,10 @@ class ResumableJsUploadDriverTest extends TestCase
         $response->assertJson(['done' => 100]);
 
         Storage::disk('local')->assertExists('chunks/200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt/100-199');
-        Storage::disk('local')->assertExists('merged/200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt.txt');
+        Storage::disk('local')->assertExists($file->hashName('merged'));
 
-        Event::assertDispatched(FileUploaded::class, function ($event) {
-            return $event->file = 'merged/200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt.txt';
+        Event::assertDispatched(FileUploaded::class, function ($event) use ($file) {
+            return $event->file = $file->hashName('merged');
         });
     }
 
@@ -269,6 +271,7 @@ class ResumableJsUploadDriverTest extends TestCase
     {
         $this->createFakeLocalFile('chunks/200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt', '000-099');
 
+        $file = UploadedFile::fake()->create('test.txt', 100);
         $request = Request::create('', Request::METHOD_POST, [
             'resumableChunkNumber' => 2,
             'resumableTotalChunks' => 2,
@@ -280,19 +283,19 @@ class ResumableJsUploadDriverTest extends TestCase
             'resumableCurrentChunkSize' => 100,
             'resumableType' => 'text/plain',
         ], [], [
-            'file' => UploadedFile::fake()->create('test.txt', 100),
+            'file' => $file,
         ]);
 
         $callback = $this->createClosureMock(
             $this->once(),
             'local',
-            'merged/200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt.txt'
+            $file->hashName('merged')
         );
 
         $this->handler->handle($request, $callback);
 
-        Event::assertDispatched(FileUploaded::class, function ($event) {
-            return $event->file = 'merged/200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt.txt';
+        Event::assertDispatched(FileUploaded::class, function ($event) use ($file) {
+            return $event->file = $file->hashName('merged');
         });
     }
 }

@@ -134,23 +134,20 @@ class DropzoneUploadDriver extends UploadDriver
             throw new BadRequestHttpException($e->getMessage(), $e);
         }
 
-        $filename = $request->post('dzuuid');
+        $uuid = $request->post('dzuuid');
 
-        // On windows you can not create a file whose name ends with a dot
-        if ($file->getClientOriginalExtension()) {
-            $filename .= '.' . $file->getClientOriginalExtension();
-        }
-
-        $chunks = $this->storeChunk($config, $range, $file, $filename);
+        $chunks = $this->storeChunk($config, $range, $file, $uuid);
 
         if (!$range->isFinished($chunks)) {
             return new PercentageJsonResponse($range->getPercentage($chunks));
         }
 
-        $path = $this->mergeChunks($config, $chunks, $filename);
+        $targetFilename = $file->hashName();
+
+        $path = $this->mergeChunks($config, $chunks, $targetFilename);
 
         if ($config->sweep()) {
-            $this->deleteChunkDirectory($config, $filename);
+            $this->deleteChunkDirectory($config, $uuid);
         }
 
         $this->triggerFileUploadedEvent($config->getDisk(), $path, $fileUploaded);

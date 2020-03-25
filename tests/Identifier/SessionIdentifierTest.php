@@ -47,6 +47,6 @@ class SessionIdentifierTest extends TestCase
     {
         $file = UploadedFile::fake()->create('test', 100);
         $identifier = $this->identifier->generateUploadedFileIdentifierName($file);
-        $this->assertEquals('3b7b99bf70a98a544319cf3bad9e912e1b89984d', $identifier);
+        $this->assertEquals('3b7b99bf70a98a544319cf3bad9e912e1b89984d.bin', $identifier);
     }
 }
