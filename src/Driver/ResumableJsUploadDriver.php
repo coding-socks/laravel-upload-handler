@@ -187,7 +187,7 @@ class ResumableJsUploadDriver extends UploadDriver
         return new PercentageJsonResponse(100);
     }
 
-    private function buildParameterName($key)
+    private function buildParameterName($key): string
     {
         if (! array_key_exists($key, $this->parameterNames)) {
             throw new InvalidArgumentException(sprintf('`%s` is an invalid key for parameter name', $key));
