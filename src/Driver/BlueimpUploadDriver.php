@@ -32,6 +32,12 @@ class BlueimpUploadDriver extends UploadDriver
      */
     private $identifier;
 
+    /**
+     * BlueimpUploadDriver constructor.
+     *
+     * @param array $config
+     * @param \LaraCrafts\ChunkUploader\Identifier\Identifier $identifier
+     */
     public function __construct($config, Identifier $identifier)
     {
         $this->fileParam = $config['param'];
@@ -41,22 +47,22 @@ class BlueimpUploadDriver extends UploadDriver
     /**
      * {@inheritDoc}
      */
-    public function handle(Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
+    public function handle(Request $request, StorageConfig $storageConfig, Closure $fileUploaded = null): Response
     {
         if ($this->isRequestMethodIn($request, [Request::METHOD_HEAD, Request::METHOD_OPTIONS])) {
             return $this->info();
         }
 
         if ($this->isRequestMethodIn($request, [Request::METHOD_GET])) {
-            return $this->download($request, $config);
+            return $this->download($request, $storageConfig);
         }
 
         if ($this->isRequestMethodIn($request, [Request::METHOD_POST, Request::METHOD_PUT, Request::METHOD_PATCH])) {
-            return $this->save($request, $config, $fileUploaded);
+            return $this->save($request, $storageConfig, $fileUploaded);
         }
 
         if ($this->isRequestMethodIn($request, [Request::METHOD_DELETE])) {
-            return $this->delete($request, $config);
+            return $this->delete($request, $storageConfig);
         }
 
         throw new MethodNotAllowedHttpException([
@@ -114,13 +120,13 @@ class BlueimpUploadDriver extends UploadDriver
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param StorageConfig $config
+     * @param Request $request
+     * @param StorageConfig $storageConfig
      * @param \Closure|null $fileUploaded
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function save(Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
+    public function save(Request $request, StorageConfig $storageConfig, Closure $fileUploaded = null): Response
     {
         $file = $request->file($this->fileParam);
 
@@ -138,7 +144,7 @@ class BlueimpUploadDriver extends UploadDriver
 
         $uuid = $this->identifier->generateUploadedFileIdentifierName($file);
 
-        $chunks = $this->storeChunk($config, $range, $file, $uuid);
+        $chunks = $this->storeChunk($storageConfig, $range, $file, $uuid);
 
         if (!$range->isLast()) {
             return new PercentageJsonResponse($range->getPercentage());
@@ -146,29 +152,29 @@ class BlueimpUploadDriver extends UploadDriver
 
         $targetFilename = $file->hashName();
 
-        $path = $this->mergeChunks($config, $chunks, $targetFilename);
+        $path = $this->mergeChunks($storageConfig, $chunks, $targetFilename);
 
-        if ($config->sweep()) {
-            $this->deleteChunkDirectory($config, $uuid);
+        if ($storageConfig->sweep()) {
+            $this->deleteChunkDirectory($storageConfig, $uuid);
         }
 
-        $this->triggerFileUploadedEvent($config->getDisk(), $path, $fileUploaded);
+        $this->triggerFileUploadedEvent($storageConfig->getDisk(), $path, $fileUploaded);
 
         return new PercentageJsonResponse(100);
     }
 
     /**
      * @param Request $request
-     * @param StorageConfig $config
+     * @param StorageConfig $storageConfig
      *
      * @return Response
      */
-    public function delete(Request $request, StorageConfig $config)
+    public function delete(Request $request, StorageConfig $storageConfig)
     {
         $filename = $request->post($this->fileParam);
 
-        $path = $config->getMergedDirectory() . '/' . $filename;
-        Storage::disk($config->getDisk())->delete($path);
+        $path = $storageConfig->getMergedDirectory() . '/' . $filename;
+        Storage::disk($storageConfig->getDisk())->delete($path);
 
         return new Response();
     }

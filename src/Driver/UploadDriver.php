@@ -19,26 +19,26 @@ abstract class UploadDriver
 {
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param \LaraCrafts\ChunkUploader\StorageConfig $config
+     * @param Request $request
+     * @param StorageConfig $storageConfig
      * @param \Closure|null $fileUploaded
      *
      * @return \Symfony\Component\HttpFoundation\Response
      *
      */
-    abstract public function handle(Request $request, StorageConfig $config, Closure $fileUploaded = null): Response;
+    abstract public function handle(Request $request, StorageConfig $storageConfig, Closure $fileUploaded = null): Response;
 
     /**
      * @param string $filename
-     * @param StorageConfig $config
+     * @param StorageConfig $storageConfig
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function fileResponse(string $filename, StorageConfig $config): Response
+    public function fileResponse(string $filename, StorageConfig $storageConfig): Response
     {
         /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
-        $disk = Storage::disk($config->getDisk());
-        $prefix = $config->getMergedDirectory() . '/';
+        $disk = Storage::disk($storageConfig->getDisk());
+        $prefix = $storageConfig->getMergedDirectory() . '/';
 
         if (! $disk->exists($prefix . $filename)) {
             throw new NotFoundHttpException($filename . ' file not found on server');

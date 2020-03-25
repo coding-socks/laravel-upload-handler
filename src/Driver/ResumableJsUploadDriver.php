@@ -45,6 +45,11 @@ class ResumableJsUploadDriver extends UploadDriver
      */
     private $parameterNames;
 
+    /**
+     * ResumableJsUploadDriver constructor.
+     *
+     * @param array $config
+     */
     public function __construct($config)
     {
         $this->fileParam = $config['param'];
@@ -59,14 +64,14 @@ class ResumableJsUploadDriver extends UploadDriver
     /**
      * @inheritDoc
      */
-    public function handle(Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
+    public function handle(Request $request, StorageConfig $storageConfig, Closure $fileUploaded = null): Response
     {
         if ($this->isRequestMethodIn($request, [$this->testMethod])) {
-            return $this->resume($request, $config);
+            return $this->resume($request, $storageConfig);
         }
 
         if ($this->isRequestMethodIn($request, [$this->uploadMethod])) {
-            return $this->save($request, $config, $fileUploaded);
+            return $this->save($request, $storageConfig, $fileUploaded);
         }
 
         throw new MethodNotAllowedHttpException([
@@ -76,12 +81,12 @@ class ResumableJsUploadDriver extends UploadDriver
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param StorageConfig $config
+     * @param Request $request
+     * @param StorageConfig $storageConfig
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function resume(Request $request, StorageConfig $config): Response
+    public function resume(Request $request, StorageConfig $storageConfig): Response
     {
         $this->validateChunkRequest($request);
 
@@ -100,7 +105,7 @@ class ResumableJsUploadDriver extends UploadDriver
         $filename = $request->query($this->buildParameterName('identifier'));
         $chunkname = $this->buildChunkname($range);
 
-        if (! $this->chunkExists($config, $filename, $chunkname)) {
+        if (! $this->chunkExists($storageConfig, $filename, $chunkname)) {
             throw new NotFoundHttpException();
         }
 
@@ -108,13 +113,13 @@ class ResumableJsUploadDriver extends UploadDriver
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param StorageConfig $config
+     * @param Request $request
+     * @param StorageConfig $storageConfig
      * @param \Closure|null $fileUploaded
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function save(Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
+    public function save(Request $request, StorageConfig $storageConfig, Closure $fileUploaded = null): Response
     {
         $file = $request->file($this->fileParam);
 
@@ -122,7 +127,7 @@ class ResumableJsUploadDriver extends UploadDriver
 
         $this->validateChunkRequest($request);
 
-        return $this->saveChunk($file, $request, $config, $fileUploaded);
+        return $this->saveChunk($file, $request, $storageConfig, $fileUploaded);
     }
 
     /**
@@ -140,14 +145,14 @@ class ResumableJsUploadDriver extends UploadDriver
     }
 
     /**
-     * @param UploadedFile $file
+     * @param UploadedFile $uploadedFile
      * @param Request $request
-     * @param StorageConfig $config
+     * @param StorageConfig $storageConfig
      * @param \Closure|null $fileUploaded
      *
      * @return Response
      */
-    private function saveChunk(UploadedFile $file, Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
+    private function saveChunk(UploadedFile $uploadedFile, Request $request, StorageConfig $storageConfig, Closure $fileUploaded = null): Response
     {
         try {
             $range = new OneBasedRequestBodyRange(
@@ -163,26 +168,31 @@ class ResumableJsUploadDriver extends UploadDriver
 
         $uuid = $request->post($this->buildParameterName('identifier'));
 
-        $chunks = $this->storeChunk($config, $range, $file, $uuid);
+        $chunks = $this->storeChunk($storageConfig, $range, $uploadedFile, $uuid);
 
         if (!$range->isFinished($chunks)) {
             return new PercentageJsonResponse($range->getPercentage($chunks));
         }
 
-        $targetFilename = $file->hashName();
+        $targetFilename = $uploadedFile->hashName();
 
-        $path = $this->mergeChunks($config, $chunks, $targetFilename);
+        $path = $this->mergeChunks($storageConfig, $chunks, $targetFilename);
 
-        if ($config->sweep()) {
-            $this->deleteChunkDirectory($config, $uuid);
+        if ($storageConfig->sweep()) {
+            $this->deleteChunkDirectory($storageConfig, $uuid);
         }
 
-        $this->triggerFileUploadedEvent($config->getDisk(), $path, $fileUploaded);
+        $this->triggerFileUploadedEvent($storageConfig->getDisk(), $path, $fileUploaded);
 
         return new PercentageJsonResponse(100);
     }
 
-    private function buildParameterName($key): string
+    /**
+     * @param $key string
+     *
+     * @return string
+     */
+    private function buildParameterName(string $key): string
     {
         if (! array_key_exists($key, $this->parameterNames)) {
             throw new InvalidArgumentException(sprintf('`%s` is an invalid key for parameter name', $key));

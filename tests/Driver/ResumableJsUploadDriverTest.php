@@ -60,7 +60,6 @@ class ResumableJsUploadDriverTest extends TestCase
     /**
      * @dataProvider notAllowedRequestMethods
      */
-
     public function testMethodNotAllowed($requestMethod)
     {
         $request = Request::create('', $requestMethod);
