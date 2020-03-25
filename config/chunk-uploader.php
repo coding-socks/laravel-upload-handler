@@ -133,7 +133,7 @@ return [
         'param' => 'file',
 
         //  HTTP method for chunk test request.
-        'test-method' => \Illuminate\Http\Request::METHOD_GET,
+        'test-method' => Illuminate\Http\Request::METHOD_GET,
         //  HTTP method to use when sending chunks to the server (POST, PUT, PATCH).
         'upload-method' => Illuminate\Http\Request::METHOD_POST,
 
