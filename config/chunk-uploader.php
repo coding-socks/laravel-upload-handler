@@ -135,7 +135,7 @@ return [
         //  HTTP method for chunk test request.
         'test-method' => \Illuminate\Http\Request::METHOD_GET,
         //  HTTP method to use when sending chunks to the server (POST, PUT, PATCH).
-        'upload-method' => \Illuminate\Http\Request::METHOD_POST,
+        'upload-method' => Illuminate\Http\Request::METHOD_POST,
 
         // Extra prefix added before the name of each parameter included in the multipart POST or in the test GET.
         'parameter-namespace' => '',
