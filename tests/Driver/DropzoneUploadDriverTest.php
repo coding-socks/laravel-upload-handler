@@ -143,6 +143,7 @@ class DropzoneUploadDriverTest extends TestCase
 
     public function testUploadFirstChunk()
     {
+        $file = UploadedFile::fake()->create('test.txt', 100);
         $request = Request::create('', Request::METHOD_POST, [
             'dzuuid' => '2494cefe4d234bd331aeb4514fe97d810efba29b',
             'dzchunkindex' => 0,
@@ -151,7 +152,7 @@ class DropzoneUploadDriverTest extends TestCase
             'dztotalchunkcount' => 2,
             'dzchunkbyteoffset' => 100,
         ], [], [
-            'file' => UploadedFile::fake()->create('test.txt', 100),
+            'file' => $file,
         ]);
 
         /** @var \Illuminate\Foundation\Testing\TestResponse $response */
@@ -159,15 +160,16 @@ class DropzoneUploadDriverTest extends TestCase
         $response->assertSuccessful();
         $response->assertJson(['done' => 50]);
 
-        Storage::disk('local')->assertExists('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt/000-099');
+        Storage::disk('local')->assertExists('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b/000-099');
 
-        Event::assertNotDispatched(FileUploaded::class, function ($event) {
-            return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
+        Event::assertNotDispatched(FileUploaded::class, function ($event) use ($file) {
+            return $event->file = $file->hashName('merged');
         });
     }
 
     public function testUploadFirstChunkWithCallback()
     {
+        $file = UploadedFile::fake()->create('test.txt', 100);
         $request = Request::create('', Request::METHOD_POST, [
             'dzuuid' => '2494cefe4d234bd331aeb4514fe97d810efba29b',
             'dzchunkindex' => 0,
@@ -176,22 +178,23 @@ class DropzoneUploadDriverTest extends TestCase
             'dztotalchunkcount' => 2,
             'dzchunkbyteoffset' => 100,
         ], [], [
-            'file' => UploadedFile::fake()->create('test.txt', 100),
+            'file' => $file,
         ]);
 
         $callback = $this->createClosureMock($this->never());
 
         $this->handler->handle($request, $callback);
 
-        Event::assertNotDispatched(FileUploaded::class, function ($event) {
-            return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
+        Event::assertNotDispatched(FileUploaded::class, function ($event) use ($file) {
+            return $event->file = $file->hashName('merged');
         });
     }
 
     public function testUploadLastChunk()
     {
-        $this->createFakeLocalFile('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt', '000');
+        $this->createFakeLocalFile('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b', '000');
 
+        $file = UploadedFile::fake()->create('test.txt', 100);
         $request = Request::create('', Request::METHOD_POST, [
             'dzuuid' => '2494cefe4d234bd331aeb4514fe97d810efba29b',
             'dzchunkindex' => 1,
@@ -200,7 +203,7 @@ class DropzoneUploadDriverTest extends TestCase
             'dztotalchunkcount' => 2,
             'dzchunkbyteoffset' => 100,
         ], [], [
-            'file' => UploadedFile::fake()->create('test.txt', 100),
+            'file' => $file,
         ]);
 
         /** @var \Illuminate\Foundation\Testing\TestResponse $response */
@@ -208,18 +211,19 @@ class DropzoneUploadDriverTest extends TestCase
         $response->assertSuccessful();
         $response->assertJson(['done' => 100]);
 
-        Storage::disk('local')->assertExists('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt/100-199');
-        Storage::disk('local')->assertExists('merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt');
+        Storage::disk('local')->assertExists('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b/100-199');
+        Storage::disk('local')->assertExists($file->hashName('merged'));
 
-        Event::assertDispatched(FileUploaded::class, function ($event) {
-            return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
+        Event::assertDispatched(FileUploaded::class, function ($event) use ($file) {
+            return $event->file = $file->hashName('merged');
         });
     }
 
     public function testUploadLastChunkWithCallback()
     {
-        $this->createFakeLocalFile('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt', '000');
+        $this->createFakeLocalFile('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b', '000');
 
+        $file = UploadedFile::fake()->create('test.txt', 100);
         $request = Request::create('', Request::METHOD_POST, [
             'dzuuid' => '2494cefe4d234bd331aeb4514fe97d810efba29b',
             'dzchunkindex' => 1,
@@ -228,19 +232,19 @@ class DropzoneUploadDriverTest extends TestCase
             'dztotalchunkcount' => 2,
             'dzchunkbyteoffset' => 100,
         ], [], [
-            'file' => UploadedFile::fake()->create('test.txt', 100),
+            'file' => $file,
         ]);
 
         $callback = $this->createClosureMock(
             $this->once(),
             'local',
-            'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt'
+            $file->hashName('merged')
         );
 
         $this->handler->handle($request, $callback);
 
-        Event::assertDispatched(FileUploaded::class, function ($event) {
-            return $event->file = 'merged/2494cefe4d234bd331aeb4514fe97d810efba29b.txt';
+        Event::assertDispatched(FileUploaded::class, function ($event) use ($file) {
+            return $event->file = $file->hashName('merged');
         });
     }
 }

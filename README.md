@@ -36,6 +36,7 @@ project at the moment is [tus](https://tus.io/).
     - [Monolith](#monolith-driver)
     - [Blueimp](#blueimp-driver)
     - [DropzoneJS](#dropzonejs-driver)
+    - [Resumable.js](#resumable-js-driver)
 - [Identifiers](#identifiers)
     - [Session identifier](#session-identifier)
 - [Contribution](#contribution)
@@ -72,7 +73,7 @@ class MyController extends Controller
 {
     public function myFunction(Request $request, UploadHandler $handler)
     {
-        $handler->handle($request);
+        return $handler->handle($request);
     }
 }
 ```
@@ -86,7 +87,7 @@ class MyController extends Controller
     public function myFunction(Request $request)
     {
         $handler = app()->make(UploadHandler::class);
-        $handler->handle($request);
+        return $handler->handle($request);
     }
 }
 ```
@@ -142,11 +143,12 @@ If you wrote a custom driver that others might find useful, please consider addi
 
 Below is a list of available drivers along with their individual specs:
 
-Service                          | Driver name | Chunk upload | Resumable
----------------------------------|-------------|--------------|-----------
-[Monolith](#monolith-driver)     | `monolith`  | no           | no
-[Blueimp](#blueimp-driver)       | `blueimp`   | yes          | yes
-[DropzoneJS](#dropzonejs-driver) | `dropzone`  | yes          | no
+Service                              | Driver name    | Chunk upload | Resumable
+-------------------------------------|----------------|--------------|-----------
+[Monolith](#monolith-driver)         | `monolith`     | no           | no
+[Blueimp](#blueimp-driver)           | `blueimp`      | yes          | yes
+[DropzoneJS](#dropzonejs-driver)     | `dropzone`     | yes          | no
+[Resumable.js](#resumable-js-driver) | `resumable-js` | yes          | yes
 
 ### Monolith driver
 
@@ -163,6 +165,12 @@ This driver handles requests made by the Blueimp jQuery File Upload client libra
 [website](https://www.dropzonejs.com/)
 
 This driver handles requests made by the DropzoneJS client library.
+
+### Resumable.js driver
+
+[website](http://resumablejs.com/)
+
+This driver handles requests made by the Resumable.js client library.
 
 ## Identifiers
 

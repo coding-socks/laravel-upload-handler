@@ -30,15 +30,15 @@ abstract class UploadDriver
 
     /**
      * @param string $filename
-     * @param array $config
+     * @param \LaraCrafts\ChunkUploader\StorageConfig $storageConfig
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function fileResponse(string $filename, StorageConfig $config): Response
+    public function fileResponse(string $filename, StorageConfig $storageConfig): Response
     {
         /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
-        $disk = Storage::disk($config->getDisk());
-        $prefix = $config->getMergedDirectory() . '/';
+        $disk = Storage::disk($storageConfig->getDisk());
+        $prefix = $storageConfig->getMergedDirectory() . '/';
 
         if (! $disk->exists($prefix . $filename)) {
             throw new NotFoundHttpException($filename . ' file not found on server');
@@ -49,6 +49,14 @@ abstract class UploadDriver
         return new BinaryFileResponse($path, 200, [], true, ResponseHeaderBag::DISPOSITION_ATTACHMENT);
     }
 
+    /**
+     * Check if the request type of the given request is in the specified list.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param array $methods
+     *
+     * @return bool
+     */
     public function isRequestMethodIn(Request $request, array $methods): bool
     {
         foreach ($methods as $method) {
@@ -60,7 +68,15 @@ abstract class UploadDriver
         return false;
     }
 
-    protected function triggerFileUploadedEvent($disk, $path, Closure $fileUploaded = null)
+    /**
+     * Dispatch a {@link \LaraCrafts\ChunkUploader\Event\FileUploaded} event.
+     * Also call the given {@link \Closure} if not null.
+     *
+     * @param $disk
+     * @param $path
+     * @param \Closure|null $fileUploaded
+     */
+    protected function triggerFileUploadedEvent($disk, $path, Closure $fileUploaded = null): void
     {
         if ($fileUploaded !== null) {
             $fileUploaded($disk, $path);
@@ -77,7 +93,7 @@ abstract class UploadDriver
      * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException when given file is null.
      * @throws \LaraCrafts\ChunkUploader\Exception\InternalServerErrorHttpException when given file is invalid.
      */
-    protected function validateUploadedFile(UploadedFile $file = null)
+    protected function validateUploadedFile(UploadedFile $file = null): void
     {
         if (null === $file) {
             throw new BadRequestHttpException('File not found in request body');

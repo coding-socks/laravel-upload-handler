@@ -22,13 +22,6 @@ abstract class Identifier
     {
         $data = $file->getClientOriginalName();
 
-        $filename = $this->generateIdentifier($data);
-
-        // On windows you can not create a file whose name ends with a dot
-        if ($file->getClientOriginalExtension()) {
-            $filename .= '.' . $file->getClientOriginalExtension();
-        }
-
-        return $filename;
+        return $this->generateIdentifier($data) . '.' . $file->guessExtension();
     }
 }

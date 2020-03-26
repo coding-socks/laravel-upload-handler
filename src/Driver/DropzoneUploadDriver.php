@@ -5,11 +5,9 @@ namespace LaraCrafts\ChunkUploader\Driver;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
 use LaraCrafts\ChunkUploader\Helper\ChunkHelpers;
-use LaraCrafts\ChunkUploader\Identifier\Identifier;
-use LaraCrafts\ChunkUploader\Range\RequestBodyRange;
+use LaraCrafts\ChunkUploader\Range\ZeroBasedRequestBodyRange;
 use LaraCrafts\ChunkUploader\Response\PercentageJsonResponse;
 use LaraCrafts\ChunkUploader\StorageConfig;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,6 +23,11 @@ class DropzoneUploadDriver extends UploadDriver
      */
     private $fileParam;
 
+    /**
+     * DropzoneUploadDriver constructor.
+     *
+     * @param array $config
+     */
     public function __construct($config)
     {
         $this->fileParam = $config['param'];
@@ -46,8 +49,7 @@ class DropzoneUploadDriver extends UploadDriver
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param \LaraCrafts\ChunkUploader\Identifier\Identifier $identifier
-     * @param StorageConfig $config
+     * @param \LaraCrafts\ChunkUploader\StorageConfig $config
      * @param \Closure|null $fileUploaded
      *
      * @return \Symfony\Component\HttpFoundation\Response
@@ -68,11 +70,11 @@ class DropzoneUploadDriver extends UploadDriver
     }
 
     /**
-     * @param Request $request
+     * @param \Illuminate\Http\Request $request
      *
      * @return bool
      */
-    private function isMonolithRequest(Request $request)
+    private function isMonolithRequest(Request $request): bool
     {
         return $request->post('dzuuid') === null
             && $request->post('dzchunkindex') === null
@@ -83,9 +85,9 @@ class DropzoneUploadDriver extends UploadDriver
     }
 
     /**
-     * @param Request $request
+     * @param \Illuminate\Http\Request $request
      */
-    private function validateChunkRequest(Request $request)
+    private function validateChunkRequest(Request $request): void
     {
         $request->validate([
             'dzuuid' => 'required',
@@ -98,12 +100,11 @@ class DropzoneUploadDriver extends UploadDriver
     }
 
     /**
-     * @param UploadedFile $file
-     * @param Identifier $identifier
-     * @param StorageConfig $config
+     * @param \Illuminate\Http\UploadedFile $file
+     * @param \LaraCrafts\ChunkUploader\StorageConfig $config
      * @param \Closure|null $fileUploaded
      *
-     * @return Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     private function saveMonolith(UploadedFile $file, StorageConfig $config, Closure $fileUploaded = null): Response
     {
@@ -117,17 +118,17 @@ class DropzoneUploadDriver extends UploadDriver
     }
 
     /**
-     * @param UploadedFile $file
-     * @param Request $request
-     * @param StorageConfig $config
+     * @param \Illuminate\Http\UploadedFile $file
+     * @param \Illuminate\Http\Request $request
+     * @param \LaraCrafts\ChunkUploader\StorageConfig $config
      * @param \Closure|null $fileUploaded
      *
-     * @return Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     private function saveChunk(UploadedFile $file, Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
     {
         try {
-            $range = new RequestBodyRange(
+            $range = new ZeroBasedRequestBodyRange(
                 $request,
                 'dzchunkindex',
                 'dztotalchunkcount',
@@ -138,23 +139,20 @@ class DropzoneUploadDriver extends UploadDriver
             throw new BadRequestHttpException($e->getMessage(), $e);
         }
 
-        $filename = $request->post('dzuuid');
+        $uuid = $request->post('dzuuid');
 
-        // On windows you can not create a file whose name ends with a dot
-        if ($file->getClientOriginalExtension()) {
-            $filename .= '.' . $file->getClientOriginalExtension();
-        }
-
-        $chunks = $this->storeChunk($config, $range, $file, $filename);
+        $chunks = $this->storeChunk($config, $range, $file, $uuid);
 
         if (!$range->isFinished($chunks)) {
             return new PercentageJsonResponse($range->getPercentage($chunks));
         }
 
-        $path = $this->mergeChunks($config, $chunks, $filename);
+        $targetFilename = $file->hashName();
 
-        if (!empty($config->sweep())) {
-            Storage::disk($config->getDisk())->deleteDirectory($filename);
+        $path = $this->mergeChunks($config, $chunks, $targetFilename);
+
+        if ($config->sweep()) {
+            $this->deleteChunkDirectory($config, $uuid);
         }
 
         $this->triggerFileUploadedEvent($config->getDisk(), $path, $fileUploaded);

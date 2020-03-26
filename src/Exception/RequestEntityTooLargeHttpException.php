@@ -9,10 +9,9 @@ class RequestEntityTooLargeHttpException extends HttpException
     /**
      * RequestEntityTooLargeHttpException constructor.
      *
-     * @param null $message
-     * @param int $statusCode
+     * @param string|null $message
      * @param \Exception|null $previous
-     * @param int|null $code
+     * @param integer $code
      */
     public function __construct($message = null, \Exception $previous = null, int $code = 0)
     {

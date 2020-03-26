@@ -32,6 +32,12 @@ class BlueimpUploadDriver extends UploadDriver
      */
     private $identifier;
 
+    /**
+     * BlueimpUploadDriver constructor.
+     *
+     * @param array $config
+     * @param \LaraCrafts\ChunkUploader\Identifier\Identifier $identifier
+     */
     public function __construct($config, Identifier $identifier)
     {
         $this->fileParam = $config['param'];
@@ -84,7 +90,13 @@ class BlueimpUploadDriver extends UploadDriver
         ]);
     }
 
-    public function download(Request $request, StorageConfig $config)
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @param \LaraCrafts\ChunkUploader\StorageConfig $config
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function download(Request $request, StorageConfig $config): Response
     {
         $download = $request->query('download', false);
         if ($download !== false) {
@@ -93,18 +105,16 @@ class BlueimpUploadDriver extends UploadDriver
             return $this->fileResponse($filename, $config);
         }
 
+        $request->validate([$this->fileParam => 'required']);
         $filename = $request->query($this->fileParam);
-        $directory = $config->getChunkDirectory() . '/' . $filename;
-        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
-        $disk = Storage::disk($config->getDisk());
 
-        if (! $disk->exists($directory)) {
+        if (!$this->chunkExists($config, $filename)) {
             return new JsonResponse([
                 'file' => null,
             ]);
         }
 
-        $chunk = Arr::last($disk->files($directory));
+        $chunk = Arr::last($this->chunks($config, $filename));
         $size = explode('-', basename($chunk))[1] + 1;
 
         return new JsonResponse([
@@ -117,8 +127,7 @@ class BlueimpUploadDriver extends UploadDriver
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param \LaraCrafts\ChunkUploader\Identifier\Identifier $identifier
-     * @param StorageConfig $config
+     * @param \LaraCrafts\ChunkUploader\StorageConfig $config
      * @param \Closure|null $fileUploaded
      *
      * @return \Symfony\Component\HttpFoundation\Response
@@ -139,18 +148,20 @@ class BlueimpUploadDriver extends UploadDriver
             throw new BadRequestHttpException($e->getMessage(), $e);
         }
 
-        $filename = $this->identifier->generateUploadedFileIdentifierName($file);
+        $uuid = $this->identifier->generateUploadedFileIdentifierName($file);
 
-        $chunks = $this->storeChunk($config, $range, $file, $filename);
+        $chunks = $this->storeChunk($config, $range, $file, $uuid);
 
-        if (! $range->isLast()) {
+        if (!$range->isLast()) {
             return new PercentageJsonResponse($range->getPercentage());
         }
 
-        $path = $this->mergeChunks($config, $chunks, $filename);
+        $targetFilename = $file->hashName();
 
-        if (! empty($config->sweep())) {
-            Storage::disk($config->getDisk())->deleteDirectory($filename);
+        $path = $this->mergeChunks($config, $chunks, $targetFilename);
+
+        if ($config->sweep()) {
+            $this->deleteChunkDirectory($config, $uuid);
         }
 
         $this->triggerFileUploadedEvent($config->getDisk(), $path, $fileUploaded);
@@ -159,11 +170,12 @@ class BlueimpUploadDriver extends UploadDriver
     }
 
     /**
-     * @param Request $request
-     * @param StorageConfig $config
-     * @return Response
+     * @param \Illuminate\Http\Request $request
+     * @param \LaraCrafts\ChunkUploader\StorageConfig $config
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function delete(Request $request, StorageConfig $config)
+    public function delete(Request $request, StorageConfig $config): Response
     {
         $filename = $request->post($this->fileParam);
 

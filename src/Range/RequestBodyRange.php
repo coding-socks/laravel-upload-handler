@@ -5,15 +5,15 @@ namespace LaraCrafts\ChunkUploader\Range;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
 
-class RequestBodyRange implements Range
+abstract class RequestBodyRange implements Range
 {
-    private $index;
+    protected $index;
 
-    private $numberOfChunks;
+    protected $numberOfChunks;
 
-    private $totalSize;
+    protected $totalSize;
 
-    private $chunkSize;
+    protected $chunkSize;
 
     /**
      * RequestRange constructor.
@@ -36,53 +36,55 @@ class RequestBodyRange implements Range
         // Must be double (which is an alias for float) for 32 bit systems
         $this->totalSize = (double) $request->get($totalSizeKey);
 
+        $this->validateNumberOfChunks($numberOfChunksKey);
+        $this->validateIndexKey($indexKey, $numberOfChunksKey);
+        $this->validateChunkSize($chunkSizeKey);
+        $this->validateTotalSize($indexKey, $numberOfChunksKey, $chunkSizeKey, $totalSizeKey);
+    }
+
+    /**
+     * @param string $numberOfChunksKey
+     */
+    protected function validateNumberOfChunks(string $numberOfChunksKey): void
+    {
         if ($this->numberOfChunks <= 0) {
             throw new InvalidArgumentException(sprintf('`%s` must be greater than zero', $numberOfChunksKey));
         }
-        if ($this->index < 0) {
-            throw new InvalidArgumentException(sprintf('`%s` must be greater than or equal to zero', $indexKey));
-        }
-        if ($this->index >= $this->numberOfChunks) {
-            throw new InvalidArgumentException(sprintf('`%s` must be smaller than `%s`', $indexKey, $numberOfChunksKey));
-        }
+    }
+
+    /**
+     * @param string $indexKey
+     * @param string $numberOfChunksKey
+     */
+    abstract protected function validateIndexKey(string $indexKey, string $numberOfChunksKey): void;
+
+    /**
+     * @param string $chunkSizeKey
+     */
+    protected function validateChunkSize(string $chunkSizeKey): void
+    {
         if ($this->chunkSize < 1) {
             throw new InvalidArgumentException(sprintf('`%s` must be greater than zero', $chunkSizeKey));
         }
-        if ($this->totalSize < 1) {
-            throw new InvalidArgumentException(sprintf('`%s` must be greater than zero', $totalSizeKey));
-        } elseif ($this->totalSize <= $this->index * $this->chunkSize) {
-            throw new InvalidArgumentException(
-                sprintf('`%s` must be greater than the multiple of `%s` and `%s`', $totalSizeKey, $chunkSizeKey, $indexKey)
-            );
-        } elseif ($this->totalSize > $this->numberOfChunks * $this->chunkSize) {
-            throw new InvalidArgumentException(
-                sprintf('`%s` must be smaller than or equal to the multiple of `%s` and `%s`', $totalSizeKey, $chunkSizeKey, $numberOfChunksKey)
-            );
-        }
     }
+
+    /**
+     * @param string $indexKey
+     * @param string $numberOfChunksKey
+     * @param string $chunkSizeKey
+     * @param string $totalSizeKey
+     */
+    abstract protected function validateTotalSize(string $indexKey, string $numberOfChunksKey, string $chunkSizeKey, string $totalSizeKey): void;
 
     /**
      * {@inheritDoc}
      */
-    public function getStart(): float
-    {
-        return $this->index * $this->chunkSize;
-    }
+    abstract public function getStart(): float;
 
     /**
      * {@inheritDoc}
      */
-    public function getEnd(): float
-    {
-        $end = (($this->index + 1) * $this->chunkSize) - 1;
-
-        $sizeIndex = $this->totalSize - 1;
-        if ($end > ($sizeIndex)) {
-            return $sizeIndex;
-        }
-
-        return $end;
-    }
+    abstract public function getEnd(): float;
 
     /**
      * {@inheritDoc}
@@ -95,18 +97,12 @@ class RequestBodyRange implements Range
     /**
      * {@inheritDoc}
      */
-    public function isFirst(): bool
-    {
-        return $this->index === 0;
-    }
+    abstract public function isFirst(): bool;
 
     /**
      * {@inheritDoc}
      */
-    public function isLast(): bool
-    {
-        return $this->index === $this->numberOfChunks - 1;
-    }
+    abstract public function isLast(): bool;
 
     /**
      * @param $uploadedChunks

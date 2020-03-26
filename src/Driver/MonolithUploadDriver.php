@@ -17,6 +17,11 @@ class MonolithUploadDriver extends UploadDriver
      */
     private $fileParam;
 
+    /**
+     * MonolithUploadDriver constructor.
+     *
+     * @param array $config
+     */
     public function __construct($config)
     {
         $this->fileParam = $config['param'];
@@ -48,7 +53,6 @@ class MonolithUploadDriver extends UploadDriver
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param \LaraCrafts\ChunkUploader\Identifier\Identifier $identifier
      * @param \LaraCrafts\ChunkUploader\StorageConfig $config
      * @param \Closure|null $fileUploaded
      *
@@ -88,7 +92,7 @@ class MonolithUploadDriver extends UploadDriver
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function delete(Request $request, StorageConfig $config)
+    public function delete(Request $request, StorageConfig $config): Response
     {
         $filename = $request->post($this->fileParam, $request->route($this->fileParam));
 
