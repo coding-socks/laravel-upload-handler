@@ -30,18 +30,18 @@ class MonolithUploadDriver extends UploadDriver
     /**
      * {@inheritDoc}
      */
-    public function handle(Request $request, StorageConfig $storageConfig, Closure $fileUploaded = null): Response
+    public function handle(Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
     {
         if ($request->isMethod(Request::METHOD_POST)) {
-            return $this->save($request, $storageConfig, $fileUploaded);
+            return $this->save($request, $config, $fileUploaded);
         }
 
         if ($request->isMethod(Request::METHOD_GET)) {
-            return $this->download($request, $storageConfig);
+            return $this->download($request, $config);
         }
 
         if ($request->isMethod(Request::METHOD_DELETE)) {
-            return $this->delete($request, $storageConfig);
+            return $this->delete($request, $config);
         }
 
         throw new MethodNotAllowedHttpException([
@@ -52,52 +52,52 @@ class MonolithUploadDriver extends UploadDriver
     }
 
     /**
-     * @param Request $request
-     * @param StorageConfig $storageConfig
+     * @param \Illuminate\Http\Request $request
+     * @param \LaraCrafts\ChunkUploader\StorageConfig $config
      * @param \Closure|null $fileUploaded
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function save(Request $request, StorageConfig $storageConfig, Closure $fileUploaded = null): Response
+    public function save(Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
     {
         $file = $request->file($this->fileParam);
 
         $this->validateUploadedFile($file);
 
-        $path = $file->store($storageConfig->getMergedDirectory(), [
-            'disk' => $storageConfig->getDisk(),
+        $path = $file->store($config->getMergedDirectory(), [
+            'disk' => $config->getDisk(),
         ]);
 
-        $this->triggerFileUploadedEvent($storageConfig->getDisk(), $path, $fileUploaded);
+        $this->triggerFileUploadedEvent($config->getDisk(), $path, $fileUploaded);
 
         return new PercentageJsonResponse(100);
     }
 
     /**
-     * @param Request $request
-     * @param StorageConfig $storageConfig
+     * @param \Illuminate\Http\Request $request
+     * @param \LaraCrafts\ChunkUploader\StorageConfig $config
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function download(Request $request, StorageConfig $storageConfig): Response
+    public function download(Request $request, StorageConfig $config): Response
     {
         $filename = $request->query($this->fileParam, $request->route($this->fileParam));
 
-        return $this->fileResponse($filename, $storageConfig);
+        return $this->fileResponse($filename, $config);
     }
 
     /**
-     * @param Request $request
-     * @param StorageConfig $storageConfig
+     * @param \Illuminate\Http\Request $request
+     * @param \LaraCrafts\ChunkUploader\StorageConfig $config
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function delete(Request $request, StorageConfig $storageConfig)
+    public function delete(Request $request, StorageConfig $config): Response
     {
         $filename = $request->post($this->fileParam, $request->route($this->fileParam));
 
-        $path = $storageConfig->getMergedDirectory() . '/' . $filename;
-        Storage::disk($storageConfig->getDisk())->delete($path);
+        $path = $config->getMergedDirectory() . '/' . $filename;
+        Storage::disk($config->getDisk())->delete($path);
 
         return new Response();
     }

@@ -47,22 +47,22 @@ class BlueimpUploadDriver extends UploadDriver
     /**
      * {@inheritDoc}
      */
-    public function handle(Request $request, StorageConfig $storageConfig, Closure $fileUploaded = null): Response
+    public function handle(Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
     {
         if ($this->isRequestMethodIn($request, [Request::METHOD_HEAD, Request::METHOD_OPTIONS])) {
             return $this->info();
         }
 
         if ($this->isRequestMethodIn($request, [Request::METHOD_GET])) {
-            return $this->download($request, $storageConfig);
+            return $this->download($request, $config);
         }
 
         if ($this->isRequestMethodIn($request, [Request::METHOD_POST, Request::METHOD_PUT, Request::METHOD_PATCH])) {
-            return $this->save($request, $storageConfig, $fileUploaded);
+            return $this->save($request, $config, $fileUploaded);
         }
 
         if ($this->isRequestMethodIn($request, [Request::METHOD_DELETE])) {
-            return $this->delete($request, $storageConfig);
+            return $this->delete($request, $config);
         }
 
         throw new MethodNotAllowedHttpException([
@@ -90,7 +90,13 @@ class BlueimpUploadDriver extends UploadDriver
         ]);
     }
 
-    public function download(Request $request, StorageConfig $config)
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @param \LaraCrafts\ChunkUploader\StorageConfig $config
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function download(Request $request, StorageConfig $config): Response
     {
         $download = $request->query('download', false);
         if ($download !== false) {
@@ -120,13 +126,13 @@ class BlueimpUploadDriver extends UploadDriver
     }
 
     /**
-     * @param Request $request
-     * @param StorageConfig $storageConfig
+     * @param \Illuminate\Http\Request $request
+     * @param \LaraCrafts\ChunkUploader\StorageConfig $config
      * @param \Closure|null $fileUploaded
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function save(Request $request, StorageConfig $storageConfig, Closure $fileUploaded = null): Response
+    public function save(Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
     {
         $file = $request->file($this->fileParam);
 
@@ -144,7 +150,7 @@ class BlueimpUploadDriver extends UploadDriver
 
         $uuid = $this->identifier->generateUploadedFileIdentifierName($file);
 
-        $chunks = $this->storeChunk($storageConfig, $range, $file, $uuid);
+        $chunks = $this->storeChunk($config, $range, $file, $uuid);
 
         if (!$range->isLast()) {
             return new PercentageJsonResponse($range->getPercentage());
@@ -152,29 +158,29 @@ class BlueimpUploadDriver extends UploadDriver
 
         $targetFilename = $file->hashName();
 
-        $path = $this->mergeChunks($storageConfig, $chunks, $targetFilename);
+        $path = $this->mergeChunks($config, $chunks, $targetFilename);
 
-        if ($storageConfig->sweep()) {
-            $this->deleteChunkDirectory($storageConfig, $uuid);
+        if ($config->sweep()) {
+            $this->deleteChunkDirectory($config, $uuid);
         }
 
-        $this->triggerFileUploadedEvent($storageConfig->getDisk(), $path, $fileUploaded);
+        $this->triggerFileUploadedEvent($config->getDisk(), $path, $fileUploaded);
 
         return new PercentageJsonResponse(100);
     }
 
     /**
-     * @param Request $request
-     * @param StorageConfig $storageConfig
+     * @param \Illuminate\Http\Request $request
+     * @param \LaraCrafts\ChunkUploader\StorageConfig $config
      *
-     * @return Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function delete(Request $request, StorageConfig $storageConfig)
+    public function delete(Request $request, StorageConfig $config): Response
     {
         $filename = $request->post($this->fileParam);
 
-        $path = $storageConfig->getMergedDirectory() . '/' . $filename;
-        Storage::disk($storageConfig->getDisk())->delete($path);
+        $path = $config->getMergedDirectory() . '/' . $filename;
+        Storage::disk($config->getDisk())->delete($path);
 
         return new Response();
     }

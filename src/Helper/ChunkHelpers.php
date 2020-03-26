@@ -18,7 +18,7 @@ trait ChunkHelpers
     /**
      * Combine all the given chunks to one single file with the given filename.
      *
-     * @param StorageConfig $config
+     * @param \LaraCrafts\ChunkUploader\StorageConfig $config
      * @param array $chunks
      * @param string $targetFilename
      *
@@ -63,9 +63,9 @@ trait ChunkHelpers
     /**
      * Persist an uploaded chunk in a directory with the given name in the chunk directory.
      *
-     * @param StorageConfig $config
-     * @param Range $range
-     * @param UploadedFile $file
+     * @param \LaraCrafts\ChunkUploader\StorageConfig $config
+     * @param \LaraCrafts\ChunkUploader\Range\Range $range
+     * @param \Illuminate\Http\UploadedFile $file
      * @param string $uuid
      * @return array
      */
