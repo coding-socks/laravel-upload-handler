@@ -2,6 +2,7 @@
 
 namespace LaraCrafts\ChunkUploader\Helper;
 
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Http\File;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -45,7 +46,7 @@ trait ChunkHelpers
             }
         }
 
-        return $targetPath;
+        return $this->correctMergedExt($disk, $mergedDirectory, $targetFilename);
     }
 
     /**
@@ -67,6 +68,7 @@ trait ChunkHelpers
      * @param \LaraCrafts\ChunkUploader\Range\Range $range
      * @param \Illuminate\Http\UploadedFile $file
      * @param string $uuid
+     *
      * @return array
      */
     public function storeChunk(StorageConfig $config, Range $range, UploadedFile $file, string $uuid): array
@@ -127,10 +129,32 @@ trait ChunkHelpers
         $directory = $config->getChunkDirectory() . '/' . $uuid;
         $disk = Storage::disk($config->getDisk());
 
-        if (! $disk->exists($directory)) {
+        if (!$disk->exists($directory)) {
             return false;
         }
 
         return $chunkname === null || $disk->exists($directory . '/' . $chunkname);
+    }
+
+    /**
+     * @param \Illuminate\Contracts\Filesystem\Filesystem $disk
+     * @param string $mergedDirectory
+     * @param string $targetFilename
+     *
+     * @return string
+     */
+    private function correctMergedExt(Filesystem $disk, string $mergedDirectory, string $targetFilename): string
+    {
+        $ext = pathinfo($targetFilename, PATHINFO_EXTENSION);
+        if ($ext === 'bin') {
+            $targetPath = $mergedDirectory . '/' . $targetFilename;
+            $var = $disk->path($targetPath);
+            $uploadedFile = new UploadedFile($var, $targetFilename);
+            $filename = pathinfo($targetFilename, PATHINFO_FILENAME);
+            $fixedTargetPath = $mergedDirectory . '/' . $filename . '.' . $uploadedFile->guessExtension();
+            $disk->move($targetPath, $fixedTargetPath);
+            $targetPath = $fixedTargetPath;
+        }
+        return $targetPath;
     }
 }
