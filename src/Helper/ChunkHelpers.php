@@ -145,9 +145,9 @@ trait ChunkHelpers
      */
     private function correctMergedExt(Filesystem $disk, string $mergedDirectory, string $targetFilename): string
     {
+        $targetPath = $mergedDirectory . '/' . $targetFilename;
         $ext = pathinfo($targetFilename, PATHINFO_EXTENSION);
         if ($ext === 'bin') {
-            $targetPath = $mergedDirectory . '/' . $targetFilename;
             $var = $disk->path($targetPath);
             $uploadedFile = new UploadedFile($var, $targetFilename);
             $filename = pathinfo($targetFilename, PATHINFO_FILENAME);
