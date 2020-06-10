@@ -13,9 +13,9 @@ use LaraCrafts\ChunkUploader\Exception\InternalServerErrorHttpException;
 use LaraCrafts\ChunkUploader\Tests\TestCase;
 use LaraCrafts\ChunkUploader\UploadHandler;
 use Mockery;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ResumableJsUploadDriverTest extends TestCase
 {
@@ -85,9 +85,8 @@ class ResumableJsUploadDriverTest extends TestCase
             'resumableType' => 'text/plain',
         ]);
 
-        $this->expectException(NotFoundHttpException::class);
-
-        $this->createTestResponse($this->handler->handle($request));
+        $response = $this->createTestResponse($this->handler->handle($request));
+        $response->assertStatus(Response::HTTP_NO_CONTENT);
     }
 
     public function testResume()
