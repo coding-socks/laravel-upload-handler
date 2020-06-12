@@ -2,20 +2,6 @@
 
 namespace LaraCrafts\ChunkUploader\Driver;
 
-use Closure;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Http\UploadedFile;
-use InvalidArgumentException;
-use LaraCrafts\ChunkUploader\Helper\ChunkHelpers;
-use LaraCrafts\ChunkUploader\Range\OneBasedRequestBodyRange;
-use LaraCrafts\ChunkUploader\Response\PercentageJsonResponse;
-use LaraCrafts\ChunkUploader\StorageConfig;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-
 class FlowJsUploadDriver extends ResumableJsUploadDriver
 {
     /**
