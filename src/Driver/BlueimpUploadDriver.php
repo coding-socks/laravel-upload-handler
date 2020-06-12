@@ -148,7 +148,7 @@ class BlueimpUploadDriver extends UploadDriver
             throw new BadRequestHttpException($e->getMessage(), $e);
         }
 
-        $uuid = $this->identifier->generateUploadedFileIdentifierName($file);
+        $uuid = $this->identifier->generateFileIdentifierName($file, $range->getTotal());
 
         $chunks = $this->storeChunk($config, $range, $file, $uuid);
 

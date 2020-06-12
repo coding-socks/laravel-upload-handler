@@ -39,14 +39,14 @@ class SessionIdentifierTest extends TestCase
     public function testUploadedFileIdentifierName()
     {
         $file = UploadedFile::fake()->create('test.txt', 100);
-        $identifier = $this->identifier->generateUploadedFileIdentifierName($file);
-        $this->assertEquals('2494cefe4d234bd331aeb4514fe97d810efba29b.txt', $identifier);
+        $identifier = $this->identifier->generateFileIdentifierName($file, 200);
+        $this->assertEquals('5d5115c1064c6e9dead0b7b71506bdfe273fd11c', $identifier);
     }
 
     public function testUploadedFileIdentifierNameWithoutExtension()
     {
         $file = UploadedFile::fake()->create('test', 100);
-        $identifier = $this->identifier->generateUploadedFileIdentifierName($file);
-        $this->assertEquals('3b7b99bf70a98a544319cf3bad9e912e1b89984d.bin', $identifier);
+        $identifier = $this->identifier->generateFileIdentifierName($file, 200);
+        $this->assertEquals('19daf2dc95ccbc0c856a1ce7a13c949f9e81fd2e', $identifier);
     }
 }

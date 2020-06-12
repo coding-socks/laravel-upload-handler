@@ -149,7 +149,7 @@ class BlueimpUploadDriverTest extends TestCase
         $response->assertSuccessful();
         $response->assertJson(['done' => 50]);
 
-        Storage::disk('local')->assertExists('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt/000-099');
+        Storage::disk('local')->assertExists('chunks/5d5115c1064c6e9dead0b7b71506bdfe273fd11c/000-099');
 
         Event::assertNotDispatched(FileUploaded::class, function ($event) use ($file) {
             return $event->file = $file->hashName('merged');
@@ -190,7 +190,7 @@ class BlueimpUploadDriverTest extends TestCase
         $response->assertSuccessful();
         $response->assertJson(['done' => 100]);
 
-        Storage::disk('local')->assertExists('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt/100-199');
+        Storage::disk('local')->assertExists('chunks/5d5115c1064c6e9dead0b7b71506bdfe273fd11c/100-199');
         Storage::disk('local')->assertExists($file->hashName('merged'));
 
         Event::assertDispatched(FileUploaded::class, function ($event) use ($file) {

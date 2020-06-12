@@ -14,14 +14,15 @@ abstract class Identifier
     abstract public function generateIdentifier(string $data): string;
 
     /**
-     * @param \Illuminate\Http\UploadedFile $file
+     * @param \Illuminate\Http\UploadedFile $chunk
+     * @param $totalSize
      *
      * @return string
      */
-    public function generateUploadedFileIdentifierName(UploadedFile $file): string
+    public function generateFileIdentifierName(UploadedFile $chunk, $totalSize): string
     {
-        $data = $file->getClientOriginalName();
+        $data = $totalSize . '_' . $chunk->getClientOriginalName();
 
-        return $this->generateIdentifier($data) . '.' . $file->guessExtension();
+        return $this->generateIdentifier($data);
     }
 }
