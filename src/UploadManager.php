@@ -5,6 +5,7 @@ namespace LaraCrafts\ChunkUploader;
 use Illuminate\Support\Manager;
 use LaraCrafts\ChunkUploader\Driver\BlueimpUploadDriver;
 use LaraCrafts\ChunkUploader\Driver\DropzoneUploadDriver;
+use LaraCrafts\ChunkUploader\Driver\FlowJsUploadDriver;
 use LaraCrafts\ChunkUploader\Driver\MonolithUploadDriver;
 use LaraCrafts\ChunkUploader\Driver\ResumableJsUploadDriver;
 
@@ -26,6 +27,11 @@ class UploadManager extends Manager
     public function createDropzoneDriver()
     {
         return new DropzoneUploadDriver($this->app['config']['chunk-uploader.dropzone']);
+    }
+
+    public function createFlowJsDriver()
+    {
+        return new FlowJsUploadDriver($this->app['config']['chunk-uploader.resumable-js']);
     }
 
     public function createResumableJsDriver()
