@@ -37,6 +37,7 @@ project at the moment is [tus](https://tus.io/).
     - [Blueimp](#blueimp-driver)
     - [DropzoneJS](#dropzonejs-driver)
     - [Resumable.js](#resumable-js-driver)
+    - [simple-uploader.js](#simple-uploader-js-driver)
 - [Identifiers](#identifiers)
     - [Session identifier](#session-identifier)
 - [Contribution](#contribution)
