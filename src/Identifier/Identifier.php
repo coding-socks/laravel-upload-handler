@@ -2,8 +2,6 @@
 
 namespace LaraCrafts\ChunkUploader\Identifier;
 
-use Illuminate\Http\UploadedFile;
-
 abstract class Identifier
 {
     /**
@@ -14,14 +12,14 @@ abstract class Identifier
     abstract public function generateIdentifier(string $data): string;
 
     /**
-     * @param \Illuminate\Http\UploadedFile $chunk
-     * @param $totalSize
+     * @param string $originalFilename
+     * @param float $totalSize
      *
      * @return string
      */
-    public function generateFileIdentifierName(UploadedFile $chunk, $totalSize): string
+    public function generateFileIdentifier(string $originalFilename, float $totalSize): string
     {
-        $data = $totalSize . '_' . $chunk->getClientOriginalName();
+        $data = $totalSize . '_' . $originalFilename;
 
         return $this->generateIdentifier($data);
     }

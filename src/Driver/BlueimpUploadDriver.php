@@ -148,7 +148,7 @@ class BlueimpUploadDriver extends UploadDriver
             throw new BadRequestHttpException($e->getMessage(), $e);
         }
 
-        $uuid = $this->identifier->generateFileIdentifierName($file, $range->getTotal());
+        $uuid = $this->identifier->generateFileIdentifier($file->getClientOriginalName(), $range->getTotal());
 
         $chunks = $this->storeChunk($config, $range, $file, $uuid);
 
@@ -178,7 +178,6 @@ class BlueimpUploadDriver extends UploadDriver
     public function delete(Request $request, StorageConfig $config): Response
     {
         $filename = $request->post($this->fileParam);
-
         $path = $config->getMergedDirectory() . '/' . $filename;
         Storage::disk($config->getDisk())->delete($path);
 
