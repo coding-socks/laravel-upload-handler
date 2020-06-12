@@ -2,7 +2,6 @@
 
 namespace LaraCrafts\ChunkUploader\Tests\Identifier;
 
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Session;
 use LaraCrafts\ChunkUploader\Identifier\SessionIdentifier;
 use Orchestra\Testbench\TestCase;

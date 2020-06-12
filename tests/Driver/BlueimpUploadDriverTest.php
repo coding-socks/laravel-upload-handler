@@ -98,7 +98,7 @@ class BlueimpUploadDriverTest extends TestCase
 
         $request = Request::create('', Request::METHOD_GET, [
             'file' => '2494cefe4d234bd331aeb4514fe97d810efba29b.txt',
-            'totalSize' => '200'
+            'totalSize' => '200',
         ]);
 
         $response = $this->createTestResponse($this->handler->handle($request));
