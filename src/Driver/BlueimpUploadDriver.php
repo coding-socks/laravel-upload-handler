@@ -100,26 +100,32 @@ class BlueimpUploadDriver extends UploadDriver
     {
         $download = $request->query('download', false);
         if ($download !== false) {
-            $filename = $request->query($this->fileParam);
+            $uuid = $request->query($this->fileParam);
 
-            return $this->fileResponse($filename, $config);
+            return $this->fileResponse($uuid, $config);
         }
 
-        $request->validate([$this->fileParam => 'required']);
-        $filename = $request->query($this->fileParam);
+        $request->validate([
+            $this->fileParam => 'required',
+            'totalSize' => 'required',
+        ]);
 
-        if (!$this->chunkExists($config, $filename)) {
+        $originalFilename = $request->query($this->fileParam);
+        $totalSize = $request->query('totalSize');
+        $uuid = $this->identifier->generateFileIdentifier($originalFilename, $totalSize);
+
+        if (!$this->chunkExists($config, $uuid)) {
             return new JsonResponse([
                 'file' => null,
             ]);
         }
 
-        $chunk = Arr::last($this->chunks($config, $filename));
+        $chunk = Arr::last($this->chunks($config, $uuid));
         $size = explode('-', basename($chunk))[1] + 1;
 
         return new JsonResponse([
             'file' => [
-                'name' => $filename,
+                'name' => $originalFilename,
                 'size' => $size,
             ],
         ]);
