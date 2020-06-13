@@ -37,6 +37,7 @@ project at the moment is [tus](https://tus.io/).
     - [Blueimp](#blueimp-driver)
     - [DropzoneJS](#dropzonejs-driver)
     - [Flow.js](#flow-js-driver)
+    - [ng-file-upload](#ng-file-upload-driver)
     - [Resumable.js](#resumable-js-driver)
     - [simple-uploader.js](#simple-uploader-js-driver)
 - [Identifiers](#identifiers)
@@ -152,6 +153,7 @@ Service                                          | Driver name          | Chunk 
 [Blueimp](#blueimp-driver)                       | `blueimp`            | yes          | yes
 [DropzoneJS](#dropzonejs-driver)                 | `dropzone`           | yes          | no
 [Flow.js](#flow-js-driver)                       | `flow-js`            | yes          | yes
+[ng-file-upload](#ng-file-upload-driver)         | `ng-file-upload`     | yes          | no
 [Resumable.js](#resumable-js-driver)             | `resumable-js`       | yes          | yes
 [simple-uploader.js](#simple-uploader-js-driver) | `simple-uploader-js` | yes          | yes
 
@@ -176,6 +178,12 @@ This driver handles requests made by the DropzoneJS client library.
 [website](https://github.com/flowjs/flow.js)
 
 This driver handles requests made by the Flow.js client library.
+
+### ng-file-upload driver
+
+[website](https://github.com/danialfarid/ng-file-upload)
+
+This driver handles requests made by the ng-file-upload client library.
 
 ### Resumable.js driver
 
