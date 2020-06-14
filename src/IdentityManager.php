@@ -2,6 +2,7 @@
 
 namespace CodingSocks\ChunkUploader;
 
+use CodingSocks\ChunkUploader\Identifier\NopIdentifier;
 use CodingSocks\ChunkUploader\Identifier\SessionIdentifier;
 use Illuminate\Support\Manager;
 
@@ -10,6 +11,11 @@ class IdentityManager extends Manager
     public function createSessionDriver()
     {
         return new SessionIdentifier();
+    }
+
+    public function createNopDriver()
+    {
+        return new NopIdentifier();
     }
 
     /**
