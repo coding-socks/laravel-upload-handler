@@ -112,7 +112,7 @@ class BlueimpUploadDriver extends UploadDriver
 
         $originalFilename = $request->query($this->fileParam);
         $totalSize = $request->query('totalSize');
-        $uuid = $this->identifier->generateFileIdentifier($originalFilename, $totalSize);
+        $uuid = $this->identifier->generateFileIdentifier($totalSize, $originalFilename);
 
         if (!$this->chunkExists($config, $uuid)) {
             return new JsonResponse([
@@ -154,7 +154,7 @@ class BlueimpUploadDriver extends UploadDriver
             throw new BadRequestHttpException($e->getMessage(), $e);
         }
 
-        $uuid = $this->identifier->generateFileIdentifier($file->getClientOriginalName(), $range->getTotal());
+        $uuid = $this->identifier->generateFileIdentifier($range->getTotal(), $file->getClientOriginalName());
 
         $chunks = $this->storeChunk($config, $range, $file, $uuid);
 

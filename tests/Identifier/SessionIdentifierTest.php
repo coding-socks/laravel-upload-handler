@@ -37,13 +37,13 @@ class SessionIdentifierTest extends TestCase
 
     public function testUploadedFileIdentifierName()
     {
-        $identifier = $this->identifier->generateFileIdentifier('test.txt', 200);
+        $identifier = $this->identifier->generateFileIdentifier(200, 'test.txt');
         $this->assertEquals('5d5115c1064c6e9dead0b7b71506bdfe273fd11c', $identifier);
     }
 
     public function testUploadedFileIdentifierNameWithoutExtension()
     {
-        $identifier = $this->identifier->generateFileIdentifier('test', 200);
+        $identifier = $this->identifier->generateFileIdentifier(200, 'test');
         $this->assertEquals('19daf2dc95ccbc0c856a1ce7a13c949f9e81fd2e', $identifier);
     }
 }

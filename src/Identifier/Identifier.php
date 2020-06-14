@@ -12,12 +12,12 @@ abstract class Identifier
     abstract public function generateIdentifier(string $data): string;
 
     /**
-     * @param string $originalFilename
      * @param float $totalSize
+     * @param string $originalFilename
      *
      * @return string
      */
-    public function generateFileIdentifier(string $originalFilename, float $totalSize): string
+    public function generateFileIdentifier(float $totalSize, string $originalFilename): string
     {
         $data = $totalSize . '_' . $originalFilename;
 
