@@ -4,7 +4,7 @@ namespace CodingSocks\ChunkUploader\Range;
 
 use InvalidArgumentException;
 
-class ZeroBasedRequestBodyRange extends RequestBodyRange
+class DropzoneRange extends RequestBodyRange
 {
     /**
      * @param string $indexKey

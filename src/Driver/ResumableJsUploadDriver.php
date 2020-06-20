@@ -4,7 +4,7 @@ namespace CodingSocks\ChunkUploader\Driver;
 
 use Closure;
 use CodingSocks\ChunkUploader\Helper\ChunkHelpers;
-use CodingSocks\ChunkUploader\Range\OneBasedRequestBodyRange;
+use CodingSocks\ChunkUploader\Range\ResumableJsRange;
 use CodingSocks\ChunkUploader\Response\PercentageJsonResponse;
 use CodingSocks\ChunkUploader\StorageConfig;
 use Illuminate\Http\JsonResponse;
@@ -90,7 +90,7 @@ class ResumableJsUploadDriver extends UploadDriver
         $this->validateChunkRequest($request);
 
         try {
-            $range = new OneBasedRequestBodyRange(
+            $range = new ResumableJsRange(
                 $request->query,
                 $this->buildParameterName('chunk-number'),
                 $this->buildParameterName('total-chunks'),
@@ -154,7 +154,7 @@ class ResumableJsUploadDriver extends UploadDriver
     private function saveChunk(UploadedFile $file, Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
     {
         try {
-            $range = new OneBasedRequestBodyRange(
+            $range = new ResumableJsRange(
                 $request,
                 $this->buildParameterName('chunk-number'),
                 $this->buildParameterName('total-chunks'),
