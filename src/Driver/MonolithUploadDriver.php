@@ -1,12 +1,12 @@
 <?php
 
-namespace LaraCrafts\ChunkUploader\Driver;
+namespace CodingSocks\ChunkUploader\Driver;
 
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use LaraCrafts\ChunkUploader\Response\PercentageJsonResponse;
-use LaraCrafts\ChunkUploader\StorageConfig;
+use CodingSocks\ChunkUploader\Response\PercentageJsonResponse;
+use CodingSocks\ChunkUploader\StorageConfig;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -53,7 +53,7 @@ class MonolithUploadDriver extends UploadDriver
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param \LaraCrafts\ChunkUploader\StorageConfig $config
+     * @param \CodingSocks\ChunkUploader\StorageConfig $config
      * @param \Closure|null $fileUploaded
      *
      * @return \Symfony\Component\HttpFoundation\Response
@@ -75,7 +75,7 @@ class MonolithUploadDriver extends UploadDriver
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param \LaraCrafts\ChunkUploader\StorageConfig $config
+     * @param \CodingSocks\ChunkUploader\StorageConfig $config
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -88,7 +88,7 @@ class MonolithUploadDriver extends UploadDriver
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param \LaraCrafts\ChunkUploader\StorageConfig $config
+     * @param \CodingSocks\ChunkUploader\StorageConfig $config
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */

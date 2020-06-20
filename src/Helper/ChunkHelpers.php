@@ -1,12 +1,12 @@
 <?php
 
-namespace LaraCrafts\ChunkUploader\Helper;
+namespace CodingSocks\ChunkUploader\Helper;
 
 use Illuminate\Http\File;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use LaraCrafts\ChunkUploader\Range\Range;
-use LaraCrafts\ChunkUploader\StorageConfig;
+use CodingSocks\ChunkUploader\Range\Range;
+use CodingSocks\ChunkUploader\StorageConfig;
 
 trait ChunkHelpers
 {
@@ -18,7 +18,7 @@ trait ChunkHelpers
     /**
      * Combine all the given chunks to one single file with the given filename.
      *
-     * @param \LaraCrafts\ChunkUploader\StorageConfig $config
+     * @param \CodingSocks\ChunkUploader\StorageConfig $config
      * @param array $chunks
      * @param string $targetFilename
      *
@@ -51,7 +51,7 @@ trait ChunkHelpers
     /**
      * Delete a directory with the given name from the chunk directory.
      *
-     * @param \LaraCrafts\ChunkUploader\StorageConfig $config
+     * @param \CodingSocks\ChunkUploader\StorageConfig $config
      * @param string $uuid
      */
     public function deleteChunkDirectory(StorageConfig $config, string $uuid): void
@@ -63,8 +63,8 @@ trait ChunkHelpers
     /**
      * Persist an uploaded chunk in a directory with the given name in the chunk directory.
      *
-     * @param \LaraCrafts\ChunkUploader\StorageConfig $config
-     * @param \LaraCrafts\ChunkUploader\Range\Range $range
+     * @param \CodingSocks\ChunkUploader\StorageConfig $config
+     * @param \CodingSocks\ChunkUploader\Range\Range $range
      * @param \Illuminate\Http\UploadedFile $file
      * @param string $uuid
      * @return array
@@ -84,7 +84,7 @@ trait ChunkHelpers
     /**
      * List all chunks from a directory with the given name.
      *
-     * @param \LaraCrafts\ChunkUploader\StorageConfig $config
+     * @param \CodingSocks\ChunkUploader\StorageConfig $config
      * @param string $uuid
      *
      * @return array
@@ -98,7 +98,7 @@ trait ChunkHelpers
     /**
      * Create a chunkname which contains range details.
      *
-     * @param \LaraCrafts\ChunkUploader\Range\Range $range
+     * @param \CodingSocks\ChunkUploader\Range\Range $range
      *
      * @return string
      */
@@ -116,7 +116,7 @@ trait ChunkHelpers
      *
      * When chunkname is given it checks the exact chunk. Otherwise only the folder has to exists.
      *
-     * @param \LaraCrafts\ChunkUploader\StorageConfig $config
+     * @param \CodingSocks\ChunkUploader\StorageConfig $config
      * @param string $uuid
      * @param string|null $chunkname
      *
