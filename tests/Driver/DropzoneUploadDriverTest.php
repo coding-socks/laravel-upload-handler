@@ -72,7 +72,6 @@ class DropzoneUploadDriverTest extends TestCase
             'file' => $file,
         ]);
 
-        /** @var \Illuminate\Foundation\Testing\TestResponse $response */
         $response = $this->createTestResponse($this->handler->handle($request));
         $response->assertSuccessful();
         $response->assertJson(['done' => 100]);
@@ -155,7 +154,6 @@ class DropzoneUploadDriverTest extends TestCase
             'file' => $file,
         ]);
 
-        /** @var \Illuminate\Foundation\Testing\TestResponse $response */
         $response = $this->createTestResponse($this->handler->handle($request));
         $response->assertSuccessful();
         $response->assertJson(['done' => 50]);
@@ -206,7 +204,6 @@ class DropzoneUploadDriverTest extends TestCase
             'file' => $file,
         ]);
 
-        /** @var \Illuminate\Foundation\Testing\TestResponse $response */
         $response = $this->createTestResponse($this->handler->handle($request));
         $response->assertSuccessful();
         $response->assertJson(['done' => 100]);
