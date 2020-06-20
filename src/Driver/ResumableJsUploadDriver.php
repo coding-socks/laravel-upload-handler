@@ -14,7 +14,6 @@ use CodingSocks\ChunkUploader\StorageConfig;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ResumableJsUploadDriver extends UploadDriver
 {
@@ -106,7 +105,7 @@ class ResumableJsUploadDriver extends UploadDriver
         $chunkname = $this->buildChunkname($range);
 
         if (! $this->chunkExists($config, $filename, $chunkname)) {
-            throw new NotFoundHttpException();
+            return new Response('', Response::HTTP_NO_CONTENT);
         }
 
         return new JsonResponse(['OK']);
