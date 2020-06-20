@@ -10,7 +10,6 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 
 class NgFileUploadRangeTest extends TestCase
 {
-
     public function invalidArgumentProvider()
     {
         return [
