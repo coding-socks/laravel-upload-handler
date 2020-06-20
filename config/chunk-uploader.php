@@ -12,8 +12,8 @@ return [
     | throughout your application here. By default, the module is setup for
     | monolith upload.
     |
-    | Supported: "monolith", "blueimp", "dropzone", "flow-js", "resumable-js",
-    | "simple-uploader-js"
+    | Supported: "monolith", "blueimp", "dropzone", "flow-js",
+    | "ng-file-upload", "resumable-js", "simple-uploader-js"
     |
     */
 
