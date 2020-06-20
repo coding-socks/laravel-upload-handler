@@ -2,7 +2,6 @@
 
 namespace CodingSocks\ChunkUploader\Tests\Identifier;
 
-use Illuminate\Http\UploadedFile;
 use CodingSocks\ChunkUploader\Identifier\NopIdentifier;
 use PHPUnit\Framework\TestCase;
 
