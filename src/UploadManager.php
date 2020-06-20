@@ -6,6 +6,7 @@ use CodingSocks\ChunkUploader\Driver\BlueimpUploadDriver;
 use CodingSocks\ChunkUploader\Driver\DropzoneUploadDriver;
 use CodingSocks\ChunkUploader\Driver\FlowJsUploadDriver;
 use CodingSocks\ChunkUploader\Driver\MonolithUploadDriver;
+use CodingSocks\ChunkUploader\Driver\PluploadUploadDriver;
 use CodingSocks\ChunkUploader\Driver\ResumableJsUploadDriver;
 use CodingSocks\ChunkUploader\Driver\SimpleUploaderJsUploadDriver;
 use Illuminate\Support\Manager;
@@ -33,6 +34,14 @@ class UploadManager extends Manager
     public function createFlowJsDriver()
     {
         return new FlowJsUploadDriver($this->app['config']['chunk-uploader.resumable-js']);
+    }
+
+    public function createPluploadDriver()
+    {
+        /** @var \Illuminate\Support\Manager $identityManager */
+        $identityManager = $this->app['chunk-uploader.identity-manager'];
+
+        return new PluploadUploadDriver($identityManager->driver());
     }
 
     public function createResumableJsDriver()
