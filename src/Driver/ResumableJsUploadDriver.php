@@ -1,20 +1,19 @@
 <?php
 
-namespace LaraCrafts\ChunkUploader\Driver;
+namespace CodingSocks\ChunkUploader\Driver;
 
 use Closure;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use InvalidArgumentException;
-use LaraCrafts\ChunkUploader\Helper\ChunkHelpers;
-use LaraCrafts\ChunkUploader\Range\OneBasedRequestBodyRange;
-use LaraCrafts\ChunkUploader\Response\PercentageJsonResponse;
-use LaraCrafts\ChunkUploader\StorageConfig;
+use CodingSocks\ChunkUploader\Helper\ChunkHelpers;
+use CodingSocks\ChunkUploader\Range\OneBasedRequestBodyRange;
+use CodingSocks\ChunkUploader\Response\PercentageJsonResponse;
+use CodingSocks\ChunkUploader\StorageConfig;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ResumableJsUploadDriver extends UploadDriver
 {
@@ -82,7 +81,7 @@ class ResumableJsUploadDriver extends UploadDriver
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param \LaraCrafts\ChunkUploader\StorageConfig $config
+     * @param \CodingSocks\ChunkUploader\StorageConfig $config
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -106,7 +105,7 @@ class ResumableJsUploadDriver extends UploadDriver
         $chunkname = $this->buildChunkname($range);
 
         if (! $this->chunkExists($config, $filename, $chunkname)) {
-            throw new NotFoundHttpException();
+            return new Response('', Response::HTTP_NO_CONTENT);
         }
 
         return new JsonResponse(['OK']);
@@ -114,7 +113,7 @@ class ResumableJsUploadDriver extends UploadDriver
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param \LaraCrafts\ChunkUploader\StorageConfig $config
+     * @param \CodingSocks\ChunkUploader\StorageConfig $config
      * @param \Closure|null $fileUploaded
      *
      * @return \Symfony\Component\HttpFoundation\Response
@@ -147,7 +146,7 @@ class ResumableJsUploadDriver extends UploadDriver
     /**
      * @param \Illuminate\Http\UploadedFile $file
      * @param \Illuminate\Http\Request $request
-     * @param \LaraCrafts\ChunkUploader\StorageConfig $config
+     * @param \CodingSocks\ChunkUploader\StorageConfig $config
      * @param \Closure|null $fileUploaded
      *
      * @return \Symfony\Component\HttpFoundation\Response

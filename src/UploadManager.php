@@ -1,13 +1,13 @@
 <?php
 
-namespace LaraCrafts\ChunkUploader;
+namespace CodingSocks\ChunkUploader;
 
 use Illuminate\Support\Manager;
-use LaraCrafts\ChunkUploader\Driver\BlueimpUploadDriver;
-use LaraCrafts\ChunkUploader\Driver\DropzoneUploadDriver;
-use LaraCrafts\ChunkUploader\Driver\FlowJsUploadDriver;
-use LaraCrafts\ChunkUploader\Driver\MonolithUploadDriver;
-use LaraCrafts\ChunkUploader\Driver\ResumableJsUploadDriver;
+use CodingSocks\ChunkUploader\Driver\BlueimpUploadDriver;
+use CodingSocks\ChunkUploader\Driver\DropzoneUploadDriver;
+use CodingSocks\ChunkUploader\Driver\FlowJsUploadDriver;
+use CodingSocks\ChunkUploader\Driver\MonolithUploadDriver;
+use CodingSocks\ChunkUploader\Driver\ResumableJsUploadDriver;
 
 class UploadManager extends Manager
 {

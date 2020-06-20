@@ -1,9 +1,9 @@
 <?php
 
-namespace LaraCrafts\ChunkUploader\Tests;
+namespace CodingSocks\ChunkUploader\Tests;
 
 use Illuminate\Http\UploadedFile;
-use LaraCrafts\ChunkUploader\ChunkUploaderServiceProvider;
+use CodingSocks\ChunkUploader\ChunkUploaderServiceProvider;
 
 class TestCase extends \Orchestra\Testbench\TestCase
 {

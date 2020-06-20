@@ -1,17 +1,17 @@
 <?php
 
-namespace LaraCrafts\ChunkUploader\Tests\Driver;
+namespace CodingSocks\ChunkUploader\Tests\Driver;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
-use LaraCrafts\ChunkUploader\Driver\DropzoneUploadDriver;
-use LaraCrafts\ChunkUploader\Event\FileUploaded;
-use LaraCrafts\ChunkUploader\Exception\InternalServerErrorHttpException;
-use LaraCrafts\ChunkUploader\Tests\TestCase;
-use LaraCrafts\ChunkUploader\UploadHandler;
+use CodingSocks\ChunkUploader\Driver\DropzoneUploadDriver;
+use CodingSocks\ChunkUploader\Event\FileUploaded;
+use CodingSocks\ChunkUploader\Exception\InternalServerErrorHttpException;
+use CodingSocks\ChunkUploader\Tests\TestCase;
+use CodingSocks\ChunkUploader\UploadHandler;
 use Mockery;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
