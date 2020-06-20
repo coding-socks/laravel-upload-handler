@@ -10,7 +10,6 @@ use CodingSocks\ChunkUploader\UploadHandler;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Mockery;
 use PHPUnit\Framework\Constraint\StringContains;
@@ -29,12 +28,10 @@ class BlueimpUploadDriverTest extends TestCase
     {
         parent::setUp();
 
+        $this->app->make('config')->set('chunk-uploader.identifier', 'nop');
         $this->app->make('config')->set('chunk-uploader.uploader', 'blueimp');
         $this->app->make('config')->set('chunk-uploader.sweep', false);
         $this->handler = $this->app->make(UploadHandler::class);
-
-        Session::shouldReceive('getId')
-            ->andReturn('frgYt7cPmNGtORpRCo4xvFIrWklzFqc2mnO6EE6b');
 
         Storage::fake('local');
         Event::fake();
@@ -82,7 +79,7 @@ class BlueimpUploadDriverTest extends TestCase
             'download' => 1,
         ]);
 
-        /** @var \Illuminate\Foundation\Testing\TestResponse|\Symfony\Component\HttpFoundation\BinaryFileResponse $response */
+        /** @var \Illuminate\Testing\TestResponse|\Symfony\Component\HttpFoundation\BinaryFileResponse $response */
         $response = $this->createTestResponse($this->handler->handle($request));
         $response->assertSuccessful();
         $response->assertStatus(200);
@@ -94,10 +91,10 @@ class BlueimpUploadDriverTest extends TestCase
 
     public function testResume()
     {
-        $this->createFakeLocalFile('chunks/4f0fce4ab7d03efd246b25d3c9e6546a0d65794d', '000-099');
+        $this->createFakeLocalFile('chunks/200_test.txt', '000-099');
 
         $request = Request::create('', Request::METHOD_GET, [
-            'file' => '2494cefe4d234bd331aeb4514fe97d810efba29b.txt',
+            'file' => 'test.txt',
             'totalSize' => '200',
         ]);
 
@@ -106,7 +103,7 @@ class BlueimpUploadDriverTest extends TestCase
 
         $response->assertJson([
             'file' => [
-                'name' => '2494cefe4d234bd331aeb4514fe97d810efba29b.txt',
+                'name' => 'test.txt',
                 'size' => 100,
             ],
         ]);
@@ -145,12 +142,11 @@ class BlueimpUploadDriverTest extends TestCase
             'HTTP_CONTENT_RANGE' => 'bytes 0-99/200',
         ]);
 
-        /** @var \Illuminate\Foundation\Testing\TestResponse $response */
         $response = $this->createTestResponse($this->handler->handle($request));
         $response->assertSuccessful();
         $response->assertJson(['done' => 50]);
 
-        Storage::disk('local')->assertExists('chunks/5d5115c1064c6e9dead0b7b71506bdfe273fd11c/000-099');
+        Storage::disk('local')->assertExists('chunks/200_test.txt/000-099');
 
         Event::assertNotDispatched(FileUploaded::class, function ($event) use ($file) {
             return $event->file = $file->hashName('merged');
@@ -177,7 +173,7 @@ class BlueimpUploadDriverTest extends TestCase
 
     public function testUploadLastChunk()
     {
-        $this->createFakeLocalFile('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt', '000');
+        $this->createFakeLocalFile('chunks/200_test.txt', '000');
 
         $file = UploadedFile::fake()->create('test.txt', 100);
         $request = Request::create('', Request::METHOD_POST, [], [], [
@@ -186,12 +182,11 @@ class BlueimpUploadDriverTest extends TestCase
             'HTTP_CONTENT_RANGE' => 'bytes 100-199/200',
         ]);
 
-        /** @var \Illuminate\Foundation\Testing\TestResponse $response */
         $response = $this->createTestResponse($this->handler->handle($request));
         $response->assertSuccessful();
         $response->assertJson(['done' => 100]);
 
-        Storage::disk('local')->assertExists('chunks/5d5115c1064c6e9dead0b7b71506bdfe273fd11c/100-199');
+        Storage::disk('local')->assertExists('chunks/200_test.txt/100-199');
         Storage::disk('local')->assertExists($file->hashName('merged'));
 
         Event::assertDispatched(FileUploaded::class, function ($event) use ($file) {
@@ -201,7 +196,7 @@ class BlueimpUploadDriverTest extends TestCase
 
     public function testUploadLastChunkWithCallback()
     {
-        $this->createFakeLocalFile('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt', '000');
+        $this->createFakeLocalFile('chunks/200_test.txt', '000');
 
         $file = UploadedFile::fake()->create('test.txt', 100);
         $request = Request::create('', Request::METHOD_POST, [], [], [

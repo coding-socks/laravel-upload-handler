@@ -50,7 +50,7 @@ class MonolithUploadDriverTest extends TestCase
             'file' => 'local-test-file',
         ]);
 
-        /** @var \Illuminate\Foundation\Testing\TestResponse|\Symfony\Component\HttpFoundation\BinaryFileResponse $response */
+        /** @var \Illuminate\Testing\TestResponse|\Symfony\Component\HttpFoundation\BinaryFileResponse $response */
         $response = $this->createTestResponse($this->handler->handle($request));
         $response->assertSuccessful();
         $response->assertStatus(200);
@@ -102,7 +102,6 @@ class MonolithUploadDriverTest extends TestCase
             'file' => $file,
         ]);
 
-        /** @var \Illuminate\Foundation\Testing\TestResponse $response */
         $response = $this->createTestResponse($this->handler->handle($request));
         $response->assertSuccessful();
 
