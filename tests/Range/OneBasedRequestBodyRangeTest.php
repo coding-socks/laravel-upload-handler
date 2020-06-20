@@ -1,10 +1,10 @@
 <?php
 
-namespace LaraCrafts\ChunkUploader\Tests\Range;
+namespace CodingSocks\ChunkUploader\Tests\Range;
 
 use Illuminate\Http\Request;
 use InvalidArgumentException;
-use LaraCrafts\ChunkUploader\Range\OneBasedRequestBodyRange;
+use CodingSocks\ChunkUploader\Range\OneBasedRequestBodyRange;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
@@ -129,7 +129,7 @@ class OneBasedRequestBodyRangeTest extends TestCase
      * @param int $chunkSize
      * @param float $totalSize
      *
-     * @return \LaraCrafts\ChunkUploader\Range\OneBasedRequestBodyRange
+     * @return \CodingSocks\ChunkUploader\Range\OneBasedRequestBodyRange
      */
     private function createRequestBodyRange(int $index, int $numberOfChunks, int $chunkSize, float $totalSize)
     {

@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraCrafts\ChunkUploader\Response;
+namespace CodingSocks\ChunkUploader\Response;
 
 use Illuminate\Http\JsonResponse;
 

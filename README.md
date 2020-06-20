@@ -2,11 +2,11 @@
 
 Chunk Uploader Package For Laravel
 
-[![](https://travis-ci.org/LaraCrafts/laravel-chunk-uploader.svg?branch=master)](https://travis-ci.org/LaraCrafts/laravel-chunk-uploader)
-[![](https://poser.pugx.org/laracrafts/laravel-chunk-uploader/downloads)](https://packagist.org/packages/laracrafts/laravel-chunk-uploader)
-[![](https://poser.pugx.org/laracrafts/laravel-chunk-uploader/version)](https://packagist.org/packages/laracrafts/laravel-chunk-uploader)
-[![](https://scrutinizer-ci.com/g/LaraCrafts/laravel-chunk-uploader/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/LaraCrafts/laravel-chunk-uploader/)
-[![](https://poser.pugx.org/laracrafts/laravel-chunk-uploader/license)](https://packagist.org/packages/laracrafts/laravel-chunk-uploader)
+[![Github Actions Badge](https://github.com/coding-socks/laravel-chunk-uploader/workflows/test/badge.svg)](https://github.com/coding-socks/laravel-chunk-uploader/actions?query=workflow%3A"test")
+[![Downloads Badge](https://poser.pugx.org/coding-socks/laravel-chunk-uploader/downloads)](https://packagist.org/packages/coding-socks/laravel-chunk-uploader)
+[![Version Badge](https://poser.pugx.org/coding-socks/laravel-chunk-uploader/version)](https://packagist.org/packages/coding-socks/laravel-chunk-uploader)
+[![Coverage Badge](https://scrutinizer-ci.com/g/coding-socks/laravel-chunk-uploader/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/coding-socks/laravel-chunk-uploader/)
+[![License Badge](https://poser.pugx.org/coding-socks/laravel-chunk-uploader/license)](https://packagist.org/packages/coding-socks/laravel-chunk-uploader)
 
 This package helps integrate a Laravel application with chunk uploader libraries eg.
 [DropzoneJS](https://www.dropzonejs.com/) and
@@ -47,7 +47,7 @@ project at the moment is [tus](https://tus.io/).
 You can easily install this package using Composer, by running the following command:
 
 ```bash
-composer require laracrafts/laravel-chunk-uploader
+composer require coding-socks/laravel-chunk-uploader
 ```
 
 ### Requirements
@@ -67,7 +67,7 @@ Route::any('/my-route', 'MyController@myFunction');
   - Using dependency injection
 ```php
 use Illuminate\Http\Request;
-use LaraCrafts\ChunkUploader\UploadHandler;
+use CodingSocks\ChunkUploader\UploadHandler;
 
 class MyController extends Controller
 {
@@ -80,7 +80,7 @@ class MyController extends Controller
   - Resolving from the app container
 ```php
 use Illuminate\Http\Request;
-use LaraCrafts\ChunkUploader\UploadHandler;
+use CodingSocks\ChunkUploader\UploadHandler;
 
 class MyController extends Controller
 {
@@ -104,7 +104,7 @@ library can be differ very much. Also, when possible the library gives the oppor
 
 ### Events
 
-Once a file upload is finished a `\LaraCrafts\ChunkUploader\Event\FileUploaded` is triggered. This event contains
+Once a file upload is finished a `\CodingSocks\ChunkUploader\Event\FileUploaded` is triggered. This event contains
 the disk and the path of the uploaded file.
 [Registering Events & Listeners from Laravel](https://laravel.com/docs/5.8/events#registering-events-and-listeners)
 
@@ -133,8 +133,8 @@ app()->make(UploadManager::class)->extend('my_driver', function () {
 });
 ```
 
-If you are adding a driver you need to extend the `\LaraCrafts\ChunkUploader\Driver\UploadDriver` abstract class, for
-which you can use the shipped drivers (e.g. `\LaraCrafts\ChunkUploader\Driver\BlueimpUploadDriver`) as an example as to
+If you are adding a driver you need to extend the `\CodingSocks\ChunkUploader\Driver\UploadDriver` abstract class, for
+which you can use the shipped drivers (e.g. `\CodingSocks\ChunkUploader\Driver\BlueimpUploadDriver`) as an example as to
 how.
 
 If you wrote a custom driver that others might find useful, please consider adding it to the package via a pull request.
@@ -193,11 +193,9 @@ information about contribution guidelines.
 
 ## License
 
-**Copyright (c) 2019 LaraCrafts.**
-
 This product is licensed under the MIT license, please refer to the [License file][license] for more information.
 
-[contributing]: https://github.com/LaraCrafts/laravel-chunk-uploader/blob/master/CONTRIBUTING.md
-[license]: https://github.com/LaraCrafts/laravel-chunk-uploader/blob/master/LICENSE
+[contributing]: CONTRIBUTING.md
+[license]: LICENSE
 [php-max-file-uploads]: https://www.php.net/manual/en/ini.core.php#ini.max-file-uploads
 [php-upload-max-filesize]: https://www.php.net/manual/en/ini.core.php#ini.upload-max-filesize
