@@ -179,6 +179,9 @@ This driver handles requests made by the DropzoneJS client library.
 
 This driver handles requests made by the Flow.js client library.
 
+Because of [Issue #44](https://github.com/coding-socks/laravel-chunk-uploader/issues/44) you must use `forceChunkSize`
+option.
+
 ### Plupload driver
 
 [website](https://github.com/moxiecode/plupload)
@@ -191,11 +194,17 @@ This driver handles requests made by the Plupload client library.
 
 This driver handles requests made by the Resumable.js client library.
 
+Because of [Issue #44](https://github.com/coding-socks/laravel-chunk-uploader/issues/44) you must use `forceChunkSize`
+option.
+
 ### simple-uploader.js driver
 
 [website](https://github.com/simple-uploader/Uploader)
 
 This driver handles requests made by the simple-uploader.js client library.
+
+Because of [Issue #44](https://github.com/coding-socks/laravel-chunk-uploader/issues/44) you must use `forceChunkSize`
+option.
 
 ## Identifiers
 
