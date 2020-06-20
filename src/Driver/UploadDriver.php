@@ -3,12 +3,12 @@
 namespace CodingSocks\ChunkUploader\Driver;
 
 use Closure;
-use Illuminate\Http\Request;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use CodingSocks\ChunkUploader\Event\FileUploaded;
 use CodingSocks\ChunkUploader\Exception\InternalServerErrorHttpException;
 use CodingSocks\ChunkUploader\StorageConfig;
+use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;

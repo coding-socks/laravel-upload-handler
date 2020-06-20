@@ -3,17 +3,17 @@
 namespace CodingSocks\ChunkUploader\Driver;
 
 use Closure;
+use CodingSocks\ChunkUploader\Helper\ChunkHelpers;
+use CodingSocks\ChunkUploader\Identifier\Identifier;
+use CodingSocks\ChunkUploader\Range\ContentRange;
+use CodingSocks\ChunkUploader\Response\PercentageJsonResponse;
+use CodingSocks\ChunkUploader\StorageConfig;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use CodingSocks\ChunkUploader\Helper\ChunkHelpers;
-use CodingSocks\ChunkUploader\Identifier\Identifier;
-use CodingSocks\ChunkUploader\Range\ContentRange;
-use CodingSocks\ChunkUploader\Response\PercentageJsonResponse;
-use CodingSocks\ChunkUploader\StorageConfig;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;

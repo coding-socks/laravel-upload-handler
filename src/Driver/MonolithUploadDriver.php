@@ -3,10 +3,10 @@
 namespace CodingSocks\ChunkUploader\Driver;
 
 use Closure;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use CodingSocks\ChunkUploader\Response\PercentageJsonResponse;
 use CodingSocks\ChunkUploader\StorageConfig;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 

@@ -2,15 +2,15 @@
 
 namespace CodingSocks\ChunkUploader\Tests\Driver;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Storage;
 use CodingSocks\ChunkUploader\Driver\MonolithUploadDriver;
 use CodingSocks\ChunkUploader\Event\FileUploaded;
 use CodingSocks\ChunkUploader\Exception\InternalServerErrorHttpException;
 use CodingSocks\ChunkUploader\Tests\TestCase;
 use CodingSocks\ChunkUploader\UploadHandler;
+use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Storage;
 use Mockery;
 use PHPUnit\Framework\Constraint\StringContains;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;

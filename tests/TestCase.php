@@ -2,8 +2,8 @@
 
 namespace CodingSocks\ChunkUploader\Tests;
 
-use Illuminate\Http\UploadedFile;
 use CodingSocks\ChunkUploader\ChunkUploaderServiceProvider;
+use Illuminate\Http\UploadedFile;
 
 class TestCase extends \Orchestra\Testbench\TestCase
 {

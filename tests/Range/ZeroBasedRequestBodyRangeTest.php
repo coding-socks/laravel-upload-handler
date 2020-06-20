@@ -2,9 +2,9 @@
 
 namespace CodingSocks\ChunkUploader\Tests\Range;
 
+use CodingSocks\ChunkUploader\Range\ZeroBasedRequestBodyRange;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
-use CodingSocks\ChunkUploader\Range\ZeroBasedRequestBodyRange;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 

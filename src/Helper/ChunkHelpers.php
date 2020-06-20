@@ -2,12 +2,12 @@
 
 namespace CodingSocks\ChunkUploader\Helper;
 
+use CodingSocks\ChunkUploader\Range\Range;
+use CodingSocks\ChunkUploader\StorageConfig;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Http\File;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use CodingSocks\ChunkUploader\Range\Range;
-use CodingSocks\ChunkUploader\StorageConfig;
 
 trait ChunkHelpers
 {

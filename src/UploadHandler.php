@@ -3,9 +3,9 @@
 namespace CodingSocks\ChunkUploader;
 
 use Closure;
+use CodingSocks\ChunkUploader\Driver\UploadDriver;
 use Illuminate\Http\Request;
 use Illuminate\Support\Traits\Macroable;
-use CodingSocks\ChunkUploader\Driver\UploadDriver;
 use Symfony\Component\HttpFoundation\Response;
 
 class UploadHandler
