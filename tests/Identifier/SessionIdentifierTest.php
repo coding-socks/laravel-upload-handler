@@ -2,8 +2,8 @@
 
 namespace CodingSocks\ChunkUploader\Tests\Identifier;
 
-use Illuminate\Support\Facades\Session;
 use CodingSocks\ChunkUploader\Identifier\SessionIdentifier;
+use Illuminate\Support\Facades\Session;
 use Orchestra\Testbench\TestCase;
 
 class SessionIdentifierTest extends TestCase

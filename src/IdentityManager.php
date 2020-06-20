@@ -2,8 +2,8 @@
 
 namespace CodingSocks\ChunkUploader;
 
-use Illuminate\Support\Manager;
 use CodingSocks\ChunkUploader\Identifier\SessionIdentifier;
+use Illuminate\Support\Manager;
 
 class IdentityManager extends Manager
 {

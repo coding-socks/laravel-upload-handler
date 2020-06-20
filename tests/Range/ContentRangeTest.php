@@ -2,9 +2,9 @@
 
 namespace CodingSocks\ChunkUploader\Tests\Range;
 
+use CodingSocks\ChunkUploader\Range\ContentRange;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
-use CodingSocks\ChunkUploader\Range\ContentRange;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\HeaderBag;
 
