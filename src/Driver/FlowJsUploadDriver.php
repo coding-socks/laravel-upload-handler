@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraCrafts\ChunkUploader\Driver;
+namespace CodingSocks\ChunkUploader\Driver;
 
 class FlowJsUploadDriver extends ResumableJsUploadDriver
 {
