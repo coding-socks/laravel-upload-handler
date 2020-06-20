@@ -10,7 +10,6 @@ use CodingSocks\ChunkUploader\UploadHandler;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Mockery;
 use PHPUnit\Framework\Constraint\StringContains;
