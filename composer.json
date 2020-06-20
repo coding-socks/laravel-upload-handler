@@ -1,20 +1,20 @@
 {
-    "name": "laracrafts/laravel-chunk-uploader",
-    "description": "",
+    "name": "coding-socks/laravel-chunk-uploader",
+    "description": "This package helps integrate a Laravel application with chunk uploader libraries eg. DropzoneJS and Resumable.js",
     "type": "library",
     "license": "MIT",
     "authors": [
         {
             "name": "László Görög",
-            "email": "contact@nergal.xyz"
+            "homepage": "https://github.com/axlon"
         },
         {
             "name": "Choraimy Kroonstuiver",
-            "email": "choraimy@live.nl"
+            "homepage": "https://github.com/nerg4l"
         },
         {
             "name": "Raed Yak",
-            "email": "contact.raedyak@gmail.com"
+            "homepage": "https://github.com/yak0d3"
         }
     ],
     "require": {
@@ -29,12 +29,12 @@
     },
     "autoload": {
         "psr-4": {
-            "LaraCrafts\\ChunkUploader\\": "src/"
+            "CodingSocks\\ChunkUploader\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "LaraCrafts\\ChunkUploader\\Tests\\": "tests/"
+            "CodingSocks\\ChunkUploader\\Tests\\": "tests/"
         }
     },
     "config": {
@@ -46,7 +46,7 @@
         },
         "laravel": {
             "providers": [
-                "LaraCrafts\\ChunkUploader\\ChunkUploaderServiceProvider"
+                "CodingSocks\\ChunkUploader\\ChunkUploaderServiceProvider"
             ]
         }
     }

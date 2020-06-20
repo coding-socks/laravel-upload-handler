@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraCrafts\ChunkUploader\Identifier;
+namespace CodingSocks\ChunkUploader\Identifier;
 
 use Illuminate\Http\UploadedFile;
 

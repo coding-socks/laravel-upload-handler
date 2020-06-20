@@ -1,16 +1,16 @@
 <?php
 
-namespace LaraCrafts\ChunkUploader\Tests\Identifier;
+namespace CodingSocks\ChunkUploader\Tests\Identifier;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Session;
-use LaraCrafts\ChunkUploader\Identifier\SessionIdentifier;
+use CodingSocks\ChunkUploader\Identifier\SessionIdentifier;
 use Orchestra\Testbench\TestCase;
 
 class SessionIdentifierTest extends TestCase
 {
     /**
-     * @var \LaraCrafts\ChunkUploader\Identifier\SessionIdentifier
+     * @var \CodingSocks\ChunkUploader\Identifier\SessionIdentifier
      */
     private $identifier;
 
