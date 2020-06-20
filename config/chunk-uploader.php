@@ -12,7 +12,7 @@ return [
     | throughout your application here. By default, the module is setup for
     | monolith upload.
     |
-    | Supported: "monolith", "blueimp", "dropzone", "resumable-js"
+    | Supported: "monolith", "blueimp", "dropzone", "flow-js", "resumable-js"
     |
     */
 
@@ -115,6 +115,27 @@ return [
     'dropzone' => [
 
         'param' => 'file',
+
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Flow.js Options
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure the options for the Flow.js driver.
+    |
+    */
+
+    'flow-js' => [
+
+        // The name of the multipart request parameter to use for the file chunk
+        'param' => 'file',
+
+        //  HTTP method for chunk test request.
+        'test-method' => Illuminate\Http\Request::METHOD_GET,
+        //  HTTP method to use when sending chunks to the server (POST, PUT, PATCH).
+        'upload-method' => Illuminate\Http\Request::METHOD_POST,
 
     ],
 

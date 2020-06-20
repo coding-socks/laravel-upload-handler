@@ -5,6 +5,7 @@ namespace CodingSocks\ChunkUploader;
 use Illuminate\Support\Manager;
 use CodingSocks\ChunkUploader\Driver\BlueimpUploadDriver;
 use CodingSocks\ChunkUploader\Driver\DropzoneUploadDriver;
+use CodingSocks\ChunkUploader\Driver\FlowJsUploadDriver;
 use CodingSocks\ChunkUploader\Driver\MonolithUploadDriver;
 use CodingSocks\ChunkUploader\Driver\ResumableJsUploadDriver;
 
@@ -26,6 +27,11 @@ class UploadManager extends Manager
     public function createDropzoneDriver()
     {
         return new DropzoneUploadDriver($this->app['config']['chunk-uploader.dropzone']);
+    }
+
+    public function createFlowJsDriver()
+    {
+        return new FlowJsUploadDriver($this->app['config']['chunk-uploader.resumable-js']);
     }
 
     public function createResumableJsDriver()
