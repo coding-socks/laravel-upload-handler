@@ -4,7 +4,7 @@ namespace CodingSocks\ChunkUploader\Driver;
 
 use Closure;
 use CodingSocks\ChunkUploader\Helper\ChunkHelpers;
-use CodingSocks\ChunkUploader\Range\ZeroBasedRequestBodyRange;
+use CodingSocks\ChunkUploader\Range\DropzoneRange;
 use CodingSocks\ChunkUploader\Response\PercentageJsonResponse;
 use CodingSocks\ChunkUploader\StorageConfig;
 use Illuminate\Http\Request;
@@ -128,7 +128,7 @@ class DropzoneUploadDriver extends UploadDriver
     private function saveChunk(UploadedFile $file, Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
     {
         try {
-            $range = new ZeroBasedRequestBodyRange(
+            $range = new DropzoneRange(
                 $request,
                 'dzchunkindex',
                 'dztotalchunkcount',

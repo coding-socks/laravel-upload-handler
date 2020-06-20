@@ -4,7 +4,7 @@ namespace CodingSocks\ChunkUploader\Range;
 
 use InvalidArgumentException;
 
-class OneBasedRequestBodyRange extends RequestBodyRange
+class ResumableJsRange extends RequestBodyRange
 {
     /**
      * @param string $numberOfChunksKey
