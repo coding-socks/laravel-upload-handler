@@ -100,26 +100,32 @@ class BlueimpUploadDriver extends UploadDriver
     {
         $download = $request->query('download', false);
         if ($download !== false) {
-            $filename = $request->query($this->fileParam);
+            $uuid = $request->query($this->fileParam);
 
-            return $this->fileResponse($filename, $config);
+            return $this->fileResponse($uuid, $config);
         }
 
-        $request->validate([$this->fileParam => 'required']);
-        $filename = $request->query($this->fileParam);
+        $request->validate([
+            $this->fileParam => 'required',
+            'totalSize' => 'required',
+        ]);
 
-        if (!$this->chunkExists($config, $filename)) {
+        $originalFilename = $request->query($this->fileParam);
+        $totalSize = $request->query('totalSize');
+        $uuid = $this->identifier->generateFileIdentifier($totalSize, $originalFilename);
+
+        if (!$this->chunkExists($config, $uuid)) {
             return new JsonResponse([
                 'file' => null,
             ]);
         }
 
-        $chunk = Arr::last($this->chunks($config, $filename));
+        $chunk = Arr::last($this->chunks($config, $uuid));
         $size = explode('-', basename($chunk))[1] + 1;
 
         return new JsonResponse([
             'file' => [
-                'name' => $filename,
+                'name' => $originalFilename,
                 'size' => $size,
             ],
         ]);
@@ -148,7 +154,7 @@ class BlueimpUploadDriver extends UploadDriver
             throw new BadRequestHttpException($e->getMessage(), $e);
         }
 
-        $uuid = $this->identifier->generateUploadedFileIdentifierName($file);
+        $uuid = $this->identifier->generateFileIdentifier($range->getTotal(), $file->getClientOriginalName());
 
         $chunks = $this->storeChunk($config, $range, $file, $uuid);
 
@@ -178,7 +184,6 @@ class BlueimpUploadDriver extends UploadDriver
     public function delete(Request $request, StorageConfig $config): Response
     {
         $filename = $request->post($this->fileParam);
-
         $path = $config->getMergedDirectory() . '/' . $filename;
         Storage::disk($config->getDisk())->delete($path);
 

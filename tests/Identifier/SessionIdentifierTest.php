@@ -2,7 +2,6 @@
 
 namespace CodingSocks\ChunkUploader\Tests\Identifier;
 
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Session;
 use CodingSocks\ChunkUploader\Identifier\SessionIdentifier;
 use Orchestra\Testbench\TestCase;
@@ -26,27 +25,13 @@ class SessionIdentifierTest extends TestCase
 
     public function testGenerateIdentifier()
     {
-        $identifier = $this->identifier->generateIdentifier('test.txt');
-        $this->assertEquals('2494cefe4d234bd331aeb4514fe97d810efba29b', $identifier);
-    }
-
-    public function testGenerateIdentifierWithoutExtension()
-    {
-        $identifier = $this->identifier->generateIdentifier('test');
-        $this->assertEquals('3b7b99bf70a98a544319cf3bad9e912e1b89984d', $identifier);
+        $identifier = $this->identifier->generateIdentifier('any_string');
+        $this->assertEquals('b41d07049729f460973494395f9bf8fe23834d48', $identifier);
     }
 
     public function testUploadedFileIdentifierName()
     {
-        $file = UploadedFile::fake()->create('test.txt', 100);
-        $identifier = $this->identifier->generateUploadedFileIdentifierName($file);
-        $this->assertEquals('2494cefe4d234bd331aeb4514fe97d810efba29b.txt', $identifier);
-    }
-
-    public function testUploadedFileIdentifierNameWithoutExtension()
-    {
-        $file = UploadedFile::fake()->create('test', 100);
-        $identifier = $this->identifier->generateUploadedFileIdentifierName($file);
-        $this->assertEquals('3b7b99bf70a98a544319cf3bad9e912e1b89984d.bin', $identifier);
+        $identifier = $this->identifier->generateFileIdentifier(200, 'any_filename.ext');
+        $this->assertEquals('ec1669bf4dee72e6dd30b94d2d29413601f1b69b', $identifier);
     }
 }

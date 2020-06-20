@@ -2,8 +2,6 @@
 
 namespace CodingSocks\ChunkUploader\Identifier;
 
-use Illuminate\Http\UploadedFile;
-
 abstract class Identifier
 {
     /**
@@ -14,14 +12,15 @@ abstract class Identifier
     abstract public function generateIdentifier(string $data): string;
 
     /**
-     * @param \Illuminate\Http\UploadedFile $file
+     * @param float $totalSize
+     * @param string $originalFilename
      *
      * @return string
      */
-    public function generateUploadedFileIdentifierName(UploadedFile $file): string
+    public function generateFileIdentifier(float $totalSize, string $originalFilename): string
     {
-        $data = $file->getClientOriginalName();
+        $data = $totalSize . '_' . $originalFilename;
 
-        return $this->generateIdentifier($data) . '.' . $file->guessExtension();
+        return $this->generateIdentifier($data);
     }
 }
