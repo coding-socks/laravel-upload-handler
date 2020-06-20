@@ -1,10 +1,10 @@
 <?php
 
-namespace LaraCrafts\ChunkUploader\Tests\Range;
+namespace CodingSocks\ChunkUploader\Tests\Range;
 
 use Illuminate\Http\Request;
 use InvalidArgumentException;
-use LaraCrafts\ChunkUploader\Range\ContentRange;
+use CodingSocks\ChunkUploader\Range\ContentRange;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\HeaderBag;
 

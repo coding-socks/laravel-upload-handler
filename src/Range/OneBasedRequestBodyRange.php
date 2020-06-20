@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraCrafts\ChunkUploader\Range;
+namespace CodingSocks\ChunkUploader\Range;
 
 use InvalidArgumentException;
 

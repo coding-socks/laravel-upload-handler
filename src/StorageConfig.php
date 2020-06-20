@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraCrafts\ChunkUploader;
+namespace CodingSocks\ChunkUploader;
 
 class StorageConfig
 {

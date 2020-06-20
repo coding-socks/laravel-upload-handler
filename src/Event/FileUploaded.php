@@ -1,6 +1,6 @@
 <?php
 
-namespace LaraCrafts\ChunkUploader\Event;
+namespace CodingSocks\ChunkUploader\Event;
 
 class FileUploaded
 {
