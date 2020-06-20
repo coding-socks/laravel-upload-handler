@@ -12,7 +12,8 @@ return [
     | throughout your application here. By default, the module is setup for
     | monolith upload.
     |
-    | Supported: "monolith", "blueimp", "dropzone", "flow-js", "resumable-js"
+    | Supported: "monolith", "blueimp", "dropzone", "flow-js", "resumable-js",
+    | "simple-uploader-js"
     |
     */
 
@@ -181,6 +182,27 @@ return [
             // The name of the file type POST parameter to use for the file chunk.
             'type' => 'resumableType',
         ],
+
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | simple-uploader.js Options
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure the options for the simple-uploader.js driver.
+    |
+    */
+
+    'simple-uploader-js' => [
+
+        // The name of the multipart request parameter to use for the file chunk
+        'param' => 'file',
+
+        //  HTTP method for chunk test request.
+        'test-method' => Illuminate\Http\Request::METHOD_GET,
+        //  HTTP method to use when sending chunks to the server (POST, PUT, PATCH).
+        'upload-method' => Illuminate\Http\Request::METHOD_POST,
 
     ],
 

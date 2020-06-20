@@ -8,6 +8,7 @@ use CodingSocks\ChunkUploader\Driver\DropzoneUploadDriver;
 use CodingSocks\ChunkUploader\Driver\FlowJsUploadDriver;
 use CodingSocks\ChunkUploader\Driver\MonolithUploadDriver;
 use CodingSocks\ChunkUploader\Driver\ResumableJsUploadDriver;
+use CodingSocks\ChunkUploader\Driver\SimpleUploaderJsUploadDriver;
 
 class UploadManager extends Manager
 {
@@ -37,6 +38,11 @@ class UploadManager extends Manager
     public function createResumableJsDriver()
     {
         return new ResumableJsUploadDriver($this->app['config']['chunk-uploader.resumable-js']);
+    }
+
+    public function createSimpleUploaderJsDriver()
+    {
+        return new SimpleUploaderJsUploadDriver($this->app['config']['chunk-uploader.simple-uploader-js']);
     }
 
     /**

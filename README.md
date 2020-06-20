@@ -38,6 +38,7 @@ project at the moment is [tus](https://tus.io/).
     - [DropzoneJS](#dropzonejs-driver)
     - [Flow.js](#flow-js-driver)
     - [Resumable.js](#resumable-js-driver)
+    - [simple-uploader.js](#simple-uploader-js-driver)
 - [Identifiers](#identifiers)
     - [Session identifier](#session-identifier)
 - [Contribution](#contribution)
@@ -144,13 +145,14 @@ If you wrote a custom driver that others might find useful, please consider addi
 
 Below is a list of available drivers along with their individual specs:
 
-Service                              | Driver name    | Chunk upload | Resumable
--------------------------------------|----------------|--------------|-----------
-[Monolith](#monolith-driver)         | `monolith`     | no           | no
-[Blueimp](#blueimp-driver)           | `blueimp`      | yes          | yes
-[DropzoneJS](#dropzonejs-driver)     | `dropzone`     | yes          | no
-[Flow.js](#flow-js-driver)           | `flow-js`      | yes          | yes
-[Resumable.js](#resumable-js-driver) | `resumable-js` | yes          | yes
+Service                                          | Driver name          | Chunk upload | Resumable
+-------------------------------------------------|----------------------|--------------|-----------
+[Monolith](#monolith-driver)                     | `monolith`           | no           | no
+[Blueimp](#blueimp-driver)                       | `blueimp`            | yes          | yes
+[DropzoneJS](#dropzonejs-driver)                 | `dropzone`           | yes          | no
+[Flow.js](#flow-js-driver)                       | `flow-js`            | yes          | yes
+[Resumable.js](#resumable-js-driver)             | `resumable-js`       | yes          | yes
+[simple-uploader.js](#simple-uploader-js-driver) | `simple-uploader-js` | yes          | yes
 
 ### Monolith driver
 
@@ -179,6 +181,12 @@ This driver handles requests made by the Flow.js client library.
 [website](http://resumablejs.com/)
 
 This driver handles requests made by the Resumable.js client library.
+
+### simple-uploader.js driver
+
+[website](https://github.com/simple-uploader/Uploader)
+
+This driver handles requests made by the simple-uploader.js client library.
 
 ## Identifiers
 
