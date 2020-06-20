@@ -3,14 +3,14 @@
 namespace CodingSocks\ChunkUploader\Driver;
 
 use Closure;
-use Illuminate\Http\Request;
-use Illuminate\Http\UploadedFile;
-use InvalidArgumentException;
 use CodingSocks\ChunkUploader\Helper\ChunkHelpers;
 use CodingSocks\ChunkUploader\Identifier\Identifier;
 use CodingSocks\ChunkUploader\Range\PluploadRange;
 use CodingSocks\ChunkUploader\Response\PercentageJsonResponse;
 use CodingSocks\ChunkUploader\StorageConfig;
+use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -90,7 +90,7 @@ class PluploadUploadDriver extends UploadDriver
     private function saveChunk(UploadedFile $file, Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
     {
         try {
-           $range = new PluploadRange($request);
+            $range = new PluploadRange($request);
         } catch (InvalidArgumentException $e) {
             throw new BadRequestHttpException($e->getMessage(), $e);
         }

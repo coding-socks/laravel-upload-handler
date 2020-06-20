@@ -2,9 +2,9 @@
 
 namespace CodingSocks\ChunkUploader\Tests\Range;
 
+use CodingSocks\ChunkUploader\Range\PluploadRange;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
-use CodingSocks\ChunkUploader\Range\PluploadRange;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
