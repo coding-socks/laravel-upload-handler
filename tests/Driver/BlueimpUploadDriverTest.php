@@ -1,17 +1,17 @@
 <?php
 
-namespace LaraCrafts\ChunkUploader\Tests\Driver;
+namespace CodingSocks\ChunkUploader\Tests\Driver;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
-use LaraCrafts\ChunkUploader\Driver\BlueimpUploadDriver;
-use LaraCrafts\ChunkUploader\Event\FileUploaded;
-use LaraCrafts\ChunkUploader\Exception\InternalServerErrorHttpException;
-use LaraCrafts\ChunkUploader\Tests\TestCase;
-use LaraCrafts\ChunkUploader\UploadHandler;
+use CodingSocks\ChunkUploader\Driver\BlueimpUploadDriver;
+use CodingSocks\ChunkUploader\Event\FileUploaded;
+use CodingSocks\ChunkUploader\Exception\InternalServerErrorHttpException;
+use CodingSocks\ChunkUploader\Tests\TestCase;
+use CodingSocks\ChunkUploader\UploadHandler;
 use Mockery;
 use PHPUnit\Framework\Constraint\StringContains;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -94,10 +94,11 @@ class BlueimpUploadDriverTest extends TestCase
 
     public function testResume()
     {
-        $this->createFakeLocalFile('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt', '000-099');
+        $this->createFakeLocalFile('chunks/4f0fce4ab7d03efd246b25d3c9e6546a0d65794d', '000-099');
 
         $request = Request::create('', Request::METHOD_GET, [
             'file' => '2494cefe4d234bd331aeb4514fe97d810efba29b.txt',
+            'totalSize' => '200',
         ]);
 
         $response = $this->createTestResponse($this->handler->handle($request));
@@ -149,7 +150,7 @@ class BlueimpUploadDriverTest extends TestCase
         $response->assertSuccessful();
         $response->assertJson(['done' => 50]);
 
-        Storage::disk('local')->assertExists('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt/000-099');
+        Storage::disk('local')->assertExists('chunks/5d5115c1064c6e9dead0b7b71506bdfe273fd11c/000-099');
 
         Event::assertNotDispatched(FileUploaded::class, function ($event) use ($file) {
             return $event->file = $file->hashName('merged');
@@ -190,7 +191,7 @@ class BlueimpUploadDriverTest extends TestCase
         $response->assertSuccessful();
         $response->assertJson(['done' => 100]);
 
-        Storage::disk('local')->assertExists('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b.txt/100-199');
+        Storage::disk('local')->assertExists('chunks/5d5115c1064c6e9dead0b7b71506bdfe273fd11c/100-199');
         Storage::disk('local')->assertExists($file->hashName('merged'));
 
         Event::assertDispatched(FileUploaded::class, function ($event) use ($file) {

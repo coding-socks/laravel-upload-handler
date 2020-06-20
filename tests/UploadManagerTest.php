@@ -1,11 +1,11 @@
 <?php
 
-namespace LaraCrafts\ChunkUploader\Tests;
+namespace CodingSocks\ChunkUploader\Tests;
 
-use LaraCrafts\ChunkUploader\Driver\BlueimpUploadDriver;
-use LaraCrafts\ChunkUploader\Driver\DropzoneUploadDriver;
-use LaraCrafts\ChunkUploader\Driver\MonolithUploadDriver;
-use LaraCrafts\ChunkUploader\UploadManager;
+use CodingSocks\ChunkUploader\Driver\BlueimpUploadDriver;
+use CodingSocks\ChunkUploader\Driver\DropzoneUploadDriver;
+use CodingSocks\ChunkUploader\Driver\MonolithUploadDriver;
+use CodingSocks\ChunkUploader\UploadManager;
 
 class UploadManagerTest extends TestCase
 {

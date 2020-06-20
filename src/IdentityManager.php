@@ -1,9 +1,9 @@
 <?php
 
-namespace LaraCrafts\ChunkUploader;
+namespace CodingSocks\ChunkUploader;
 
 use Illuminate\Support\Manager;
-use LaraCrafts\ChunkUploader\Identifier\SessionIdentifier;
+use CodingSocks\ChunkUploader\Identifier\SessionIdentifier;
 
 class IdentityManager extends Manager
 {

@@ -1,14 +1,14 @@
 <?php
 
-namespace LaraCrafts\ChunkUploader\Driver;
+namespace CodingSocks\ChunkUploader\Driver;
 
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use LaraCrafts\ChunkUploader\Event\FileUploaded;
-use LaraCrafts\ChunkUploader\Exception\InternalServerErrorHttpException;
-use LaraCrafts\ChunkUploader\StorageConfig;
+use CodingSocks\ChunkUploader\Event\FileUploaded;
+use CodingSocks\ChunkUploader\Exception\InternalServerErrorHttpException;
+use CodingSocks\ChunkUploader\StorageConfig;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -20,7 +20,7 @@ abstract class UploadDriver
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param \LaraCrafts\ChunkUploader\StorageConfig $config
+     * @param \CodingSocks\ChunkUploader\StorageConfig $config
      * @param \Closure|null $fileUploaded
      *
      * @return \Symfony\Component\HttpFoundation\Response
@@ -30,7 +30,7 @@ abstract class UploadDriver
 
     /**
      * @param string $filename
-     * @param \LaraCrafts\ChunkUploader\StorageConfig $storageConfig
+     * @param \CodingSocks\ChunkUploader\StorageConfig $storageConfig
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -69,7 +69,7 @@ abstract class UploadDriver
     }
 
     /**
-     * Dispatch a {@link \LaraCrafts\ChunkUploader\Event\FileUploaded} event.
+     * Dispatch a {@link \CodingSocks\ChunkUploader\Event\FileUploaded} event.
      * Also call the given {@link \Closure} if not null.
      *
      * @param $disk
@@ -91,7 +91,7 @@ abstract class UploadDriver
      * @param \Illuminate\Http\UploadedFile|null $file
      *
      * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException when given file is null.
-     * @throws \LaraCrafts\ChunkUploader\Exception\InternalServerErrorHttpException when given file is invalid.
+     * @throws \CodingSocks\ChunkUploader\Exception\InternalServerErrorHttpException when given file is invalid.
      */
     protected function validateUploadedFile(UploadedFile $file = null): void
     {
