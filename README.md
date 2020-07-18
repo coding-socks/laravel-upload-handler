@@ -43,6 +43,7 @@ project at the moment is [tus](https://tus.io/).
     - [simple-uploader.js](#simple-uploader-js-driver)
 - [Identifiers](#identifiers)
     - [Session identifier](#session-identifier)
+    - [Auth identifier](#auth-identifier)
     - [NOP identifier](#nop-identifier)
 - [Contribution](#contribution)
 - [License](#license)
@@ -223,11 +224,18 @@ file for a specific client. Without the identifier collisions can happen.
 Service                                   | Driver name
 ------------------------------------------|-------------
 [Session identifier](#session-identifier) | `session`
+[Auth identifier](#auth-identifier)       | `auth`
 [NOP identifier](#nop-identifier)         | `nop`
 
 ### Session identifier
 
-This identifier uses the client session and, the original file name to create an identifier for the upload file.
+This identifier uses the client session, and the original file name to create an identifier for the upload file.
+
+### Auth identifier
+
+This identifier uses the id of the authenticated user, and the original file name to create an identifier for the upload file.
+
+It will throw `UnauthorizedException` when the user is unauthorized. However, it is still recommended to use the `auth` middleware.
 
 ### NOP identifier
 

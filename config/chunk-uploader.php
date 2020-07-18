@@ -28,7 +28,7 @@ return [
     | specify which one you're using throughout your application here. By
     | default, the module is setup for session identity.
     |
-    | Supported: "session"
+    | Supported: "auth", "nop", "session"
     |
      */
 
