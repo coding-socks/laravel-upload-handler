@@ -2,9 +2,9 @@
 
 namespace CodingSocks\ChunkUploader\Tests\Identifier;
 
+use CodingSocks\ChunkUploader\Identifier\AuthIdentifier;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\UnauthorizedException;
-use CodingSocks\ChunkUploader\Identifier\AuthIdentifier;
 use Orchestra\Testbench\TestCase;
 
 class AuthIdentifierTest extends TestCase
