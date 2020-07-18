@@ -60,7 +60,8 @@ class UploadManager extends Manager
     /**
      * @return \Illuminate\Support\Manager
      */
-    protected function identityManager() {
+    protected function identityManager()
+    {
         return $this->app['chunk-uploader.identity-manager'];
     }
 
