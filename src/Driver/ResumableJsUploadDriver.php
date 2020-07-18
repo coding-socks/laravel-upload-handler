@@ -4,6 +4,7 @@ namespace CodingSocks\ChunkUploader\Driver;
 
 use Closure;
 use CodingSocks\ChunkUploader\Helper\ChunkHelpers;
+use CodingSocks\ChunkUploader\Identifier\Identifier;
 use CodingSocks\ChunkUploader\Range\ResumableJsRange;
 use CodingSocks\ChunkUploader\Response\PercentageJsonResponse;
 use CodingSocks\ChunkUploader\StorageConfig;
@@ -23,6 +24,11 @@ class ResumableJsUploadDriver extends UploadDriver
      * @var string
      */
     private $fileParam;
+
+    /**
+     * @var \CodingSocks\ChunkUploader\Identifier\Identifier
+     */
+    private $identifier;
 
     /**
      * @var string
@@ -48,10 +54,12 @@ class ResumableJsUploadDriver extends UploadDriver
      * ResumableJsUploadDriver constructor.
      *
      * @param array $config
+     * @param \CodingSocks\ChunkUploader\Identifier\Identifier $identifier
      */
-    public function __construct($config)
+    public function __construct($config, Identifier $identifier)
     {
         $this->fileParam = $config['param'];
+        $this->identifier = $identifier;
 
         $this->uploadMethod = $config['upload-method'];
         $this->testMethod = $config['test-method'];
@@ -101,10 +109,10 @@ class ResumableJsUploadDriver extends UploadDriver
             throw new BadRequestHttpException($e->getMessage(), $e);
         }
 
-        $filename = $request->query($this->buildParameterName('identifier'));
+        $uid = $this->identifier->generateIdentifier($request->query($this->buildParameterName('identifier')));
         $chunkname = $this->buildChunkname($range);
 
-        if (! $this->chunkExists($config, $filename, $chunkname)) {
+        if (! $this->chunkExists($config, $uid, $chunkname)) {
             return new Response('', Response::HTTP_NO_CONTENT);
         }
 
@@ -165,9 +173,10 @@ class ResumableJsUploadDriver extends UploadDriver
             throw new BadRequestHttpException($e->getMessage(), $e);
         }
 
-        $uuid = $request->post($this->buildParameterName('identifier'));
+        $weakId = $request->post($this->buildParameterName('identifier'));
+        $uid = $this->identifier->generateIdentifier($weakId);
 
-        $chunks = $this->storeChunk($config, $range, $file, $uuid);
+        $chunks = $this->storeChunk($config, $range, $file, $uid);
 
         if (!$range->isFinished($chunks)) {
             return new PercentageJsonResponse($range->getPercentage($chunks));
@@ -178,7 +187,7 @@ class ResumableJsUploadDriver extends UploadDriver
         $path = $this->mergeChunks($config, $chunks, $targetFilename);
 
         if ($config->sweep()) {
-            $this->deleteChunkDirectory($config, $uuid);
+            $this->deleteChunkDirectory($config, $uid);
         }
 
         $this->triggerFileUploadedEvent($config->getDisk(), $path, $fileUploaded);

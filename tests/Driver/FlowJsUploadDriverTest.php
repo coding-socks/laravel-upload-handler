@@ -28,6 +28,7 @@ class FlowJsUploadDriverTest extends TestCase
     {
         parent::setUp();
 
+        $this->app->make('config')->set('chunk-uploader.identifier', 'nop');
         $this->app->make('config')->set('chunk-uploader.uploader', 'flow-js');
         $this->app->make('config')->set('chunk-uploader.sweep', false);
         $this->handler = $this->app->make(UploadHandler::class);
