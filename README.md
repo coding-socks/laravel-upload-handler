@@ -229,11 +229,11 @@ Service                                   | Driver name
 
 ### Session identifier
 
-This identifier uses the client session, and the original file name to create an identifier for the upload file.
+This identifier uses the client session and the original file name to create an identifier for the upload file.
 
 ### Auth identifier
 
-This identifier uses the id of the authenticated user, and the original file name to create an identifier for the upload file.
+This identifier uses the id of the authenticated user and the original file name to create an identifier for the upload file.
 
 It will throw `UnauthorizedException` when the user is unauthorized. However, it is still recommended to use the `auth` middleware.
 
