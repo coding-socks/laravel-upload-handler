@@ -34,33 +34,35 @@ class UploadManager extends Manager
 
     public function createFlowJsDriver()
     {
-        return new FlowJsUploadDriver($this->app['config']['chunk-uploader.resumable-js']);
+        return new FlowJsUploadDriver($this->app['config']['chunk-uploader.resumable-js'], $this->identityManager()->driver());
     }
 
     public function createNgFileUploadDriver()
     {
-        /** @var \Illuminate\Support\Manager $identityManager */
-        $identityManager = $this->app['chunk-uploader.identity-manager'];
-
-        return new NgFileUploadDriver($identityManager->driver());
+        return new NgFileUploadDriver($this->identityManager()->driver());
     }
 
     public function createPluploadDriver()
     {
-        /** @var \Illuminate\Support\Manager $identityManager */
-        $identityManager = $this->app['chunk-uploader.identity-manager'];
-
-        return new PluploadUploadDriver($identityManager->driver());
+        return new PluploadUploadDriver($this->identityManager()->driver());
     }
 
     public function createResumableJsDriver()
     {
-        return new ResumableJsUploadDriver($this->app['config']['chunk-uploader.resumable-js']);
+        return new ResumableJsUploadDriver($this->app['config']['chunk-uploader.resumable-js'], $this->identityManager()->driver());
     }
 
     public function createSimpleUploaderJsDriver()
     {
-        return new SimpleUploaderJsUploadDriver($this->app['config']['chunk-uploader.simple-uploader-js']);
+        return new SimpleUploaderJsUploadDriver($this->app['config']['chunk-uploader.simple-uploader-js'], $this->identityManager()->driver());
+    }
+
+    /**
+     * @return \Illuminate\Support\Manager
+     */
+    protected function identityManager()
+    {
+        return $this->app['chunk-uploader.identity-manager'];
     }
 
     /**

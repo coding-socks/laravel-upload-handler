@@ -2,14 +2,11 @@
 
 namespace CodingSocks\ChunkUploader\Driver;
 
+use CodingSocks\ChunkUploader\Identifier\Identifier;
+
 class FlowJsUploadDriver extends ResumableJsUploadDriver
 {
-    /**
-     * ResumableJsUploadDriver constructor.
-     *
-     * @param array $config
-     */
-    public function __construct($config)
+    public function __construct($config, Identifier $identifier)
     {
         $config['parameter-namespace'] = '';
         $config['parameter-names'] = [
@@ -30,6 +27,6 @@ class FlowJsUploadDriver extends ResumableJsUploadDriver
             // The name of the current chunk size POST parameter to use for the file chunk.
             'current-chunk-size' => 'flowCurrentChunkSize',
         ];
-        parent::__construct($config);
+        parent::__construct($config, $identifier);
     }
 }
