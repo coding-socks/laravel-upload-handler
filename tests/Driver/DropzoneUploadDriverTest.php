@@ -106,7 +106,7 @@ class DropzoneUploadDriverTest extends TestCase
     public function excludedPostParameterProvider()
     {
         return [
-            'dzuuid' => ['dzuuid'],
+            'dzuid' => ['dzuid'],
             'dzchunkindex' => ['dzchunkindex'],
             'dztotalfilesize' => ['dztotalfilesize'],
             'dzchunksize' => ['dzchunksize'],
@@ -121,7 +121,7 @@ class DropzoneUploadDriverTest extends TestCase
     public function testPostParameterValidation($exclude)
     {
         $arr = [
-            'dzuuid' => '2494cefe4d234bd331aeb4514fe97d810efba29b',
+            'dzuid' => '2494cefe4d234bd331aeb4514fe97d810efba29b',
             'dzchunkindex' => 0,
             'dztotalfilesize' => 200,
             'dzchunksize' => 100,
@@ -144,7 +144,7 @@ class DropzoneUploadDriverTest extends TestCase
     {
         $file = UploadedFile::fake()->create('test.txt', 100);
         $request = Request::create('', Request::METHOD_POST, [
-            'dzuuid' => '2494cefe4d234bd331aeb4514fe97d810efba29b',
+            'dzuid' => '2494cefe4d234bd331aeb4514fe97d810efba29b',
             'dzchunkindex' => 0,
             'dztotalfilesize' => 200,
             'dzchunksize' => 100,
@@ -169,7 +169,7 @@ class DropzoneUploadDriverTest extends TestCase
     {
         $file = UploadedFile::fake()->create('test.txt', 100);
         $request = Request::create('', Request::METHOD_POST, [
-            'dzuuid' => '2494cefe4d234bd331aeb4514fe97d810efba29b',
+            'dzuid' => '2494cefe4d234bd331aeb4514fe97d810efba29b',
             'dzchunkindex' => 0,
             'dztotalfilesize' => 200,
             'dzchunksize' => 100,
@@ -194,7 +194,7 @@ class DropzoneUploadDriverTest extends TestCase
 
         $file = UploadedFile::fake()->create('test.txt', 100);
         $request = Request::create('', Request::METHOD_POST, [
-            'dzuuid' => '2494cefe4d234bd331aeb4514fe97d810efba29b',
+            'dzuid' => '2494cefe4d234bd331aeb4514fe97d810efba29b',
             'dzchunkindex' => 1,
             'dztotalfilesize' => 200,
             'dzchunksize' => 100,
@@ -222,7 +222,7 @@ class DropzoneUploadDriverTest extends TestCase
 
         $file = UploadedFile::fake()->create('test.txt', 100);
         $request = Request::create('', Request::METHOD_POST, [
-            'dzuuid' => '2494cefe4d234bd331aeb4514fe97d810efba29b',
+            'dzuid' => '2494cefe4d234bd331aeb4514fe97d810efba29b',
             'dzchunkindex' => 1,
             'dztotalfilesize' => 200,
             'dzchunksize' => 100,

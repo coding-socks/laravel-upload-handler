@@ -76,7 +76,7 @@ class DropzoneUploadDriver extends UploadDriver
      */
     private function isMonolithRequest(Request $request): bool
     {
-        return $request->post('dzuuid') === null
+        return $request->post('dzuid') === null
             && $request->post('dzchunkindex') === null
             && $request->post('dztotalfilesize') === null
             && $request->post('dzchunksize') === null
@@ -90,7 +90,7 @@ class DropzoneUploadDriver extends UploadDriver
     private function validateChunkRequest(Request $request): void
     {
         $request->validate([
-            'dzuuid' => 'required',
+            'dzuid' => 'required',
             'dzchunkindex' => 'required',
             'dztotalfilesize' => 'required',
             'dzchunksize' => 'required',
@@ -139,9 +139,9 @@ class DropzoneUploadDriver extends UploadDriver
             throw new BadRequestHttpException($e->getMessage(), $e);
         }
 
-        $uuid = $request->post('dzuuid');
+        $uid = $request->post('dzuid');
 
-        $chunks = $this->storeChunk($config, $range, $file, $uuid);
+        $chunks = $this->storeChunk($config, $range, $file, $uid);
 
         if (!$range->isFinished($chunks)) {
             return new PercentageJsonResponse($range->getPercentage($chunks));
@@ -152,7 +152,7 @@ class DropzoneUploadDriver extends UploadDriver
         $path = $this->mergeChunks($config, $chunks, $targetFilename);
 
         if ($config->sweep()) {
-            $this->deleteChunkDirectory($config, $uuid);
+            $this->deleteChunkDirectory($config, $uid);
         }
 
         $this->triggerFileUploadedEvent($config->getDisk(), $path, $fileUploaded);

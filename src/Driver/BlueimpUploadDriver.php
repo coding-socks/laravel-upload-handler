@@ -100,9 +100,9 @@ class BlueimpUploadDriver extends UploadDriver
     {
         $download = $request->query('download', false);
         if ($download !== false) {
-            $uuid = $request->query($this->fileParam);
+            $uid = $request->query($this->fileParam);
 
-            return $this->fileResponse($uuid, $config);
+            return $this->fileResponse($uid, $config);
         }
 
         $request->validate([
@@ -112,15 +112,15 @@ class BlueimpUploadDriver extends UploadDriver
 
         $originalFilename = $request->query($this->fileParam);
         $totalSize = $request->query('totalSize');
-        $uuid = $this->identifier->generateFileIdentifier($totalSize, $originalFilename);
+        $uid = $this->identifier->generateFileIdentifier($totalSize, $originalFilename);
 
-        if (!$this->chunkExists($config, $uuid)) {
+        if (!$this->chunkExists($config, $uid)) {
             return new JsonResponse([
                 'file' => null,
             ]);
         }
 
-        $chunk = Arr::last($this->chunks($config, $uuid));
+        $chunk = Arr::last($this->chunks($config, $uid));
         $size = explode('-', basename($chunk))[1] + 1;
 
         return new JsonResponse([
@@ -154,9 +154,9 @@ class BlueimpUploadDriver extends UploadDriver
             throw new BadRequestHttpException($e->getMessage(), $e);
         }
 
-        $uuid = $this->identifier->generateFileIdentifier($range->getTotal(), $file->getClientOriginalName());
+        $uid = $this->identifier->generateFileIdentifier($range->getTotal(), $file->getClientOriginalName());
 
-        $chunks = $this->storeChunk($config, $range, $file, $uuid);
+        $chunks = $this->storeChunk($config, $range, $file, $uid);
 
         if (!$range->isLast()) {
             return new PercentageJsonResponse($range->getPercentage());
@@ -167,7 +167,7 @@ class BlueimpUploadDriver extends UploadDriver
         $path = $this->mergeChunks($config, $chunks, $targetFilename);
 
         if ($config->sweep()) {
-            $this->deleteChunkDirectory($config, $uuid);
+            $this->deleteChunkDirectory($config, $uid);
         }
 
         $this->triggerFileUploadedEvent($config->getDisk(), $path, $fileUploaded);
