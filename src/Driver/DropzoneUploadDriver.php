@@ -76,7 +76,7 @@ class DropzoneUploadDriver extends UploadDriver
      */
     private function isMonolithRequest(Request $request): bool
     {
-        return $request->post('dzuid') === null
+        return $request->post('dzuuid') === null
             && $request->post('dzchunkindex') === null
             && $request->post('dztotalfilesize') === null
             && $request->post('dzchunksize') === null
@@ -90,7 +90,7 @@ class DropzoneUploadDriver extends UploadDriver
     private function validateChunkRequest(Request $request): void
     {
         $request->validate([
-            'dzuid' => 'required',
+            'dzuuid' => 'required',
             'dzchunkindex' => 'required',
             'dztotalfilesize' => 'required',
             'dzchunksize' => 'required',
@@ -139,7 +139,7 @@ class DropzoneUploadDriver extends UploadDriver
             throw new BadRequestHttpException($e->getMessage(), $e);
         }
 
-        $uid = $request->post('dzuid');
+        $uid = $request->post('dzuuid');
 
         $chunks = $this->storeChunk($config, $range, $file, $uid);
 
