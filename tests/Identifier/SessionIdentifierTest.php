@@ -1,15 +1,15 @@
 <?php
 
-namespace CodingSocks\ChunkUploader\Tests\Identifier;
+namespace CodingSocks\UploadHandler\Tests\Identifier;
 
-use CodingSocks\ChunkUploader\Identifier\SessionIdentifier;
+use CodingSocks\UploadHandler\Identifier\SessionIdentifier;
 use Illuminate\Support\Facades\Session;
 use Orchestra\Testbench\TestCase;
 
 class SessionIdentifierTest extends TestCase
 {
     /**
-     * @var \CodingSocks\ChunkUploader\Identifier\SessionIdentifier
+     * @var \CodingSocks\UploadHandler\Identifier\SessionIdentifier
      */
     private $identifier;
 

@@ -1,9 +1,9 @@
 <?php
 
-namespace CodingSocks\ChunkUploader;
+namespace CodingSocks\UploadHandler;
 
 use Closure;
-use CodingSocks\ChunkUploader\Driver\UploadDriver;
+use CodingSocks\UploadHandler\Driver\BaseHandler;
 use Illuminate\Http\Request;
 use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,7 +13,7 @@ class UploadHandler
     use Macroable;
 
     /**
-     * @var \CodingSocks\ChunkUploader\Driver\UploadDriver
+     * @var \CodingSocks\UploadHandler\Driver\BaseHandler
      */
     protected $driver;
 
@@ -25,10 +25,10 @@ class UploadHandler
     /**
      * UploadHandler constructor.
      *
-     * @param \CodingSocks\ChunkUploader\Driver\UploadDriver $driver
+     * @param \CodingSocks\UploadHandler\Driver\BaseHandler $driver
      * @param StorageConfig $config
      */
-    public function __construct(UploadDriver $driver, StorageConfig $config)
+    public function __construct(BaseHandler $driver, StorageConfig $config)
     {
         $this->driver = $driver;
         $this->config = $config;

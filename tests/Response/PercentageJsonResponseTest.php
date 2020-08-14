@@ -1,6 +1,6 @@
 <?php
 
-namespace CodingSocks\ChunkUploader\Response;
+namespace CodingSocks\UploadHandler\Response;
 
 use Illuminate\Foundation\Testing\Concerns\MakesHttpRequests;
 use Illuminate\Http\Response;

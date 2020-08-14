@@ -1,6 +1,6 @@
 <?php
 
-namespace CodingSocks\ChunkUploader\Identifier;
+namespace CodingSocks\UploadHandler\Identifier;
 
 abstract class Identifier
 {

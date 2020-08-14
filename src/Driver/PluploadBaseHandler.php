@@ -1,13 +1,13 @@
 <?php
 
-namespace CodingSocks\ChunkUploader\Driver;
+namespace CodingSocks\UploadHandler\Driver;
 
 use Closure;
-use CodingSocks\ChunkUploader\Helper\ChunkHelpers;
-use CodingSocks\ChunkUploader\Identifier\Identifier;
-use CodingSocks\ChunkUploader\Range\PluploadRange;
-use CodingSocks\ChunkUploader\Response\PercentageJsonResponse;
-use CodingSocks\ChunkUploader\StorageConfig;
+use CodingSocks\UploadHandler\Helper\ChunkHelpers;
+use CodingSocks\UploadHandler\Identifier\Identifier;
+use CodingSocks\UploadHandler\Range\PluploadRange;
+use CodingSocks\UploadHandler\Response\PercentageJsonResponse;
+use CodingSocks\UploadHandler\StorageConfig;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use InvalidArgumentException;
@@ -15,19 +15,19 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-class PluploadUploadDriver extends UploadDriver
+class PluploadBaseHandler extends BaseHandler
 {
     use ChunkHelpers;
 
     /**
-     * @var \CodingSocks\ChunkUploader\Identifier\Identifier
+     * @var \CodingSocks\UploadHandler\Identifier\Identifier
      */
     private $identifier;
 
     /**
-     * PluploadUploadDriver constructor.
+     * PluploadDriver constructor.
      *
-     * @param \CodingSocks\ChunkUploader\Identifier\Identifier $identifier
+     * @param \CodingSocks\UploadHandler\Identifier\Identifier $identifier
      */
     public function __construct(Identifier $identifier)
     {
@@ -51,7 +51,7 @@ class PluploadUploadDriver extends UploadDriver
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param \CodingSocks\ChunkUploader\StorageConfig $config
+     * @param \CodingSocks\UploadHandler\StorageConfig $config
      * @param \Closure|null $fileUploaded
      *
      * @return mixed
@@ -82,7 +82,7 @@ class PluploadUploadDriver extends UploadDriver
     /**
      * @param \Illuminate\Http\UploadedFile $file
      * @param \Illuminate\Http\Request $request
-     * @param \CodingSocks\ChunkUploader\StorageConfig $config
+     * @param \CodingSocks\UploadHandler\StorageConfig $config
      * @param \Closure|null $fileUploaded
      *
      * @return \Symfony\Component\HttpFoundation\Response

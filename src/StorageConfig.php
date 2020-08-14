@@ -1,6 +1,6 @@
 <?php
 
-namespace CodingSocks\ChunkUploader;
+namespace CodingSocks\UploadHandler;
 
 class StorageConfig
 {

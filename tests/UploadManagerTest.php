@@ -1,11 +1,11 @@
 <?php
 
-namespace CodingSocks\ChunkUploader\Tests;
+namespace CodingSocks\UploadHandler\Tests;
 
-use CodingSocks\ChunkUploader\Driver\BlueimpUploadDriver;
-use CodingSocks\ChunkUploader\Driver\DropzoneUploadDriver;
-use CodingSocks\ChunkUploader\Driver\MonolithUploadDriver;
-use CodingSocks\ChunkUploader\UploadManager;
+use CodingSocks\UploadHandler\Driver\BlueimpBaseHandler;
+use CodingSocks\UploadHandler\Driver\DropzoneBaseHandler;
+use CodingSocks\UploadHandler\Driver\MonolithBaseHandler;
+use CodingSocks\UploadHandler\UploadManager;
 
 class UploadManagerTest extends TestCase
 {
@@ -27,18 +27,18 @@ class UploadManagerTest extends TestCase
     public function testMonolithDriverCreation()
     {
         $driver = $this->manager->driver('monolith');
-        $this->assertInstanceOf(MonolithUploadDriver::class, $driver);
+        $this->assertInstanceOf(MonolithBaseHandler::class, $driver);
     }
 
     public function testBlueimpDriverCreation()
     {
         $driver = $this->manager->driver('blueimp');
-        $this->assertInstanceOf(BlueimpUploadDriver::class, $driver);
+        $this->assertInstanceOf(BlueimpBaseHandler::class, $driver);
     }
 
     public function testDropzoneDriverCreation()
     {
         $driver = $this->manager->driver('dropzone');
-        $this->assertInstanceOf(DropzoneUploadDriver::class, $driver);
+        $this->assertInstanceOf(DropzoneBaseHandler::class, $driver);
     }
 }

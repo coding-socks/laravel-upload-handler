@@ -1,11 +1,11 @@
 <?php
 
-namespace CodingSocks\ChunkUploader\Driver;
+namespace CodingSocks\UploadHandler\Driver;
 
 use Closure;
-use CodingSocks\ChunkUploader\Event\FileUploaded;
-use CodingSocks\ChunkUploader\Exception\InternalServerErrorHttpException;
-use CodingSocks\ChunkUploader\StorageConfig;
+use CodingSocks\UploadHandler\Event\FileUploaded;
+use CodingSocks\UploadHandler\Exception\InternalServerErrorHttpException;
+use CodingSocks\UploadHandler\StorageConfig;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -15,12 +15,12 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-abstract class UploadDriver
+abstract class BaseHandler
 {
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param \CodingSocks\ChunkUploader\StorageConfig $config
+     * @param \CodingSocks\UploadHandler\StorageConfig $config
      * @param \Closure|null $fileUploaded
      *
      * @return \Symfony\Component\HttpFoundation\Response
@@ -30,7 +30,7 @@ abstract class UploadDriver
 
     /**
      * @param string $filename
-     * @param \CodingSocks\ChunkUploader\StorageConfig $storageConfig
+     * @param \CodingSocks\UploadHandler\StorageConfig $storageConfig
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -69,7 +69,7 @@ abstract class UploadDriver
     }
 
     /**
-     * Dispatch a {@link \CodingSocks\ChunkUploader\Event\FileUploaded} event.
+     * Dispatch a {@link \CodingSocks\UploadHandler\Event\FileUploaded} event.
      * Also call the given {@link \Closure} if not null.
      *
      * @param $disk
@@ -91,7 +91,7 @@ abstract class UploadDriver
      * @param \Illuminate\Http\UploadedFile|null $file
      *
      * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException when given file is null.
-     * @throws \CodingSocks\ChunkUploader\Exception\InternalServerErrorHttpException when given file is invalid.
+     * @throws \CodingSocks\UploadHandler\Exception\InternalServerErrorHttpException when given file is invalid.
      */
     protected function validateUploadedFile(UploadedFile $file = null): void
     {

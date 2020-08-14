@@ -1,6 +1,6 @@
 <?php
 
-namespace CodingSocks\ChunkUploader\Event;
+namespace CodingSocks\UploadHandler\Event;
 
 class FileUploaded
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace CodingSocks\ChunkUploader\Tests\Range;
+namespace CodingSocks\UploadHandler\Tests\Range;
 
-use CodingSocks\ChunkUploader\Range\ContentRange;
+use CodingSocks\UploadHandler\Range\ContentRange;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;

@@ -1,6 +1,6 @@
 <?php
 
-namespace CodingSocks\ChunkUploader\Exception;
+namespace CodingSocks\UploadHandler\Exception;
 
 use Symfony\Component\HttpKernel\Exception\HttpException;
 

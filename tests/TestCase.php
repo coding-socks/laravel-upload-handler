@@ -1,8 +1,8 @@
 <?php
 
-namespace CodingSocks\ChunkUploader\Tests;
+namespace CodingSocks\UploadHandler\Tests;
 
-use CodingSocks\ChunkUploader\ChunkUploaderServiceProvider;
+use CodingSocks\UploadHandler\UploadHandlerServiceProvider;
 use Illuminate\Http\UploadedFile;
 
 class TestCase extends \Orchestra\Testbench\TestCase
@@ -13,7 +13,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
     protected function getPackageProviders($app)
     {
         return [
-            ChunkUploaderServiceProvider::class,
+            UploadHandlerServiceProvider::class,
         ];
     }
 

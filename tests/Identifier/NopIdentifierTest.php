@@ -1,14 +1,14 @@
 <?php
 
-namespace CodingSocks\ChunkUploader\Tests\Identifier;
+namespace CodingSocks\UploadHandler\Tests\Identifier;
 
-use CodingSocks\ChunkUploader\Identifier\NopIdentifier;
+use CodingSocks\UploadHandler\Identifier\NopIdentifier;
 use PHPUnit\Framework\TestCase;
 
 class NopIdentifierTest extends TestCase
 {
     /**
-     * @var \CodingSocks\ChunkUploader\Identifier\SessionIdentifier
+     * @var \CodingSocks\UploadHandler\Identifier\SessionIdentifier
      */
     private $identifier;
 

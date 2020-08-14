@@ -1,31 +1,31 @@
 <?php
 
-namespace CodingSocks\ChunkUploader\Driver;
+namespace CodingSocks\UploadHandler\Driver;
 
-use CodingSocks\ChunkUploader\Identifier\Identifier;
+use CodingSocks\UploadHandler\Identifier\Identifier;
 
-class SimpleUploaderJsUploadDriver extends ResumableJsUploadDriver
+class FlowJsHandler extends ResumableJsBaseHandler
 {
     public function __construct($config, Identifier $identifier)
     {
         $config['parameter-namespace'] = '';
         $config['parameter-names'] = [
             // The name of the chunk index (base-1) in the current upload POST parameter to use for the file chunk.
-            'chunk-number' => 'chunkNumber',
+            'chunk-number' => 'flowChunkNumber',
             // The name of the total number of chunks POST parameter to use for the file chunk.
-            'total-chunks' => 'totalChunks',
+            'total-chunks' => 'flowTotalChunks',
             // The name of the general chunk size POST parameter to use for the file chunk.
-            'chunk-size' => 'chunkSize',
+            'chunk-size' => 'flowChunkSize',
             // The name of the total file size number POST parameter to use for the file chunk.
-            'total-size' => 'totalSize',
+            'total-size' => 'flowTotalSize',
             // The name of the unique identifier POST parameter to use for the file chunk.
-            'identifier' => 'identifier',
+            'identifier' => 'flowIdentifier',
             // The name of the original file name POST parameter to use for the file chunk.
-            'file-name' => 'filename',
+            'file-name' => 'flowFilename',
             // The name of the file's relative path POST parameter to use for the file chunk.
-            'relative-path' => 'relativePath',
+            'relative-path' => 'flowRelativePath',
             // The name of the current chunk size POST parameter to use for the file chunk.
-            'current-chunk-size' => 'currentChunkSize',
+            'current-chunk-size' => 'flowCurrentChunkSize',
         ];
         parent::__construct($config, $identifier);
     }

@@ -1,12 +1,12 @@
 <?php
 
-namespace CodingSocks\ChunkUploader\Tests\Driver;
+namespace CodingSocks\UploadHandler\Tests\Driver;
 
-use CodingSocks\ChunkUploader\Driver\BlueimpUploadDriver;
-use CodingSocks\ChunkUploader\Event\FileUploaded;
-use CodingSocks\ChunkUploader\Exception\InternalServerErrorHttpException;
-use CodingSocks\ChunkUploader\Tests\TestCase;
-use CodingSocks\ChunkUploader\UploadHandler;
+use CodingSocks\UploadHandler\Driver\BlueimpBaseHandler;
+use CodingSocks\UploadHandler\Event\FileUploaded;
+use CodingSocks\UploadHandler\Exception\InternalServerErrorHttpException;
+use CodingSocks\UploadHandler\Tests\TestCase;
+use CodingSocks\UploadHandler\UploadHandler;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class BlueimpUploadDriverTest extends TestCase
+class BlueimpUploadHandlerTest extends TestCase
 {
     /**
      * @var UploadHandler
@@ -28,9 +28,9 @@ class BlueimpUploadDriverTest extends TestCase
     {
         parent::setUp();
 
-        $this->app->make('config')->set('chunk-uploader.identifier', 'nop');
-        $this->app->make('config')->set('chunk-uploader.uploader', 'blueimp');
-        $this->app->make('config')->set('chunk-uploader.sweep', false);
+        $this->app->make('config')->set('upload-handler.identifier', 'nop');
+        $this->app->make('config')->set('upload-handler.handler', 'blueimp');
+        $this->app->make('config')->set('upload-handler.sweep', false);
         $this->handler = $this->app->make(UploadHandler::class);
 
         Storage::fake('local');
@@ -39,9 +39,9 @@ class BlueimpUploadDriverTest extends TestCase
 
     public function testDriverInstance()
     {
-        $manager = $this->app->make('chunk-uploader.upload-manager');
+        $manager = $this->app->make('upload-handler.upload-manager');
 
-        $this->assertInstanceOf(BlueimpUploadDriver::class, $manager->driver());
+        $this->assertInstanceOf(BlueimpBaseHandler::class, $manager->driver());
     }
 
     public function testInfo()

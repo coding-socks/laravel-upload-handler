@@ -1,9 +1,9 @@
 <?php
 
-namespace CodingSocks\ChunkUploader\Helper;
+namespace CodingSocks\UploadHandler\Helper;
 
-use CodingSocks\ChunkUploader\Range\Range;
-use CodingSocks\ChunkUploader\StorageConfig;
+use CodingSocks\UploadHandler\Range\Range;
+use CodingSocks\UploadHandler\StorageConfig;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Http\File;
 use Illuminate\Http\UploadedFile;
@@ -19,7 +19,7 @@ trait ChunkHelpers
     /**
      * Combine all the given chunks to one single file with the given filename.
      *
-     * @param \CodingSocks\ChunkUploader\StorageConfig $config
+     * @param \CodingSocks\UploadHandler\StorageConfig $config
      * @param array $chunks
      * @param string $targetFilename
      *
@@ -52,7 +52,7 @@ trait ChunkHelpers
     /**
      * Delete a directory with the given name from the chunk directory.
      *
-     * @param \CodingSocks\ChunkUploader\StorageConfig $config
+     * @param \CodingSocks\UploadHandler\StorageConfig $config
      * @param string $uid
      */
     public function deleteChunkDirectory(StorageConfig $config, string $uid): void
@@ -64,8 +64,8 @@ trait ChunkHelpers
     /**
      * Persist an uploaded chunk in a directory with the given name in the chunk directory.
      *
-     * @param \CodingSocks\ChunkUploader\StorageConfig $config
-     * @param \CodingSocks\ChunkUploader\Range\Range $range
+     * @param \CodingSocks\UploadHandler\StorageConfig $config
+     * @param \CodingSocks\UploadHandler\Range\Range $range
      * @param \Illuminate\Http\UploadedFile $file
      * @param string $uid
      *
@@ -86,7 +86,7 @@ trait ChunkHelpers
     /**
      * List all chunks from a directory with the given name.
      *
-     * @param \CodingSocks\ChunkUploader\StorageConfig $config
+     * @param \CodingSocks\UploadHandler\StorageConfig $config
      * @param string $uid
      *
      * @return array
@@ -100,7 +100,7 @@ trait ChunkHelpers
     /**
      * Create a chunkname which contains range details.
      *
-     * @param \CodingSocks\ChunkUploader\Range\Range $range
+     * @param \CodingSocks\UploadHandler\Range\Range $range
      *
      * @return string
      */
@@ -118,7 +118,7 @@ trait ChunkHelpers
      *
      * When chunkname is given it checks the exact chunk. Otherwise only the folder has to exists.
      *
-     * @param \CodingSocks\ChunkUploader\StorageConfig $config
+     * @param \CodingSocks\UploadHandler\StorageConfig $config
      * @param string $uid
      * @param string|null $chunkname
      *

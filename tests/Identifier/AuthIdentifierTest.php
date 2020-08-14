@@ -1,8 +1,8 @@
 <?php
 
-namespace CodingSocks\ChunkUploader\Tests\Identifier;
+namespace CodingSocks\UploadHandler\Tests\Identifier;
 
-use CodingSocks\ChunkUploader\Identifier\AuthIdentifier;
+use CodingSocks\UploadHandler\Identifier\AuthIdentifier;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\UnauthorizedException;
 use Orchestra\Testbench\TestCase;
@@ -10,7 +10,7 @@ use Orchestra\Testbench\TestCase;
 class AuthIdentifierTest extends TestCase
 {
     /**
-     * @var \CodingSocks\ChunkUploader\Identifier\Identifier
+     * @var \CodingSocks\UploadHandler\Identifier\Identifier
      */
     private $identifier;
 

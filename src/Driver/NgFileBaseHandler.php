@@ -1,62 +1,90 @@
 <?php
 
-namespace CodingSocks\ChunkUploader\Driver;
+namespace CodingSocks\UploadHandler\Driver;
 
 use Closure;
-use CodingSocks\ChunkUploader\Helper\ChunkHelpers;
-use CodingSocks\ChunkUploader\Range\DropzoneRange;
-use CodingSocks\ChunkUploader\Response\PercentageJsonResponse;
-use CodingSocks\ChunkUploader\StorageConfig;
+use CodingSocks\UploadHandler\Helper\ChunkHelpers;
+use CodingSocks\UploadHandler\Identifier\Identifier;
+use CodingSocks\UploadHandler\Range\NgFileUploadRange;
+use CodingSocks\UploadHandler\Response\PercentageJsonResponse;
+use CodingSocks\UploadHandler\StorageConfig;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-class DropzoneUploadDriver extends UploadDriver
+class NgFileBaseHandler extends BaseHandler
 {
     use ChunkHelpers;
 
     /**
-     * @var string
+     * @var \CodingSocks\UploadHandler\Identifier\Identifier
      */
-    private $fileParam;
+    private $identifier;
 
     /**
-     * DropzoneUploadDriver constructor.
+     * NgFileDriver constructor.
      *
-     * @param array $config
+     * @param \CodingSocks\UploadHandler\Identifier\Identifier $identifier
      */
-    public function __construct($config)
+    public function __construct(Identifier $identifier)
     {
-        $this->fileParam = $config['param'];
+        $this->identifier = $identifier;
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function handle(Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
     {
+        if ($this->isRequestMethodIn($request, [Request::METHOD_GET])) {
+            return $this->resume($request, $config);
+        }
+
         if ($this->isRequestMethodIn($request, [Request::METHOD_POST])) {
             return $this->save($request, $config, $fileUploaded);
         }
 
         throw new MethodNotAllowedHttpException([
+            Request::METHOD_GET,
             Request::METHOD_POST,
         ]);
     }
 
-    /**
-     * @param \Illuminate\Http\Request $request
-     * @param \CodingSocks\ChunkUploader\StorageConfig $config
-     * @param \Closure|null $fileUploaded
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function save(Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
+    private function resume(Request $request, StorageConfig $config): Response
     {
-        $file = $request->file($this->fileParam);
+        $request->validate([
+            'file' => 'required',
+            'totalSize' => 'required',
+        ]);
+
+        $originalFilename = $request->get('file');
+        $totalSize = $request->get('totalSize');
+        $uid = $this->identifier->generateFileIdentifier($totalSize, $originalFilename);
+
+        if (!$this->chunkExists($config, $uid)) {
+            return new JsonResponse([
+                'file' => $originalFilename,
+                'size' => 0,
+            ]);
+        }
+
+        $chunk = Arr::last($this->chunks($config, $uid));
+        $size = explode('-', basename($chunk))[1] + 1;
+
+        return new JsonResponse([
+            'file' => $originalFilename,
+            'size' => $size,
+        ]);
+    }
+
+    private function save(Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
+    {
+        $file = $request->file('file');
 
         $this->validateUploadedFile($file);
 
@@ -69,19 +97,9 @@ class DropzoneUploadDriver extends UploadDriver
         return $this->saveChunk($file, $request, $config, $fileUploaded);
     }
 
-    /**
-     * @param \Illuminate\Http\Request $request
-     *
-     * @return bool
-     */
-    private function isMonolithRequest(Request $request): bool
+    private function isMonolithRequest(Request $request)
     {
-        return $request->post('dzuuid') === null
-            && $request->post('dzchunkindex') === null
-            && $request->post('dztotalfilesize') === null
-            && $request->post('dzchunksize') === null
-            && $request->post('dztotalchunkcount') === null
-            && $request->post('dzchunkbyteoffset') === null;
+        return empty($request->post());
     }
 
     /**
@@ -90,18 +108,16 @@ class DropzoneUploadDriver extends UploadDriver
     private function validateChunkRequest(Request $request): void
     {
         $request->validate([
-            'dzuuid' => 'required',
-            'dzchunkindex' => 'required',
-            'dztotalfilesize' => 'required',
-            'dzchunksize' => 'required',
-            'dztotalchunkcount' => 'required',
-            'dzchunkbyteoffset' => 'required',
+            '_chunkNumber' => 'required|numeric',
+            '_chunkSize' => 'required|numeric',
+            '_totalSize' => 'required|numeric',
+            '_currentChunkSize' => 'required|numeric',
         ]);
     }
 
     /**
      * @param \Illuminate\Http\UploadedFile $file
-     * @param \CodingSocks\ChunkUploader\StorageConfig $config
+     * @param \CodingSocks\UploadHandler\StorageConfig $config
      * @param \Closure|null $fileUploaded
      *
      * @return \Symfony\Component\HttpFoundation\Response
@@ -120,7 +136,7 @@ class DropzoneUploadDriver extends UploadDriver
     /**
      * @param \Illuminate\Http\UploadedFile $file
      * @param \Illuminate\Http\Request $request
-     * @param \CodingSocks\ChunkUploader\StorageConfig $config
+     * @param \CodingSocks\UploadHandler\StorageConfig $config
      * @param \Closure|null $fileUploaded
      *
      * @return \Symfony\Component\HttpFoundation\Response
@@ -128,23 +144,19 @@ class DropzoneUploadDriver extends UploadDriver
     private function saveChunk(UploadedFile $file, Request $request, StorageConfig $config, Closure $fileUploaded = null): Response
     {
         try {
-            $range = new DropzoneRange(
-                $request,
-                'dzchunkindex',
-                'dztotalchunkcount',
-                'dzchunksize',
-                'dztotalfilesize'
-            );
+            $range = new NgFileUploadRange($request);
         } catch (InvalidArgumentException $e) {
             throw new BadRequestHttpException($e->getMessage(), $e);
         }
 
-        $uid = $request->post('dzuuid');
+        $originalFilename = $file->getClientOriginalName();
+        $totalSize = $request->get('_totalSize');
+        $uid = $this->identifier->generateFileIdentifier($totalSize, $originalFilename);
 
         $chunks = $this->storeChunk($config, $range, $file, $uid);
 
-        if (!$range->isFinished($chunks)) {
-            return new PercentageJsonResponse($range->getPercentage($chunks));
+        if (!$range->isLast()) {
+            return new PercentageJsonResponse($range->getPercentage());
         }
 
         $targetFilename = $file->hashName();

@@ -1,8 +1,8 @@
 <?php
 
-namespace CodingSocks\ChunkUploader\Tests\Range;
+namespace CodingSocks\UploadHandler\Tests\Range;
 
-use CodingSocks\ChunkUploader\Range\DropzoneRange;
+use CodingSocks\UploadHandler\Range\DropzoneRange;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -130,7 +130,7 @@ class DropzoneRangeTest extends TestCase
      * @param int $chunkSize
      * @param float $totalSize
      *
-     * @return \CodingSocks\ChunkUploader\Range\DropzoneRange
+     * @return \CodingSocks\UploadHandler\Range\DropzoneRange
      */
     private function createRequestBodyRange(int $index, int $numberOfChunks, int $chunkSize, float $totalSize)
     {

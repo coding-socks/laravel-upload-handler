@@ -1,13 +1,13 @@
 <?php
 
-namespace CodingSocks\ChunkUploader\Driver;
+namespace CodingSocks\UploadHandler\Driver;
 
 use Closure;
-use CodingSocks\ChunkUploader\Helper\ChunkHelpers;
-use CodingSocks\ChunkUploader\Identifier\Identifier;
-use CodingSocks\ChunkUploader\Range\ContentRange;
-use CodingSocks\ChunkUploader\Response\PercentageJsonResponse;
-use CodingSocks\ChunkUploader\StorageConfig;
+use CodingSocks\UploadHandler\Helper\ChunkHelpers;
+use CodingSocks\UploadHandler\Identifier\Identifier;
+use CodingSocks\UploadHandler\Range\ContentRange;
+use CodingSocks\UploadHandler\Response\PercentageJsonResponse;
+use CodingSocks\UploadHandler\StorageConfig;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-class BlueimpUploadDriver extends UploadDriver
+class BlueimpBaseHandler extends BaseHandler
 {
     use ChunkHelpers;
 
@@ -28,15 +28,15 @@ class BlueimpUploadDriver extends UploadDriver
     private $fileParam;
 
     /**
-     * @var \CodingSocks\ChunkUploader\Identifier\Identifier
+     * @var \CodingSocks\UploadHandler\Identifier\Identifier
      */
     private $identifier;
 
     /**
-     * BlueimpUploadDriver constructor.
+     * BlueimpDriver constructor.
      *
      * @param array $config
-     * @param \CodingSocks\ChunkUploader\Identifier\Identifier $identifier
+     * @param \CodingSocks\UploadHandler\Identifier\Identifier $identifier
      */
     public function __construct($config, Identifier $identifier)
     {
@@ -92,7 +92,7 @@ class BlueimpUploadDriver extends UploadDriver
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param \CodingSocks\ChunkUploader\StorageConfig $config
+     * @param \CodingSocks\UploadHandler\StorageConfig $config
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -133,7 +133,7 @@ class BlueimpUploadDriver extends UploadDriver
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param \CodingSocks\ChunkUploader\StorageConfig $config
+     * @param \CodingSocks\UploadHandler\StorageConfig $config
      * @param \Closure|null $fileUploaded
      *
      * @return \Symfony\Component\HttpFoundation\Response
@@ -177,7 +177,7 @@ class BlueimpUploadDriver extends UploadDriver
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param \CodingSocks\ChunkUploader\StorageConfig $config
+     * @param \CodingSocks\UploadHandler\StorageConfig $config
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
