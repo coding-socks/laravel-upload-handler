@@ -53,11 +53,11 @@ trait ChunkHelpers
      * Delete a directory with the given name from the chunk directory.
      *
      * @param \CodingSocks\ChunkUploader\StorageConfig $config
-     * @param string $uuid
+     * @param string $uid
      */
-    public function deleteChunkDirectory(StorageConfig $config, string $uuid): void
+    public function deleteChunkDirectory(StorageConfig $config, string $uid): void
     {
-        $directory = $config->getChunkDirectory() . '/' . $uuid;
+        $directory = $config->getChunkDirectory() . '/' . $uid;
         Storage::disk($config->getDisk())->deleteDirectory($directory);
     }
 
@@ -67,15 +67,15 @@ trait ChunkHelpers
      * @param \CodingSocks\ChunkUploader\StorageConfig $config
      * @param \CodingSocks\ChunkUploader\Range\Range $range
      * @param \Illuminate\Http\UploadedFile $file
-     * @param string $uuid
+     * @param string $uid
      *
      * @return array
      */
-    public function storeChunk(StorageConfig $config, Range $range, UploadedFile $file, string $uuid): array
+    public function storeChunk(StorageConfig $config, Range $range, UploadedFile $file, string $uid): array
     {
         $chunkname = $this->buildChunkname($range);
 
-        $directory = $config->getChunkDirectory() . '/' . $uuid;
+        $directory = $config->getChunkDirectory() . '/' . $uid;
         $file->storeAs($directory, $chunkname, [
             'disk' => $config->getDisk(),
         ]);
@@ -87,13 +87,13 @@ trait ChunkHelpers
      * List all chunks from a directory with the given name.
      *
      * @param \CodingSocks\ChunkUploader\StorageConfig $config
-     * @param string $uuid
+     * @param string $uid
      *
      * @return array
      */
-    public function chunks(StorageConfig $config, string $uuid): array
+    public function chunks(StorageConfig $config, string $uid): array
     {
-        $directory = $config->getChunkDirectory() . '/' . $uuid;
+        $directory = $config->getChunkDirectory() . '/' . $uid;
         return Storage::disk($config->getDisk())->files($directory);
     }
 
@@ -119,14 +119,14 @@ trait ChunkHelpers
      * When chunkname is given it checks the exact chunk. Otherwise only the folder has to exists.
      *
      * @param \CodingSocks\ChunkUploader\StorageConfig $config
-     * @param string $uuid
+     * @param string $uid
      * @param string|null $chunkname
      *
      * @return bool
      */
-    public function chunkExists(StorageConfig $config, string $uuid, string $chunkname = null): bool
+    public function chunkExists(StorageConfig $config, string $uid, string $chunkname = null): bool
     {
-        $directory = $config->getChunkDirectory() . '/' . $uuid;
+        $directory = $config->getChunkDirectory() . '/' . $uid;
         $disk = Storage::disk($config->getDisk());
 
         if (!$disk->exists($directory)) {

@@ -95,9 +95,9 @@ class PluploadUploadDriver extends UploadDriver
             throw new BadRequestHttpException($e->getMessage(), $e);
         }
 
-        $uuid = $this->identifier->generateFileIdentifier($range->getTotal(), $file->getClientOriginalName());
+        $uid = $this->identifier->generateFileIdentifier($range->getTotal(), $file->getClientOriginalName());
 
-        $chunks = $this->storeChunk($config, $range, $file, $uuid);
+        $chunks = $this->storeChunk($config, $range, $file, $uid);
 
         if (!$range->isLast()) {
             return new PercentageJsonResponse($range->getPercentage());
@@ -108,7 +108,7 @@ class PluploadUploadDriver extends UploadDriver
         $path = $this->mergeChunks($config, $chunks, $targetFilename);
 
         if ($config->sweep()) {
-            $this->deleteChunkDirectory($config, $uuid);
+            $this->deleteChunkDirectory($config, $uid);
         }
 
         $this->triggerFileUploadedEvent($config->getDisk(), $path, $fileUploaded);

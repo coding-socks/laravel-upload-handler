@@ -64,16 +64,16 @@ class NgFileUploadDriver extends UploadDriver
 
         $originalFilename = $request->get('file');
         $totalSize = $request->get('totalSize');
-        $uuid = $this->identifier->generateFileIdentifier($totalSize, $originalFilename);
+        $uid = $this->identifier->generateFileIdentifier($totalSize, $originalFilename);
 
-        if (!$this->chunkExists($config, $uuid)) {
+        if (!$this->chunkExists($config, $uid)) {
             return new JsonResponse([
                 'file' => $originalFilename,
                 'size' => 0,
             ]);
         }
 
-        $chunk = Arr::last($this->chunks($config, $uuid));
+        $chunk = Arr::last($this->chunks($config, $uid));
         $size = explode('-', basename($chunk))[1] + 1;
 
         return new JsonResponse([
@@ -151,9 +151,9 @@ class NgFileUploadDriver extends UploadDriver
 
         $originalFilename = $file->getClientOriginalName();
         $totalSize = $request->get('_totalSize');
-        $uuid = $this->identifier->generateFileIdentifier($totalSize, $originalFilename);
+        $uid = $this->identifier->generateFileIdentifier($totalSize, $originalFilename);
 
-        $chunks = $this->storeChunk($config, $range, $file, $uuid);
+        $chunks = $this->storeChunk($config, $range, $file, $uid);
 
         if (!$range->isLast()) {
             return new PercentageJsonResponse($range->getPercentage());
@@ -164,7 +164,7 @@ class NgFileUploadDriver extends UploadDriver
         $path = $this->mergeChunks($config, $chunks, $targetFilename);
 
         if ($config->sweep()) {
-            $this->deleteChunkDirectory($config, $uuid);
+            $this->deleteChunkDirectory($config, $uid);
         }
 
         $this->triggerFileUploadedEvent($config->getDisk(), $path, $fileUploaded);
