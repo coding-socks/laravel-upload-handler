@@ -1,4 +1,4 @@
-name: test
+name: run-tests
 
 on:
   push:
@@ -9,26 +9,41 @@ on:
       - 'master'
 
 jobs:
-  build:
-    name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }}
+  test:
     runs-on: ubuntu-latest
+
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
-        php: [ '7.2', '7.3', '7.4' ]
-        laravel: [ '5.5.*', '5.6.*', '5.7.*', '5.8.*', '^6.0', '^7.0' ]
+        php: [ 7.4, 7.3 ]
+        laravel: [ 8.*, 7.* ]
+        dependency-version: [prefer-lowest, prefer-stable]
+        include:
+          - laravel: 7.*
+            testbench: 5.*
+          - laravel: 8.*
+            testbench: 6.*
+
+    name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }}
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Update apt
+        run: sudo apt-get update --fix-missing
 
-      - uses: actions/cache@v1
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache/files
-          key: laravel-${{ matrix.laravel }}-php-${{ matrix.php }}-composer-${{ hashFiles('composer.json') }}
+          key: dependencies-laravel-${{ matrix.laravel }}-php-${{ matrix.php }}-composer-${{ hashFiles('composer.json') }}
 
-      - uses: shivammathur/setup-php@v1
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
           coverage: none
 
       - name: Validate composer.json
@@ -36,8 +51,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer require "illuminate/support:${{ matrix.laravel }}" "illuminate/http:${{ matrix.laravel }}" --no-interaction --no-update
-          composer update --prefer-dist --no-interaction --no-suggest
+          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
+          composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-suggest
 
-      - name: Run test
-        run: ./vendor/bin/phpunit --verbose
+      - name: Execute tests
+        run: vendor/bin/phpunit

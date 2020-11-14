@@ -28,10 +28,10 @@ class FlowJsUploadHandlerTest extends TestCase
     {
         parent::setUp();
 
-        $this->app->make('config')->set('upload-handler.identifier', 'nop');
-        $this->app->make('config')->set('upload-handler.handler', 'flow-js');
-        $this->app->make('config')->set('upload-handler.sweep', false);
-        $this->handler = $this->app->make(UploadHandler::class);
+        config()->set('upload-handler.identifier', 'nop');
+        config()->set('upload-handler.handler', 'flow-js');
+        config()->set('upload-handler.sweep', false);
+        $this->handler = app()->make(UploadHandler::class);
 
         Storage::fake('local');
         Event::fake();
@@ -39,7 +39,7 @@ class FlowJsUploadHandlerTest extends TestCase
 
     public function testDriverInstance()
     {
-        $manager = $this->app->make('upload-handler.upload-manager');
+        $manager = app()->make('upload-handler.upload-manager');
 
         $this->assertInstanceOf(FlowJsHandler::class, $manager->driver());
     }
