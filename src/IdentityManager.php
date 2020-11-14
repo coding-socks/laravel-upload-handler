@@ -31,7 +31,7 @@ class IdentityManager extends Manager
      */
     public function getDefaultDriver()
     {
-        return $this->app['config']['upload-handler.identifier'];
+        return $this->container['config']['upload-handler.identifier'];
     }
 
     /**
@@ -43,6 +43,6 @@ class IdentityManager extends Manager
      */
     public function setDefaultDriver($name)
     {
-        $this->app['config']['upload-handler.identifier'] = $name;
+        $this->container['config']['upload-handler.identifier'] = $name;
     }
 }

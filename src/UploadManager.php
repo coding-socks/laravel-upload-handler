@@ -16,25 +16,25 @@ class UploadManager extends Manager
 {
     public function createMonolithDriver()
     {
-        return new MonolithBaseHandler($this->app['config']['upload-handler.monolith']);
+        return new MonolithBaseHandler($this->container['config']['upload-handler.monolith']);
     }
 
     public function createBlueimpDriver()
     {
         /** @var \Illuminate\Support\Manager $identityManager */
-        $identityManager = $this->app['upload-handler.identity-manager'];
+        $identityManager = $this->container['upload-handler.identity-manager'];
 
-        return new BlueimpBaseHandler($this->app['config']['upload-handler.blueimp'], $identityManager->driver());
+        return new BlueimpBaseHandler($this->container['config']['upload-handler.blueimp'], $identityManager->driver());
     }
 
     public function createDropzoneDriver()
     {
-        return new DropzoneBaseHandler($this->app['config']['upload-handler.dropzone']);
+        return new DropzoneBaseHandler($this->container['config']['upload-handler.dropzone']);
     }
 
     public function createFlowJsDriver()
     {
-        return new FlowJsHandler($this->app['config']['upload-handler.resumable-js'], $this->identityManager()->driver());
+        return new FlowJsHandler($this->container['config']['upload-handler.resumable-js'], $this->identityManager()->driver());
     }
 
     public function createNgFileUploadDriver()
@@ -49,12 +49,12 @@ class UploadManager extends Manager
 
     public function createResumableJsDriver()
     {
-        return new ResumableJsBaseHandler($this->app['config']['upload-handler.resumable-js'], $this->identityManager()->driver());
+        return new ResumableJsBaseHandler($this->container['config']['upload-handler.resumable-js'], $this->identityManager()->driver());
     }
 
     public function createSimpleUploaderJsDriver()
     {
-        return new SimpleUploaderJsHandler($this->app['config']['upload-handler.simple-uploader-js'], $this->identityManager()->driver());
+        return new SimpleUploaderJsHandler($this->container['config']['upload-handler.simple-uploader-js'], $this->identityManager()->driver());
     }
 
     /**
@@ -62,7 +62,7 @@ class UploadManager extends Manager
      */
     protected function identityManager()
     {
-        return $this->app['upload-handler.identity-manager'];
+        return $this->container['upload-handler.identity-manager'];
     }
 
     /**
@@ -72,7 +72,7 @@ class UploadManager extends Manager
      */
     public function getDefaultDriver()
     {
-        return $this->app['config']['upload-handler.handler'];
+        return $this->container['config']['upload-handler.handler'];
     }
 
     /**
@@ -84,6 +84,6 @@ class UploadManager extends Manager
      */
     public function setDefaultDriver($name)
     {
-        $this->app['config']['upload-handler.handler'] = $name;
+        $this->container['config']['upload-handler.handler'] = $name;
     }
 }
