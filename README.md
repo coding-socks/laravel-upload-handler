@@ -12,7 +12,7 @@ This package helps integrate a Laravel application with chunk uploader libraries
 [DropzoneJS](https://www.dropzonejs.com/) and
 [jQuery-File-Upload from blueimp](https://blueimp.github.io/jQuery-File-Upload/).
 
-Uploading a large file in chunks can help reduce risks. 
+Uploading a large file in chunks can help reduce risks.
 
 - PHP from 5.3.4 limits the number of concurrent uploads and by uploading a file in one request can limit the
 availability of a service. ([max_file_uploads][php-max-file-uploads])
@@ -47,7 +47,7 @@ project at the moment is [tus](https://tus.io/).
     - [NOP identifier](#nop-identifier)
 - [Contribution](#contribution)
 - [License](#license)
-    
+
 ## Installation
 
 You can easily install this package using Composer, by running the following command:
@@ -60,8 +60,8 @@ composer require coding-socks/laravel-upload-handler
 
 This package has the following requirements:
 
-- PHP 7.1 or higher
-- Laravel 5.5 or higher
+- PHP 7.3 or higher
+- Laravel 7 or higher
 
 ## Usage
 
@@ -118,7 +118,7 @@ the disk and the path of the uploaded file.
 - [Laravel 8.x - Defining Listeners](https://laravel.com/docs/8.x/events#defining-listeners)
 
 You can also add a `Closure` as the second parameter of the `handle` method to add an inline listener. The listener
-is called with the disk and the path of the uploaded file. 
+is called with the disk and the path of the uploaded file.
 
 ```php
 $handler->handle($request, function ($disk, $path) {
