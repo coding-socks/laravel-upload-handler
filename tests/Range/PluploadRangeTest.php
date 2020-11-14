@@ -1,8 +1,8 @@
 <?php
 
-namespace CodingSocks\ChunkUploader\Tests\Range;
+namespace CodingSocks\UploadHandler\Tests\Range;
 
-use CodingSocks\ChunkUploader\Range\PluploadRange;
+use CodingSocks\UploadHandler\Range\PluploadRange;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -95,7 +95,7 @@ class PluploadRangeTest extends TestCase
      * @param float $chunk
      * @param float $chunks
      *
-     * @return \CodingSocks\ChunkUploader\Range\PluploadRange
+     * @return \CodingSocks\UploadHandler\Range\PluploadRange
      */
     private function createRequestBodyRange(float $chunk, float $chunks)
     {

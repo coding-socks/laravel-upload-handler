@@ -1,8 +1,8 @@
 <?php
 
-namespace CodingSocks\ChunkUploader\Tests\Range;
+namespace CodingSocks\UploadHandler\Tests\Range;
 
-use CodingSocks\ChunkUploader\Range\ResumableJsRange;
+use CodingSocks\UploadHandler\Range\ResumableJsRange;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -129,7 +129,7 @@ class ResumableJsRangeTest extends TestCase
      * @param int $chunkSize
      * @param float $totalSize
      *
-     * @return \CodingSocks\ChunkUploader\Range\ResumableJsRange
+     * @return \CodingSocks\UploadHandler\Range\ResumableJsRange
      */
     private function createRequestBodyRange(int $index, int $numberOfChunks, int $chunkSize, float $totalSize)
     {

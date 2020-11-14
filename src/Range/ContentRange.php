@@ -1,6 +1,6 @@
 <?php
 
-namespace CodingSocks\ChunkUploader\Range;
+namespace CodingSocks\UploadHandler\Range;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;

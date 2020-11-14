@@ -17,7 +17,7 @@ return [
     |
     */
 
-    'uploader' => env('UPLOAD_DRIVER', 'monolith'),
+    'handler' => env('UPLOAD_HANDLER', 'monolith'),
 
     /*
     |--------------------------------------------------------------------------

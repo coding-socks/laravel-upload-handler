@@ -1,12 +1,12 @@
 <?php
 
-namespace CodingSocks\ChunkUploader\Tests\Driver;
+namespace CodingSocks\UploadHandler\Tests\Driver;
 
-use CodingSocks\ChunkUploader\Driver\DropzoneUploadDriver;
-use CodingSocks\ChunkUploader\Event\FileUploaded;
-use CodingSocks\ChunkUploader\Exception\InternalServerErrorHttpException;
-use CodingSocks\ChunkUploader\Tests\TestCase;
-use CodingSocks\ChunkUploader\UploadHandler;
+use CodingSocks\UploadHandler\Driver\DropzoneBaseHandler;
+use CodingSocks\UploadHandler\Event\FileUploaded;
+use CodingSocks\UploadHandler\Exception\InternalServerErrorHttpException;
+use CodingSocks\UploadHandler\Tests\TestCase;
+use CodingSocks\UploadHandler\UploadHandler;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
@@ -15,7 +15,7 @@ use Illuminate\Validation\ValidationException;
 use Mockery;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class DropzoneUploadDriverTest extends TestCase
+class DropzoneUploadHandlerTest extends TestCase
 {
     /**
      * @var UploadHandler
@@ -26,8 +26,8 @@ class DropzoneUploadDriverTest extends TestCase
     {
         parent::setUp();
 
-        $this->app->make('config')->set('chunk-uploader.uploader', 'dropzone');
-        $this->app->make('config')->set('chunk-uploader.sweep', false);
+        $this->app->make('config')->set('upload-handler.handler', 'dropzone');
+        $this->app->make('config')->set('upload-handler.sweep', false);
         $this->handler = $this->app->make(UploadHandler::class);
 
         Storage::fake('local');
@@ -36,9 +36,9 @@ class DropzoneUploadDriverTest extends TestCase
 
     public function testDriverInstance()
     {
-        $manager = $this->app->make('chunk-uploader.upload-manager');
+        $manager = $this->app->make('upload-handler.upload-manager');
 
-        $this->assertInstanceOf(DropzoneUploadDriver::class, $manager->driver());
+        $this->assertInstanceOf(DropzoneBaseHandler::class, $manager->driver());
     }
 
     public function testUploadWhenFileParameterIsEmpty()

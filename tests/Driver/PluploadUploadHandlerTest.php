@@ -1,12 +1,12 @@
 <?php
 
-namespace CodingSocks\ChunkUploader\Tests\Driver;
+namespace CodingSocks\UploadHandler\Tests\Driver;
 
-use CodingSocks\ChunkUploader\Driver\PluploadUploadDriver;
-use CodingSocks\ChunkUploader\Event\FileUploaded;
-use CodingSocks\ChunkUploader\Exception\InternalServerErrorHttpException;
-use CodingSocks\ChunkUploader\Tests\TestCase;
-use CodingSocks\ChunkUploader\UploadHandler;
+use CodingSocks\UploadHandler\Driver\PluploadBaseHandler;
+use CodingSocks\UploadHandler\Event\FileUploaded;
+use CodingSocks\UploadHandler\Exception\InternalServerErrorHttpException;
+use CodingSocks\UploadHandler\Tests\TestCase;
+use CodingSocks\UploadHandler\UploadHandler;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
@@ -16,7 +16,7 @@ use Mockery;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-class PluploadUploadDriverTest extends TestCase
+class PluploadUploadHandlerTest extends TestCase
 {
     /**
      * @var UploadHandler
@@ -27,9 +27,9 @@ class PluploadUploadDriverTest extends TestCase
     {
         parent::setUp();
 
-        $this->app->make('config')->set('chunk-uploader.identifier', 'nop');
-        $this->app->make('config')->set('chunk-uploader.uploader', 'plupload');
-        $this->app->make('config')->set('chunk-uploader.sweep', false);
+        $this->app->make('config')->set('upload-handler.identifier', 'nop');
+        $this->app->make('config')->set('upload-handler.handler', 'plupload');
+        $this->app->make('config')->set('upload-handler.sweep', false);
         $this->handler = $this->app->make(UploadHandler::class);
 
         Storage::fake('local');
@@ -38,9 +38,9 @@ class PluploadUploadDriverTest extends TestCase
 
     public function testDriverInstance()
     {
-        $manager = $this->app->make('chunk-uploader.upload-manager');
+        $manager = $this->app->make('upload-handler.upload-manager');
 
-        $this->assertInstanceOf(PluploadUploadDriver::class, $manager->driver());
+        $this->assertInstanceOf(PluploadBaseHandler::class, $manager->driver());
     }
 
     public function notAllowedRequestMethods()

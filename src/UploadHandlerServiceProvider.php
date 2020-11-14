@@ -1,10 +1,10 @@
 <?php
 
-namespace CodingSocks\ChunkUploader;
+namespace CodingSocks\UploadHandler;
 
 use Illuminate\Support\ServiceProvider;
 
-class ChunkUploaderServiceProvider extends ServiceProvider
+class UploadHandlerServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap any package services.
@@ -23,10 +23,10 @@ class ChunkUploaderServiceProvider extends ServiceProvider
      */
     protected function setupConfig()
     {
-        $source = realpath(__DIR__ . '/../config/chunk-uploader.php');
-        $this->publishes([$source => config_path('chunk-uploader.php')]);
+        $source = realpath(__DIR__ . '/../config/upload-handler.php');
+        $this->publishes([$source => config_path('upload-handler.php')]);
 
-        $this->mergeConfigFrom($source, 'chunk-uploader');
+        $this->mergeConfigFrom($source, 'upload-handler');
     }
 
     /**
@@ -36,7 +36,7 @@ class ChunkUploaderServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->registerChunkUploader();
+        $this->registerUploadHandler();
     }
 
     /**
@@ -44,16 +44,16 @@ class ChunkUploaderServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function registerChunkUploader()
+    protected function registerUploadHandler()
     {
         $this->registerUploadManager();
         $this->registerIdentityManager();
 
         $this->app->singleton(UploadHandler::class, function () {
             /** @var \Illuminate\Support\Manager $uploadManager */
-            $uploadManager = $this->app['chunk-uploader.upload-manager'];
+            $uploadManager = $this->app['upload-handler.upload-manager'];
 
-            $storageConfig = new StorageConfig($this->app->make('config')->get('chunk-uploader'));
+            $storageConfig = new StorageConfig($this->app->make('config')->get('upload-handler'));
 
             return new UploadHandler($uploadManager->driver(), $storageConfig);
         });
@@ -66,7 +66,7 @@ class ChunkUploaderServiceProvider extends ServiceProvider
      */
     protected function registerUploadManager()
     {
-        $this->app->singleton('chunk-uploader.upload-manager', function () {
+        $this->app->singleton('upload-handler.upload-manager', function () {
             return new UploadManager($this->app);
         });
     }
@@ -78,7 +78,7 @@ class ChunkUploaderServiceProvider extends ServiceProvider
      */
     protected function registerIdentityManager()
     {
-        $this->app->singleton('chunk-uploader.identity-manager', function () {
+        $this->app->singleton('upload-handler.identity-manager', function () {
             return new IdentityManager($this->app);
         });
     }
@@ -92,7 +92,7 @@ class ChunkUploaderServiceProvider extends ServiceProvider
     {
         return [
             UploadHandler::class,
-            'chunk-uploader.upload-manager',
+            'upload-handler.upload-manager',
         ];
     }
 }

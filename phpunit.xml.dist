@@ -16,7 +16,7 @@
          verbose="true"
 >
     <testsuites>
-        <testsuite name="Laravel Chunk Uploader Test Suite">
+        <testsuite name="Laravel Upload Handler Test Suite">
             <directory>./tests</directory>
         </testsuite>
     </testsuites>

@@ -1,16 +1,16 @@
 <?php
 
-namespace CodingSocks\ChunkUploader\Driver;
+namespace CodingSocks\UploadHandler\Driver;
 
 use Closure;
-use CodingSocks\ChunkUploader\Response\PercentageJsonResponse;
-use CodingSocks\ChunkUploader\StorageConfig;
+use CodingSocks\UploadHandler\Response\PercentageJsonResponse;
+use CodingSocks\UploadHandler\StorageConfig;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-class MonolithUploadDriver extends UploadDriver
+class MonolithBaseHandler extends BaseHandler
 {
     /**
      * @var string
@@ -18,7 +18,7 @@ class MonolithUploadDriver extends UploadDriver
     private $fileParam;
 
     /**
-     * MonolithUploadDriver constructor.
+     * MonolithDriver constructor.
      *
      * @param array $config
      */
@@ -53,7 +53,7 @@ class MonolithUploadDriver extends UploadDriver
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param \CodingSocks\ChunkUploader\StorageConfig $config
+     * @param \CodingSocks\UploadHandler\StorageConfig $config
      * @param \Closure|null $fileUploaded
      *
      * @return \Symfony\Component\HttpFoundation\Response
@@ -75,7 +75,7 @@ class MonolithUploadDriver extends UploadDriver
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param \CodingSocks\ChunkUploader\StorageConfig $config
+     * @param \CodingSocks\UploadHandler\StorageConfig $config
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -88,7 +88,7 @@ class MonolithUploadDriver extends UploadDriver
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param \CodingSocks\ChunkUploader\StorageConfig $config
+     * @param \CodingSocks\UploadHandler\StorageConfig $config
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */

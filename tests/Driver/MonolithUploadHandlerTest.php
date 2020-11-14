@@ -1,12 +1,12 @@
 <?php
 
-namespace CodingSocks\ChunkUploader\Tests\Driver;
+namespace CodingSocks\UploadHandler\Tests\Driver;
 
-use CodingSocks\ChunkUploader\Driver\MonolithUploadDriver;
-use CodingSocks\ChunkUploader\Event\FileUploaded;
-use CodingSocks\ChunkUploader\Exception\InternalServerErrorHttpException;
-use CodingSocks\ChunkUploader\Tests\TestCase;
-use CodingSocks\ChunkUploader\UploadHandler;
+use CodingSocks\UploadHandler\Driver\MonolithBaseHandler;
+use CodingSocks\UploadHandler\Event\FileUploaded;
+use CodingSocks\UploadHandler\Exception\InternalServerErrorHttpException;
+use CodingSocks\UploadHandler\Tests\TestCase;
+use CodingSocks\UploadHandler\UploadHandler;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class MonolithUploadDriverTest extends TestCase
+class MonolithUploadHandlerTest extends TestCase
 {
     /**
      * @var UploadHandler
@@ -28,7 +28,7 @@ class MonolithUploadDriverTest extends TestCase
     {
         parent::setUp();
 
-        $this->app->make('config')->set('chunk-uploader.uploader', 'monolith');
+        $this->app->make('config')->set('upload-handler.handler', 'monolith');
         $this->handler = $this->app->make(UploadHandler::class);
 
         Storage::fake('local');
@@ -37,9 +37,9 @@ class MonolithUploadDriverTest extends TestCase
 
     public function testDriverInstance()
     {
-        $manager = $this->app->make('chunk-uploader.upload-manager');
+        $manager = $this->app->make('upload-handler.upload-manager');
 
-        $this->assertInstanceOf(MonolithUploadDriver::class, $manager->driver());
+        $this->assertInstanceOf(MonolithBaseHandler::class, $manager->driver());
     }
 
     public function testDownload()

@@ -1,12 +1,12 @@
 <?php
 
-namespace CodingSocks\ChunkUploader\Tests\Driver;
+namespace CodingSocks\UploadHandler\Tests\Driver;
 
-use CodingSocks\ChunkUploader\Driver\ResumableJsUploadDriver;
-use CodingSocks\ChunkUploader\Event\FileUploaded;
-use CodingSocks\ChunkUploader\Exception\InternalServerErrorHttpException;
-use CodingSocks\ChunkUploader\Tests\TestCase;
-use CodingSocks\ChunkUploader\UploadHandler;
+use CodingSocks\UploadHandler\Driver\FlowJsHandler;
+use CodingSocks\UploadHandler\Event\FileUploaded;
+use CodingSocks\UploadHandler\Exception\InternalServerErrorHttpException;
+use CodingSocks\UploadHandler\Tests\TestCase;
+use CodingSocks\UploadHandler\UploadHandler;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-class ResumableJsUploadDriverTest extends TestCase
+class FlowJsUploadHandlerTest extends TestCase
 {
     /**
      * @var UploadHandler
@@ -28,9 +28,9 @@ class ResumableJsUploadDriverTest extends TestCase
     {
         parent::setUp();
 
-        $this->app->make('config')->set('chunk-uploader.identifier', 'nop');
-        $this->app->make('config')->set('chunk-uploader.uploader', 'resumable-js');
-        $this->app->make('config')->set('chunk-uploader.sweep', false);
+        $this->app->make('config')->set('upload-handler.identifier', 'nop');
+        $this->app->make('config')->set('upload-handler.handler', 'flow-js');
+        $this->app->make('config')->set('upload-handler.sweep', false);
         $this->handler = $this->app->make(UploadHandler::class);
 
         Storage::fake('local');
@@ -39,9 +39,9 @@ class ResumableJsUploadDriverTest extends TestCase
 
     public function testDriverInstance()
     {
-        $manager = $this->app->make('chunk-uploader.upload-manager');
+        $manager = $this->app->make('upload-handler.upload-manager');
 
-        $this->assertInstanceOf(ResumableJsUploadDriver::class, $manager->driver());
+        $this->assertInstanceOf(FlowJsHandler::class, $manager->driver());
     }
 
     public function notAllowedRequestMethods()
@@ -75,15 +75,14 @@ class ResumableJsUploadDriverTest extends TestCase
         $this->createFakeLocalFile('chunks/200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt', '000-099');
 
         $request = Request::create('', Request::METHOD_GET, [
-            'resumableChunkNumber' => 2,
-            'resumableTotalChunks' => 2,
-            'resumableChunkSize' => 100,
-            'resumableTotalSize' => 200,
-            'resumableIdentifier' => '200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt',
-            'resumableFilename' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
-            'resumableRelativePath' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
-            'resumableCurrentChunkSize' => 100,
-            'resumableType' => 'text/plain',
+            'flowChunkNumber' => 2,
+            'flowTotalChunks' => 2,
+            'flowChunkSize' => 100,
+            'flowTotalSize' => 200,
+            'flowIdentifier' => '200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt',
+            'flowFilename' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
+            'flowRelativePath' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
+            'flowCurrentChunkSize' => 100,
         ]);
 
         $response = $this->createTestResponse($this->handler->handle($request));
@@ -95,15 +94,14 @@ class ResumableJsUploadDriverTest extends TestCase
         $this->createFakeLocalFile('chunks/200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt', '000-099');
 
         $request = Request::create('', Request::METHOD_GET, [
-            'resumableChunkNumber' => 1,
-            'resumableTotalChunks' => 2,
-            'resumableChunkSize' => 100,
-            'resumableTotalSize' => 200,
-            'resumableIdentifier' => '200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt',
-            'resumableFilename' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
-            'resumableRelativePath' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
-            'resumableCurrentChunkSize' => 100,
-            'resumableType' => 'text/plain',
+            'flowChunkNumber' => 1,
+            'flowTotalChunks' => 2,
+            'flowChunkSize' => 100,
+            'flowTotalSize' => 200,
+            'flowIdentifier' => '200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt',
+            'flowFilename' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
+            'flowRelativePath' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
+            'flowCurrentChunkSize' => 100,
         ]);
 
         $response = $this->createTestResponse($this->handler->handle($request));
@@ -138,15 +136,14 @@ class ResumableJsUploadDriverTest extends TestCase
     public function excludedPostParameterProvider()
     {
         return [
-            'resumableChunkNumber' => ['resumableChunkNumber'],
-            'resumableTotalChunks' => ['resumableTotalChunks'],
-            'resumableChunkSize' => ['resumableChunkSize'],
-            'resumableTotalSize' => ['resumableTotalSize'],
-            'resumableIdentifier' => ['resumableIdentifier'],
-            'resumableFilename' => ['resumableFilename'],
-            'resumableRelativePath' => ['resumableRelativePath'],
-            'resumableCurrentChunkSize' => ['resumableCurrentChunkSize'],
-            'resumableType' => ['resumableType'],
+            'flowChunkNumber' => ['flowChunkNumber'],
+            'flowTotalChunks' => ['flowTotalChunks'],
+            'flowChunkSize' => ['flowChunkSize'],
+            'flowTotalSize' => ['flowTotalSize'],
+            'flowIdentifier' => ['flowIdentifier'],
+            'flowFilename' => ['flowFilename'],
+            'flowRelativePath' => ['flowRelativePath'],
+            'flowCurrentChunkSize' => ['flowCurrentChunkSize'],
         ];
     }
 
@@ -156,15 +153,14 @@ class ResumableJsUploadDriverTest extends TestCase
     public function testPostParameterValidation($exclude)
     {
         $arr = [
-            'resumableChunkNumber' => 1,
-            'resumableTotalChunks' => 2,
-            'resumableChunkSize' => 100,
-            'resumableTotalSize' => 200,
-            'resumableIdentifier' => '200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt',
-            'resumableFilename' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
-            'resumableRelativePath' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
-            'resumableCurrentChunkSize' => 100,
-            'resumableType' => 'text/plain',
+            'flowChunkNumber' => 1,
+            'flowTotalChunks' => 2,
+            'flowChunkSize' => 100,
+            'flowTotalSize' => 200,
+            'flowIdentifier' => '200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt',
+            'flowFilename' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
+            'flowRelativePath' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
+            'flowCurrentChunkSize' => 100,
         ];
 
         unset($arr[$exclude]);
@@ -183,15 +179,14 @@ class ResumableJsUploadDriverTest extends TestCase
     {
         $file = UploadedFile::fake()->create('test.txt', 100);
         $request = Request::create('', Request::METHOD_POST, [
-            'resumableChunkNumber' => 1,
-            'resumableTotalChunks' => 2,
-            'resumableChunkSize' => 100,
-            'resumableTotalSize' => 200,
-            'resumableIdentifier' => '200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt',
-            'resumableFilename' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
-            'resumableRelativePath' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
-            'resumableCurrentChunkSize' => 100,
-            'resumableType' => 'text/plain',
+            'flowChunkNumber' => 1,
+            'flowTotalChunks' => 2,
+            'flowChunkSize' => 100,
+            'flowTotalSize' => 200,
+            'flowIdentifier' => '200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt',
+            'flowFilename' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
+            'flowRelativePath' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
+            'flowCurrentChunkSize' => 100,
         ], [], [
             'file' => $file,
         ]);
@@ -211,15 +206,14 @@ class ResumableJsUploadDriverTest extends TestCase
     {
         $file = UploadedFile::fake()->create('test.txt', 100);
         $request = Request::create('', Request::METHOD_POST, [
-            'resumableChunkNumber' => 1,
-            'resumableTotalChunks' => 2,
-            'resumableChunkSize' => 100,
-            'resumableTotalSize' => 200,
-            'resumableIdentifier' => '200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt',
-            'resumableFilename' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
-            'resumableRelativePath' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
-            'resumableCurrentChunkSize' => 100,
-            'resumableType' => 'text/plain',
+            'flowChunkNumber' => 1,
+            'flowTotalChunks' => 2,
+            'flowChunkSize' => 100,
+            'flowTotalSize' => 200,
+            'flowIdentifier' => '200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt',
+            'flowFilename' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
+            'flowRelativePath' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
+            'flowCurrentChunkSize' => 100,
         ], [], [
             'file' => $file,
         ]);
@@ -239,15 +233,14 @@ class ResumableJsUploadDriverTest extends TestCase
 
         $file = UploadedFile::fake()->create('test.txt', 100);
         $request = Request::create('', Request::METHOD_POST, [
-            'resumableChunkNumber' => 2,
-            'resumableTotalChunks' => 2,
-            'resumableChunkSize' => 100,
-            'resumableTotalSize' => 200,
-            'resumableIdentifier' => '200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt',
-            'resumableFilename' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
-            'resumableRelativePath' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
-            'resumableCurrentChunkSize' => 100,
-            'resumableType' => 'text/plain',
+            'flowChunkNumber' => 2,
+            'flowTotalChunks' => 2,
+            'flowChunkSize' => 100,
+            'flowTotalSize' => 200,
+            'flowIdentifier' => '200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt',
+            'flowFilename' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
+            'flowRelativePath' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
+            'flowCurrentChunkSize' => 100,
         ], [], [
             'file' => $file,
         ]);
@@ -270,15 +263,14 @@ class ResumableJsUploadDriverTest extends TestCase
 
         $file = UploadedFile::fake()->create('test.txt', 100);
         $request = Request::create('', Request::METHOD_POST, [
-            'resumableChunkNumber' => 2,
-            'resumableTotalChunks' => 2,
-            'resumableChunkSize' => 100,
-            'resumableTotalSize' => 200,
-            'resumableIdentifier' => '200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt',
-            'resumableFilename' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
-            'resumableRelativePath' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
-            'resumableCurrentChunkSize' => 100,
-            'resumableType' => 'text/plain',
+            'flowChunkNumber' => 2,
+            'flowTotalChunks' => 2,
+            'flowChunkSize' => 100,
+            'flowTotalSize' => 200,
+            'flowIdentifier' => '200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt',
+            'flowFilename' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
+            'flowRelativePath' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
+            'flowCurrentChunkSize' => 100,
         ], [], [
             'file' => $file,
         ]);

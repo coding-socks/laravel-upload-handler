@@ -1,10 +1,10 @@
 <?php
 
-namespace CodingSocks\ChunkUploader;
+namespace CodingSocks\UploadHandler;
 
-use CodingSocks\ChunkUploader\Identifier\AuthIdentifier;
-use CodingSocks\ChunkUploader\Identifier\NopIdentifier;
-use CodingSocks\ChunkUploader\Identifier\SessionIdentifier;
+use CodingSocks\UploadHandler\Identifier\AuthIdentifier;
+use CodingSocks\UploadHandler\Identifier\NopIdentifier;
+use CodingSocks\UploadHandler\Identifier\SessionIdentifier;
 use Illuminate\Support\Manager;
 
 class IdentityManager extends Manager
@@ -31,7 +31,7 @@ class IdentityManager extends Manager
      */
     public function getDefaultDriver()
     {
-        return $this->app['config']['chunk-uploader.identifier'];
+        return $this->app['config']['upload-handler.identifier'];
     }
 
     /**
@@ -43,6 +43,6 @@ class IdentityManager extends Manager
      */
     public function setDefaultDriver($name)
     {
-        $this->app['config']['chunk-uploader.identifier'] = $name;
+        $this->app['config']['upload-handler.identifier'] = $name;
     }
 }

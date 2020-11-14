@@ -1,60 +1,60 @@
 <?php
 
-namespace CodingSocks\ChunkUploader;
+namespace CodingSocks\UploadHandler;
 
-use CodingSocks\ChunkUploader\Driver\BlueimpUploadDriver;
-use CodingSocks\ChunkUploader\Driver\DropzoneUploadDriver;
-use CodingSocks\ChunkUploader\Driver\FlowJsUploadDriver;
-use CodingSocks\ChunkUploader\Driver\MonolithUploadDriver;
-use CodingSocks\ChunkUploader\Driver\NgFileUploadDriver;
-use CodingSocks\ChunkUploader\Driver\PluploadUploadDriver;
-use CodingSocks\ChunkUploader\Driver\ResumableJsUploadDriver;
-use CodingSocks\ChunkUploader\Driver\SimpleUploaderJsUploadDriver;
+use CodingSocks\UploadHandler\Driver\BlueimpBaseHandler;
+use CodingSocks\UploadHandler\Driver\DropzoneBaseHandler;
+use CodingSocks\UploadHandler\Driver\FlowJsHandler;
+use CodingSocks\UploadHandler\Driver\MonolithBaseHandler;
+use CodingSocks\UploadHandler\Driver\NgFileBaseHandler;
+use CodingSocks\UploadHandler\Driver\PluploadBaseHandler;
+use CodingSocks\UploadHandler\Driver\ResumableJsBaseHandler;
+use CodingSocks\UploadHandler\Driver\SimpleUploaderJsHandler;
 use Illuminate\Support\Manager;
 
 class UploadManager extends Manager
 {
     public function createMonolithDriver()
     {
-        return new MonolithUploadDriver($this->app['config']['chunk-uploader.monolith']);
+        return new MonolithBaseHandler($this->app['config']['upload-handler.monolith']);
     }
 
     public function createBlueimpDriver()
     {
         /** @var \Illuminate\Support\Manager $identityManager */
-        $identityManager = $this->app['chunk-uploader.identity-manager'];
+        $identityManager = $this->app['upload-handler.identity-manager'];
 
-        return new BlueimpUploadDriver($this->app['config']['chunk-uploader.blueimp'], $identityManager->driver());
+        return new BlueimpBaseHandler($this->app['config']['upload-handler.blueimp'], $identityManager->driver());
     }
 
     public function createDropzoneDriver()
     {
-        return new DropzoneUploadDriver($this->app['config']['chunk-uploader.dropzone']);
+        return new DropzoneBaseHandler($this->app['config']['upload-handler.dropzone']);
     }
 
     public function createFlowJsDriver()
     {
-        return new FlowJsUploadDriver($this->app['config']['chunk-uploader.resumable-js'], $this->identityManager()->driver());
+        return new FlowJsHandler($this->app['config']['upload-handler.resumable-js'], $this->identityManager()->driver());
     }
 
     public function createNgFileUploadDriver()
     {
-        return new NgFileUploadDriver($this->identityManager()->driver());
+        return new NgFileBaseHandler($this->identityManager()->driver());
     }
 
     public function createPluploadDriver()
     {
-        return new PluploadUploadDriver($this->identityManager()->driver());
+        return new PluploadBaseHandler($this->identityManager()->driver());
     }
 
     public function createResumableJsDriver()
     {
-        return new ResumableJsUploadDriver($this->app['config']['chunk-uploader.resumable-js'], $this->identityManager()->driver());
+        return new ResumableJsBaseHandler($this->app['config']['upload-handler.resumable-js'], $this->identityManager()->driver());
     }
 
     public function createSimpleUploaderJsDriver()
     {
-        return new SimpleUploaderJsUploadDriver($this->app['config']['chunk-uploader.simple-uploader-js'], $this->identityManager()->driver());
+        return new SimpleUploaderJsHandler($this->app['config']['upload-handler.simple-uploader-js'], $this->identityManager()->driver());
     }
 
     /**
@@ -62,7 +62,7 @@ class UploadManager extends Manager
      */
     protected function identityManager()
     {
-        return $this->app['chunk-uploader.identity-manager'];
+        return $this->app['upload-handler.identity-manager'];
     }
 
     /**
@@ -72,7 +72,7 @@ class UploadManager extends Manager
      */
     public function getDefaultDriver()
     {
-        return $this->app['config']['chunk-uploader.uploader'];
+        return $this->app['config']['upload-handler.handler'];
     }
 
     /**
@@ -84,6 +84,6 @@ class UploadManager extends Manager
      */
     public function setDefaultDriver($name)
     {
-        $this->app['config']['chunk-uploader.uploader'] = $name;
+        $this->app['config']['upload-handler.handler'] = $name;
     }
 }

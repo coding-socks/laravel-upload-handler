@@ -1,6 +1,6 @@
 <?php
 
-namespace CodingSocks\ChunkUploader\Identifier;
+namespace CodingSocks\UploadHandler\Identifier;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\UnauthorizedException;

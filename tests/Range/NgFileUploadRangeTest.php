@@ -1,8 +1,8 @@
 <?php
 
-namespace CodingSocks\ChunkUploader\Tests\Range;
+namespace CodingSocks\UploadHandler\Tests\Range;
 
-use CodingSocks\ChunkUploader\Range\NgFileUploadRange;
+use CodingSocks\UploadHandler\Range\NgFileUploadRange;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -111,7 +111,7 @@ class NgFileUploadRangeTest extends TestCase
      * @param int $currentChunkSize
      * @param float $totalSize
      *
-     * @return \CodingSocks\ChunkUploader\Range\NgFileUploadRange
+     * @return \CodingSocks\UploadHandler\Range\NgFileUploadRange
      */
     private function createRequestBodyRange(int $chunkNumber, int $chunkSize, int $currentChunkSize, float $totalSize)
     {
