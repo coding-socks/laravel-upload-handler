@@ -104,15 +104,18 @@ Method         | Description
 ---------------|--------------------------
 `handle`       | Handle the given request
 
-"Handle" is quite vague but there is a reason for that. This library tries to provide more functionality then just
+"Handle" is quite vague but there is a reason for that. This library tries to provide more functionality than just
 saving the uploaded chunks. It is also adds functionality for resumable uploads which depending on the client side
-library can be differ very much. Also, when possible the library gives the opportunity to download the uploaded file.
+library can differ very much. Also, when possible the library gives the opportunity to download the uploaded file.
 
 ### Events
 
-Once a file upload is finished a `\CodingSocks\UploadHandler\Event\FileUploaded` is triggered. This event contains
+Once a file upload finished a `\CodingSocks\UploadHandler\Event\FileUploaded` is triggered. This event contains
 the disk and the path of the uploaded file.
-[Registering Events & Listeners from Laravel](https://laravel.com/docs/5.8/events#registering-events-and-listeners)
+
+- [Laravel 7.x - Defining Listeners](https://laravel.com/docs/6.x/events#defining-listeners)
+- [Laravel 7.x - Defining Listeners](https://laravel.com/docs/7.x/events#defining-listeners)
+- [Laravel 8.x - Defining Listeners](https://laravel.com/docs/8.x/events#defining-listeners)
 
 You can also add a `Closure` as the second parameter of the `handle` method to add an inline listener. The listener
 is called with the disk and the path of the uploaded file. 
@@ -125,7 +128,7 @@ $handler->handle($request, function ($disk, $path) {
 
 ### Changing the driver
 
-You can change the default driver by setting a `UPLOAD_DRIVER` environment variable or publishing the
+You can change the default driver by setting an `UPLOAD_DRIVER` environment variable or publishing the
 config file and changing it directly.
 
 ### Adding your own drivers
@@ -139,7 +142,7 @@ app()->make(UploadManager::class)->extend('my_driver', function () {
 });
 ```
 
-If you are adding a driver you need to extend the `\CodingSocks\UploadHandler\Driver\UploadDriver` abstract class, for
+If you are adding a driver you need to extend the `\CodingSocks\UploadHandler\Driver\BaseHandler` abstract class, for
 which you can use the shipped drivers (e.g. `\CodingSocks\UploadHandler\Driver\BlueimpUploadDriver`) as an example as to
 how.
 
