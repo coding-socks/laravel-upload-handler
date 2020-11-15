@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" bootstrap="vendor/autoload.php" backupGlobals="false" backupStaticAttributes="false" colors="true" verbose="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" stopOnFailure="false" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+         verbose="true">
     <coverage>
         <include>
             <directory suffix=".php">src/</directory>
         </include>
+        <report>
+            <clover outputFile="build/logs/clover.xml"/>
+        </report>
     </coverage>
     <testsuites>
         <testsuite name="Laravel Upload Handler Test Suite">
@@ -11,9 +18,7 @@
         </testsuite>
     </testsuites>
     <logging>
-      <log type="tap" target="build/report.tap"/>
-      <log type="junit" target="build/report.junit.xml"/>
-      <log type="coverage-text" target="build/coverage.txt"/>
-      <log type="coverage-clover" target="build/logs/clover.xml"/>
+        <junit outputFile="build/report.junit.xml"/>
+        <text outputFile="build/coverage.txt"/>
     </logging>
 </phpunit>
