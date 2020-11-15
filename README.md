@@ -60,8 +60,10 @@ composer require coding-socks/laravel-upload-handler
 
 This package has the following requirements:
 
-- PHP 7.3 or higher
-- Laravel 7 or higher
+- PHP `^7.3`
+- Laravel `^6.10 || ^7.0 || ^8.0`
+
+[Caret Version Range (^)](https://getcomposer.org/doc/articles/versions.md#caret-version-range-)
 
 ## Usage
 
