@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-class MonolithBaseHandler extends BaseHandler
+class MonolithHandler extends BaseHandler
 {
     /**
      * @var string

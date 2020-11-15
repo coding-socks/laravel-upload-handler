@@ -2,7 +2,7 @@
 
 namespace CodingSocks\UploadHandler\Tests\Driver;
 
-use CodingSocks\UploadHandler\Driver\BlueimpBaseHandler;
+use CodingSocks\UploadHandler\Driver\BlueimpHandler;
 use CodingSocks\UploadHandler\Event\FileUploaded;
 use CodingSocks\UploadHandler\Exception\InternalServerErrorHttpException;
 use CodingSocks\UploadHandler\Tests\TestCase;
@@ -41,7 +41,7 @@ class BlueimpUploadHandlerTest extends TestCase
     {
         $manager = app()->make('upload-handler.upload-manager');
 
-        $this->assertInstanceOf(BlueimpBaseHandler::class, $manager->driver());
+        $this->assertInstanceOf(BlueimpHandler::class, $manager->driver());
     }
 
     public function testInfo()

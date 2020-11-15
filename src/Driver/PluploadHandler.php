@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-class PluploadBaseHandler extends BaseHandler
+class PluploadHandler extends BaseHandler
 {
     use ChunkHelpers;
 

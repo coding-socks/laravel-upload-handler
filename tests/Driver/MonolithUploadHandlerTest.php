@@ -2,7 +2,7 @@
 
 namespace CodingSocks\UploadHandler\Tests\Driver;
 
-use CodingSocks\UploadHandler\Driver\MonolithBaseHandler;
+use CodingSocks\UploadHandler\Driver\MonolithHandler;
 use CodingSocks\UploadHandler\Event\FileUploaded;
 use CodingSocks\UploadHandler\Exception\InternalServerErrorHttpException;
 use CodingSocks\UploadHandler\Tests\TestCase;
@@ -39,7 +39,7 @@ class MonolithUploadHandlerTest extends TestCase
     {
         $manager = app()->make('upload-handler.upload-manager');
 
-        $this->assertInstanceOf(MonolithBaseHandler::class, $manager->driver());
+        $this->assertInstanceOf(MonolithHandler::class, $manager->driver());
     }
 
     public function testDownload()

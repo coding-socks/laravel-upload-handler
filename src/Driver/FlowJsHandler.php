@@ -4,7 +4,7 @@ namespace CodingSocks\UploadHandler\Driver;
 
 use CodingSocks\UploadHandler\Identifier\Identifier;
 
-class FlowJsHandler extends ResumableJsBaseHandler
+class FlowJsHandler extends ResumableJsHandler
 {
     public function __construct($config, Identifier $identifier)
     {

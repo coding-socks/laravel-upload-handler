@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-class DropzoneBaseHandler extends BaseHandler
+class DropzoneHandler extends BaseHandler
 {
     use ChunkHelpers;
 

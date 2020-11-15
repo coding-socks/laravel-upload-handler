@@ -2,7 +2,7 @@
 
 namespace CodingSocks\UploadHandler\Tests\Driver;
 
-use CodingSocks\UploadHandler\Driver\ResumableJsBaseHandler;
+use CodingSocks\UploadHandler\Driver\ResumableJsHandler;
 use CodingSocks\UploadHandler\Event\FileUploaded;
 use CodingSocks\UploadHandler\Exception\InternalServerErrorHttpException;
 use CodingSocks\UploadHandler\Tests\TestCase;
@@ -41,7 +41,7 @@ class ResumableJsUploadHandlerTest extends TestCase
     {
         $manager = app()->make('upload-handler.upload-manager');
 
-        $this->assertInstanceOf(ResumableJsBaseHandler::class, $manager->driver());
+        $this->assertInstanceOf(ResumableJsHandler::class, $manager->driver());
     }
 
     public function notAllowedRequestMethods()

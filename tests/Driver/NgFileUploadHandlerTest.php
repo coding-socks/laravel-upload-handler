@@ -2,7 +2,7 @@
 
 namespace CodingSocks\UploadHandler\Tests\Driver;
 
-use CodingSocks\UploadHandler\Driver\NgFileBaseHandler;
+use CodingSocks\UploadHandler\Driver\NgFileHandler;
 use CodingSocks\UploadHandler\Event\FileUploaded;
 use CodingSocks\UploadHandler\Exception\InternalServerErrorHttpException;
 use CodingSocks\UploadHandler\Tests\TestCase;
@@ -40,7 +40,7 @@ class NgFileUploadHandlerTest extends TestCase
     {
         $manager = app()->make('upload-handler.upload-manager');
 
-        $this->assertInstanceOf(NgFileBaseHandler::class, $manager->driver());
+        $this->assertInstanceOf(NgFileHandler::class, $manager->driver());
     }
 
     public function notAllowedRequestMethods()

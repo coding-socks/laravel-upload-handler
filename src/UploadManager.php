@@ -2,13 +2,13 @@
 
 namespace CodingSocks\UploadHandler;
 
-use CodingSocks\UploadHandler\Driver\BlueimpBaseHandler;
-use CodingSocks\UploadHandler\Driver\DropzoneBaseHandler;
+use CodingSocks\UploadHandler\Driver\BlueimpHandler;
+use CodingSocks\UploadHandler\Driver\DropzoneHandler;
 use CodingSocks\UploadHandler\Driver\FlowJsHandler;
-use CodingSocks\UploadHandler\Driver\MonolithBaseHandler;
-use CodingSocks\UploadHandler\Driver\NgFileBaseHandler;
-use CodingSocks\UploadHandler\Driver\PluploadBaseHandler;
-use CodingSocks\UploadHandler\Driver\ResumableJsBaseHandler;
+use CodingSocks\UploadHandler\Driver\MonolithHandler;
+use CodingSocks\UploadHandler\Driver\NgFileHandler;
+use CodingSocks\UploadHandler\Driver\PluploadHandler;
+use CodingSocks\UploadHandler\Driver\ResumableJsHandler;
 use CodingSocks\UploadHandler\Driver\SimpleUploaderJsHandler;
 use Illuminate\Support\Manager;
 
@@ -16,7 +16,7 @@ class UploadManager extends Manager
 {
     public function createMonolithDriver()
     {
-        return new MonolithBaseHandler($this->container['config']['upload-handler.monolith']);
+        return new MonolithHandler($this->container['config']['upload-handler.monolith']);
     }
 
     public function createBlueimpDriver()
@@ -24,12 +24,12 @@ class UploadManager extends Manager
         /** @var \Illuminate\Support\Manager $identityManager */
         $identityManager = $this->container['upload-handler.identity-manager'];
 
-        return new BlueimpBaseHandler($this->container['config']['upload-handler.blueimp'], $identityManager->driver());
+        return new BlueimpHandler($this->container['config']['upload-handler.blueimp'], $identityManager->driver());
     }
 
     public function createDropzoneDriver()
     {
-        return new DropzoneBaseHandler($this->container['config']['upload-handler.dropzone']);
+        return new DropzoneHandler($this->container['config']['upload-handler.dropzone']);
     }
 
     public function createFlowJsDriver()
@@ -39,17 +39,17 @@ class UploadManager extends Manager
 
     public function createNgFileUploadDriver()
     {
-        return new NgFileBaseHandler($this->identityManager()->driver());
+        return new NgFileHandler($this->identityManager()->driver());
     }
 
     public function createPluploadDriver()
     {
-        return new PluploadBaseHandler($this->identityManager()->driver());
+        return new PluploadHandler($this->identityManager()->driver());
     }
 
     public function createResumableJsDriver()
     {
-        return new ResumableJsBaseHandler($this->container['config']['upload-handler.resumable-js'], $this->identityManager()->driver());
+        return new ResumableJsHandler($this->container['config']['upload-handler.resumable-js'], $this->identityManager()->driver());
     }
 
     public function createSimpleUploaderJsDriver()

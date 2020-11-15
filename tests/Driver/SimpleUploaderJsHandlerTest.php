@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-class SimpleUploaderUploadHandlerTest extends TestCase
+class SimpleUploaderJsHandlerTest extends TestCase
 {
     /**
      * @var UploadHandler

@@ -2,7 +2,7 @@
 
 namespace CodingSocks\UploadHandler\Tests\Driver;
 
-use CodingSocks\UploadHandler\Driver\PluploadBaseHandler;
+use CodingSocks\UploadHandler\Driver\PluploadHandler;
 use CodingSocks\UploadHandler\Event\FileUploaded;
 use CodingSocks\UploadHandler\Exception\InternalServerErrorHttpException;
 use CodingSocks\UploadHandler\Tests\TestCase;
@@ -40,7 +40,7 @@ class PluploadUploadHandlerTest extends TestCase
     {
         $manager = app()->make('upload-handler.upload-manager');
 
-        $this->assertInstanceOf(PluploadBaseHandler::class, $manager->driver());
+        $this->assertInstanceOf(PluploadHandler::class, $manager->driver());
     }
 
     public function notAllowedRequestMethods()

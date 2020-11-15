@@ -2,7 +2,7 @@
 
 namespace CodingSocks\UploadHandler\Tests\Driver;
 
-use CodingSocks\UploadHandler\Driver\DropzoneBaseHandler;
+use CodingSocks\UploadHandler\Driver\DropzoneHandler;
 use CodingSocks\UploadHandler\Event\FileUploaded;
 use CodingSocks\UploadHandler\Exception\InternalServerErrorHttpException;
 use CodingSocks\UploadHandler\Tests\TestCase;
@@ -38,7 +38,7 @@ class DropzoneUploadHandlerTest extends TestCase
     {
         $manager = app()->make('upload-handler.upload-manager');
 
-        $this->assertInstanceOf(DropzoneBaseHandler::class, $manager->driver());
+        $this->assertInstanceOf(DropzoneHandler::class, $manager->driver());
     }
 
     public function testUploadWhenFileParameterIsEmpty()
