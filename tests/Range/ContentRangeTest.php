@@ -2,6 +2,7 @@
 
 namespace CodingSocks\UploadHandler\Tests\Range;
 
+use CodingSocks\UploadHandler\Exception\RequestEntityTooLargeHttpException;
 use CodingSocks\UploadHandler\Range\ContentRange;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
@@ -34,6 +35,14 @@ class ContentRangeTest extends TestCase
         $this->expectExceptionMessage($expectedExceptionMessage);
 
         new ContentRange($contentRange);
+    }
+
+    public function testRequestEntityTooLargeHttpException()
+    {
+        $this->expectException(RequestEntityTooLargeHttpException::class);
+        $this->expectExceptionMessage('The content range value is too large');
+
+        new ContentRange(sprintf('bytes 40-49/%s', str_repeat('9', 350)));
     }
 
     public function testIsFirst()

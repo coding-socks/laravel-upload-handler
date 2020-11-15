@@ -2,6 +2,7 @@
 
 namespace CodingSocks\UploadHandler\Range;
 
+use CodingSocks\UploadHandler\Exception\RequestEntityTooLargeHttpException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use InvalidArgumentException;
@@ -67,7 +68,7 @@ class ContentRange implements Range
         $floatVal = floatval($value);
 
         if ($floatVal === INF) {
-            throw new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR, 'The content range value is too large');
+            throw new RequestEntityTooLargeHttpException('The content range value is too large');
         }
 
         return $floatVal;
