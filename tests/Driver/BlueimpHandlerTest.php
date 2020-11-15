@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Mockery;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class BlueimpHandlerTest extends TestCase
 {
@@ -39,6 +40,28 @@ class BlueimpHandlerTest extends TestCase
         $manager = app()->make('upload-handler.upload-manager');
 
         $this->assertInstanceOf(BlueimpHandler::class, $manager->driver());
+    }
+
+    public function notAllowedRequestMethods()
+    {
+        return [
+            'DELETE' => [Request::METHOD_DELETE],
+            'PURGE' => [Request::METHOD_PURGE],
+            'TRACE' => [Request::METHOD_TRACE],
+            'CONNECT' => [Request::METHOD_CONNECT],
+        ];
+    }
+
+    /**
+     * @dataProvider notAllowedRequestMethods
+     */
+    public function testMethodNotAllowed($requestMethod)
+    {
+        $request = Request::create('', $requestMethod);
+
+        $this->expectException(MethodNotAllowedHttpException::class);
+
+        $this->createTestResponse($this->handler->handle($request));
     }
 
     public function testInfo()
