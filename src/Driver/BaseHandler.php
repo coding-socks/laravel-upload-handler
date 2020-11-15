@@ -9,6 +9,7 @@ use CodingSocks\UploadHandler\StorageConfig;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 abstract class BaseHandler
 {
@@ -62,15 +63,19 @@ abstract class BaseHandler
     /**
      * Validate an uploaded file. An exception is thrown when it is invalid.
      *
-     * @param \Illuminate\Http\UploadedFile|null $file
+     * @param \Illuminate\Http\UploadedFile|array|null $file
      *
      * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException when given file is null.
      * @throws \CodingSocks\UploadHandler\Exception\InternalServerErrorHttpException when given file is invalid.
      */
-    protected function validateUploadedFile(UploadedFile $file = null): void
+    protected function validateUploadedFile($file): void
     {
         if (null === $file) {
             throw new BadRequestHttpException('File not found in request body');
+        }
+
+        if (is_array($file)) {
+            throw new UnprocessableEntityHttpException('File parameter cannot be an array');
         }
 
         if (! $file->isValid()) {
