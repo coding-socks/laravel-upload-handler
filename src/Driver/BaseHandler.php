@@ -7,13 +7,8 @@ use CodingSocks\UploadHandler\Event\FileUploaded;
 use CodingSocks\UploadHandler\Exception\InternalServerErrorHttpException;
 use CodingSocks\UploadHandler\StorageConfig;
 use Illuminate\Http\Request;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 abstract class BaseHandler
 {
@@ -27,27 +22,6 @@ abstract class BaseHandler
      *
      */
     abstract public function handle(Request $request, StorageConfig $config, Closure $fileUploaded = null): Response;
-
-    /**
-     * @param string $filename
-     * @param \CodingSocks\UploadHandler\StorageConfig $storageConfig
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function fileResponse(string $filename, StorageConfig $storageConfig): Response
-    {
-        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
-        $disk = Storage::disk($storageConfig->getDisk());
-        $prefix = $storageConfig->getMergedDirectory() . '/';
-
-        if (! $disk->exists($prefix . $filename)) {
-            throw new NotFoundHttpException($filename . ' file not found on server');
-        }
-
-        $path = $disk->path($prefix . $filename);
-
-        return new BinaryFileResponse($path, 200, [], true, ResponseHeaderBag::DISPOSITION_ATTACHMENT);
-    }
 
     /**
      * Check if the request type of the given request is in the specified list.
