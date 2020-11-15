@@ -2,7 +2,7 @@
 
 namespace CodingSocks\UploadHandler\Tests\Driver;
 
-use CodingSocks\UploadHandler\Driver\PluploadHandler;
+use CodingSocks\UploadHandler\Driver\DropzoneHandler;
 use CodingSocks\UploadHandler\Event\FileUploaded;
 use CodingSocks\UploadHandler\Exception\InternalServerErrorHttpException;
 use CodingSocks\UploadHandler\Tests\TestCase;
@@ -14,9 +14,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Mockery;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-class PluploadUploadHandlerTest extends TestCase
+class DropzoneHandlerTest extends TestCase
 {
     /**
      * @var UploadHandler
@@ -27,8 +26,7 @@ class PluploadUploadHandlerTest extends TestCase
     {
         parent::setUp();
 
-        config()->set('upload-handler.identifier', 'nop');
-        config()->set('upload-handler.handler', 'plupload');
+        config()->set('upload-handler.handler', 'dropzone');
         config()->set('upload-handler.sweep', false);
         $this->handler = app()->make(UploadHandler::class);
 
@@ -40,34 +38,7 @@ class PluploadUploadHandlerTest extends TestCase
     {
         $manager = app()->make('upload-handler.upload-manager');
 
-        $this->assertInstanceOf(PluploadHandler::class, $manager->driver());
-    }
-
-    public function notAllowedRequestMethods()
-    {
-        return [
-            'GET' => [Request::METHOD_GET],
-            'HEAD' => [Request::METHOD_HEAD],
-            'PUT' => [Request::METHOD_PUT],
-            'PATCH' => [Request::METHOD_PATCH],
-            'DELETE' => [Request::METHOD_DELETE],
-            'PURGE' => [Request::METHOD_PURGE],
-            'OPTIONS' => [Request::METHOD_OPTIONS],
-            'TRACE' => [Request::METHOD_TRACE],
-            'CONNECT' => [Request::METHOD_CONNECT],
-        ];
-    }
-
-    /**
-     * @dataProvider notAllowedRequestMethods
-     */
-    public function testMethodNotAllowed($requestMethod)
-    {
-        $request = Request::create('', $requestMethod);
-
-        $this->expectException(MethodNotAllowedHttpException::class);
-
-        $this->createTestResponse($this->handler->handle($request));
+        $this->assertInstanceOf(DropzoneHandler::class, $manager->driver());
     }
 
     public function testUploadWhenFileParameterIsEmpty()
@@ -81,8 +52,7 @@ class PluploadUploadHandlerTest extends TestCase
 
     public function testUploadWhenFileParameterIsInvalid()
     {
-        $file = Mockery::mock(UploadedFile::class)
-            ->makePartial();
+        $file = Mockery::mock(UploadedFile::class)->makePartial();
         $file->shouldReceive('isValid')
             ->andReturn(false);
 
@@ -95,12 +65,53 @@ class PluploadUploadHandlerTest extends TestCase
         $this->handler->handle($request);
     }
 
+    public function testUploadMonolith()
+    {
+        $file = UploadedFile::fake()->create('test.txt', 100);
+        $request = Request::create('', Request::METHOD_POST, [], [], [
+            'file' => $file,
+        ]);
+
+        $response = $this->createTestResponse($this->handler->handle($request));
+        $response->assertSuccessful();
+        $response->assertJson(['done' => 100]);
+
+        Storage::disk('local')->assertExists($file->hashName('merged'));
+
+        Event::assertDispatched(FileUploaded::class, function ($event) use ($file) {
+            return $event->file = $file->hashName('merged');
+        });
+    }
+
+    public function testUploadMonolithWithCallback()
+    {
+        $file = UploadedFile::fake()->create('test.txt', 100);
+        $request = Request::create('', Request::METHOD_POST, [], [], [
+            'file' => $file,
+        ]);
+
+        $callback = $this->createClosureMock(
+            $this->once(),
+            'local',
+            $file->hashName('merged')
+        );
+
+        $this->handler->handle($request, $callback);
+
+        Event::assertDispatched(FileUploaded::class, function ($event) use ($file) {
+            return $event->file = $file->hashName('merged');
+        });
+    }
+
     public function excludedPostParameterProvider()
     {
         return [
-            'name' => ['name'],
-            'chunk' => ['chunk'],
-            'chunks' => ['chunks'],
+            'dzuuid' => ['dzuuid'],
+            'dzchunkindex' => ['dzchunkindex'],
+            'dztotalfilesize' => ['dztotalfilesize'],
+            'dzchunksize' => ['dzchunksize'],
+            'dztotalchunkcount' => ['dztotalchunkcount'],
+            'dzchunkbyteoffset' => ['dzchunkbyteoffset'],
         ];
     }
 
@@ -110,16 +121,18 @@ class PluploadUploadHandlerTest extends TestCase
     public function testPostParameterValidation($exclude)
     {
         $arr = [
-            'name' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
-            'chunk' => 1,
-            'chunks' => 2,
+            'dzuuid' => '2494cefe4d234bd331aeb4514fe97d810efba29b',
+            'dzchunkindex' => 0,
+            'dztotalfilesize' => 200,
+            'dzchunksize' => 100,
+            'dztotalchunkcount' => 2,
+            'dzchunkbyteoffset' => 100,
         ];
 
         unset($arr[$exclude]);
 
         $request = Request::create('', Request::METHOD_POST, $arr, [], [
-            'file' => UploadedFile::fake()
-                ->create('test.txt', 100),
+            'file' => UploadedFile::fake()->create('test.txt', 100),
         ]);
 
         $this->expectException(ValidationException::class);
@@ -131,9 +144,12 @@ class PluploadUploadHandlerTest extends TestCase
     {
         $file = UploadedFile::fake()->create('test.txt', 100);
         $request = Request::create('', Request::METHOD_POST, [
-            'name' => 'test.txt',
-            'chunk' => '0',
-            'chunks' => '2',
+            'dzuuid' => '2494cefe4d234bd331aeb4514fe97d810efba29b',
+            'dzchunkindex' => 0,
+            'dztotalfilesize' => 200,
+            'dzchunksize' => 100,
+            'dztotalchunkcount' => 2,
+            'dzchunkbyteoffset' => 100,
         ], [], [
             'file' => $file,
         ]);
@@ -142,7 +158,7 @@ class PluploadUploadHandlerTest extends TestCase
         $response->assertSuccessful();
         $response->assertJson(['done' => 50]);
 
-        Storage::disk('local')->assertExists('chunks/2_test.txt/0-1');
+        Storage::disk('local')->assertExists('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b/000-099');
 
         Event::assertNotDispatched(FileUploaded::class, function ($event) use ($file) {
             return $event->file = $file->hashName('merged');
@@ -153,9 +169,12 @@ class PluploadUploadHandlerTest extends TestCase
     {
         $file = UploadedFile::fake()->create('test.txt', 100);
         $request = Request::create('', Request::METHOD_POST, [
-            'name' => 'test.txt',
-            'chunk' => '0',
-            'chunks' => '2',
+            'dzuuid' => '2494cefe4d234bd331aeb4514fe97d810efba29b',
+            'dzchunkindex' => 0,
+            'dztotalfilesize' => 200,
+            'dzchunksize' => 100,
+            'dztotalchunkcount' => 2,
+            'dzchunkbyteoffset' => 100,
         ], [], [
             'file' => $file,
         ]);
@@ -171,13 +190,16 @@ class PluploadUploadHandlerTest extends TestCase
 
     public function testUploadLastChunk()
     {
-        $this->createFakeLocalFile('chunks/2_test.txt', '0-1');
+        $this->createFakeLocalFile('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b', '000');
 
         $file = UploadedFile::fake()->create('test.txt', 100);
         $request = Request::create('', Request::METHOD_POST, [
-            'name' => 'test.txt',
-            'chunk' => '1',
-            'chunks' => '2',
+            'dzuuid' => '2494cefe4d234bd331aeb4514fe97d810efba29b',
+            'dzchunkindex' => 1,
+            'dztotalfilesize' => 200,
+            'dzchunksize' => 100,
+            'dztotalchunkcount' => 2,
+            'dzchunkbyteoffset' => 100,
         ], [], [
             'file' => $file,
         ]);
@@ -186,7 +208,7 @@ class PluploadUploadHandlerTest extends TestCase
         $response->assertSuccessful();
         $response->assertJson(['done' => 100]);
 
-        Storage::disk('local')->assertExists('chunks/2_test.txt/1-2');
+        Storage::disk('local')->assertExists('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b/100-199');
         Storage::disk('local')->assertExists($file->hashName('merged'));
 
         Event::assertDispatched(FileUploaded::class, function ($event) use ($file) {
@@ -196,13 +218,16 @@ class PluploadUploadHandlerTest extends TestCase
 
     public function testUploadLastChunkWithCallback()
     {
-        $this->createFakeLocalFile('chunks/2_test.txt', '0-1');
+        $this->createFakeLocalFile('chunks/2494cefe4d234bd331aeb4514fe97d810efba29b', '000');
 
         $file = UploadedFile::fake()->create('test.txt', 100);
         $request = Request::create('', Request::METHOD_POST, [
-            'name' => 'test.txt',
-            'chunk' => '1',
-            'chunks' => '2',
+            'dzuuid' => '2494cefe4d234bd331aeb4514fe97d810efba29b',
+            'dzchunkindex' => 1,
+            'dztotalfilesize' => 200,
+            'dzchunksize' => 100,
+            'dztotalchunkcount' => 2,
+            'dzchunkbyteoffset' => 100,
         ], [], [
             'file' => $file,
         ]);

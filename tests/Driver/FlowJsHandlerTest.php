@@ -2,7 +2,7 @@
 
 namespace CodingSocks\UploadHandler\Tests\Driver;
 
-use CodingSocks\UploadHandler\Driver\NgFileHandler;
+use CodingSocks\UploadHandler\Driver\FlowJsHandler;
 use CodingSocks\UploadHandler\Event\FileUploaded;
 use CodingSocks\UploadHandler\Exception\InternalServerErrorHttpException;
 use CodingSocks\UploadHandler\Tests\TestCase;
@@ -13,10 +13,11 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Mockery;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-class NgFileUploadHandlerTest extends TestCase
+class FlowJsHandlerTest extends TestCase
 {
     /**
      * @var UploadHandler
@@ -28,7 +29,7 @@ class NgFileUploadHandlerTest extends TestCase
         parent::setUp();
 
         config()->set('upload-handler.identifier', 'nop');
-        config()->set('upload-handler.handler', 'ng-file-upload');
+        config()->set('upload-handler.handler', 'flow-js');
         config()->set('upload-handler.sweep', false);
         $this->handler = app()->make(UploadHandler::class);
 
@@ -40,7 +41,7 @@ class NgFileUploadHandlerTest extends TestCase
     {
         $manager = app()->make('upload-handler.upload-manager');
 
-        $this->assertInstanceOf(NgFileHandler::class, $manager->driver());
+        $this->assertInstanceOf(FlowJsHandler::class, $manager->driver());
     }
 
     public function notAllowedRequestMethods()
@@ -71,28 +72,40 @@ class NgFileUploadHandlerTest extends TestCase
 
     public function testResumeWhenChunkDoesNotExists()
     {
+        $this->createFakeLocalFile('chunks/200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt', '000-099');
+
         $request = Request::create('', Request::METHOD_GET, [
-            'file' => 'test.txt',
-            'totalSize' => '200',
+            'flowChunkNumber' => 2,
+            'flowTotalChunks' => 2,
+            'flowChunkSize' => 100,
+            'flowTotalSize' => 200,
+            'flowIdentifier' => '200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt',
+            'flowFilename' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
+            'flowRelativePath' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
+            'flowCurrentChunkSize' => 100,
         ]);
 
         $response = $this->createTestResponse($this->handler->handle($request));
-        $response->assertSuccessful();
-        $response->assertJson(['size' => 0]);
+        $response->assertStatus(Response::HTTP_NO_CONTENT);
     }
 
     public function testResume()
     {
-        $this->createFakeLocalFile('chunks/200_test.txt', '000-099');
+        $this->createFakeLocalFile('chunks/200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt', '000-099');
 
         $request = Request::create('', Request::METHOD_GET, [
-            'file' => 'test.txt',
-            'totalSize' => '200',
+            'flowChunkNumber' => 1,
+            'flowTotalChunks' => 2,
+            'flowChunkSize' => 100,
+            'flowTotalSize' => 200,
+            'flowIdentifier' => '200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt',
+            'flowFilename' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
+            'flowRelativePath' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
+            'flowCurrentChunkSize' => 100,
         ]);
 
         $response = $this->createTestResponse($this->handler->handle($request));
         $response->assertSuccessful();
-        $response->assertJson(['size' => 100]);
     }
 
     public function testUploadWhenFileParameterIsEmpty()
@@ -120,51 +133,17 @@ class NgFileUploadHandlerTest extends TestCase
         $this->handler->handle($request);
     }
 
-    public function testUploadMonolith()
-    {
-        $file = UploadedFile::fake()->create('test.txt', 100);
-        $request = Request::create('', Request::METHOD_POST, [], [], [
-            'file' => $file,
-        ]);
-
-        $response = $this->createTestResponse($this->handler->handle($request));
-        $response->assertSuccessful();
-        $response->assertJson(['done' => 100]);
-
-        Storage::disk('local')->assertExists($file->hashName('merged'));
-
-        Event::assertDispatched(FileUploaded::class, function ($event) use ($file) {
-            return $event->file = $file->hashName('merged');
-        });
-    }
-
-    public function testUploadMonolithWithCallback()
-    {
-        $file = UploadedFile::fake()->create('test.txt', 100);
-        $request = Request::create('', Request::METHOD_POST, [], [], [
-            'file' => $file,
-        ]);
-
-        $callback = $this->createClosureMock(
-            $this->once(),
-            'local',
-            $file->hashName('merged')
-        );
-
-        $this->handler->handle($request, $callback);
-
-        Event::assertDispatched(FileUploaded::class, function ($event) use ($file) {
-            return $event->file = $file->hashName('merged');
-        });
-    }
-
     public function excludedPostParameterProvider()
     {
         return [
-            '_chunkNumber' => ['_chunkNumber'],
-            '_chunkSize' => ['_chunkSize'],
-            '_totalSize' => ['_totalSize'],
-            '_currentChunkSize' => ['_currentChunkSize'],
+            'flowChunkNumber' => ['flowChunkNumber'],
+            'flowTotalChunks' => ['flowTotalChunks'],
+            'flowChunkSize' => ['flowChunkSize'],
+            'flowTotalSize' => ['flowTotalSize'],
+            'flowIdentifier' => ['flowIdentifier'],
+            'flowFilename' => ['flowFilename'],
+            'flowRelativePath' => ['flowRelativePath'],
+            'flowCurrentChunkSize' => ['flowCurrentChunkSize'],
         ];
     }
 
@@ -174,10 +153,14 @@ class NgFileUploadHandlerTest extends TestCase
     public function testPostParameterValidation($exclude)
     {
         $arr = [
-            '_chunkNumber' => 1,
-            '_chunkSize' => 100,
-            '_totalSize' => 200,
-            '_currentChunkSize' => 100,
+            'flowChunkNumber' => 1,
+            'flowTotalChunks' => 2,
+            'flowChunkSize' => 100,
+            'flowTotalSize' => 200,
+            'flowIdentifier' => '200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt',
+            'flowFilename' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
+            'flowRelativePath' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
+            'flowCurrentChunkSize' => 100,
         ];
 
         unset($arr[$exclude]);
@@ -196,10 +179,14 @@ class NgFileUploadHandlerTest extends TestCase
     {
         $file = UploadedFile::fake()->create('test.txt', 100);
         $request = Request::create('', Request::METHOD_POST, [
-            '_chunkNumber' => 0,
-            '_chunkSize' => 100,
-            '_totalSize' => 200,
-            '_currentChunkSize' => 100,
+            'flowChunkNumber' => 1,
+            'flowTotalChunks' => 2,
+            'flowChunkSize' => 100,
+            'flowTotalSize' => 200,
+            'flowIdentifier' => '200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt',
+            'flowFilename' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
+            'flowRelativePath' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
+            'flowCurrentChunkSize' => 100,
         ], [], [
             'file' => $file,
         ]);
@@ -208,7 +195,7 @@ class NgFileUploadHandlerTest extends TestCase
         $response->assertSuccessful();
         $response->assertJson(['done' => 50]);
 
-        Storage::disk('local')->assertExists('chunks/200_test.txt/000-099');
+        Storage::disk('local')->assertExists('chunks/200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt/000-099');
 
         Event::assertNotDispatched(FileUploaded::class, function ($event) use ($file) {
             return $event->file = $file->hashName('merged');
@@ -219,10 +206,14 @@ class NgFileUploadHandlerTest extends TestCase
     {
         $file = UploadedFile::fake()->create('test.txt', 100);
         $request = Request::create('', Request::METHOD_POST, [
-            '_chunkNumber' => 0,
-            '_chunkSize' => 100,
-            '_totalSize' => 200,
-            '_currentChunkSize' => 100,
+            'flowChunkNumber' => 1,
+            'flowTotalChunks' => 2,
+            'flowChunkSize' => 100,
+            'flowTotalSize' => 200,
+            'flowIdentifier' => '200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt',
+            'flowFilename' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
+            'flowRelativePath' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
+            'flowCurrentChunkSize' => 100,
         ], [], [
             'file' => $file,
         ]);
@@ -238,14 +229,18 @@ class NgFileUploadHandlerTest extends TestCase
 
     public function testUploadLastChunk()
     {
-        $this->createFakeLocalFile('chunks/200_test.txt', '000-099');
+        $this->createFakeLocalFile('chunks/200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt', '000-099');
 
         $file = UploadedFile::fake()->create('test.txt', 100);
         $request = Request::create('', Request::METHOD_POST, [
-            '_chunkNumber' => 1,
-            '_chunkSize' => 100,
-            '_totalSize' => 200,
-            '_currentChunkSize' => 100,
+            'flowChunkNumber' => 2,
+            'flowTotalChunks' => 2,
+            'flowChunkSize' => 100,
+            'flowTotalSize' => 200,
+            'flowIdentifier' => '200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt',
+            'flowFilename' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
+            'flowRelativePath' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
+            'flowCurrentChunkSize' => 100,
         ], [], [
             'file' => $file,
         ]);
@@ -254,7 +249,7 @@ class NgFileUploadHandlerTest extends TestCase
         $response->assertSuccessful();
         $response->assertJson(['done' => 100]);
 
-        Storage::disk('local')->assertExists('chunks/200_test.txt/100-199');
+        Storage::disk('local')->assertExists('chunks/200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt/100-199');
         Storage::disk('local')->assertExists($file->hashName('merged'));
 
         Event::assertDispatched(FileUploaded::class, function ($event) use ($file) {
@@ -264,14 +259,18 @@ class NgFileUploadHandlerTest extends TestCase
 
     public function testUploadLastChunkWithCallback()
     {
-        $this->createFakeLocalFile('chunks/200_test.txt', '000-099');
+        $this->createFakeLocalFile('chunks/200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt', '000-099');
 
         $file = UploadedFile::fake()->create('test.txt', 100);
         $request = Request::create('', Request::METHOD_POST, [
-            '_chunkNumber' => 1,
-            '_chunkSize' => 100,
-            '_totalSize' => 200,
-            '_currentChunkSize' => 100,
+            'flowChunkNumber' => 2,
+            'flowTotalChunks' => 2,
+            'flowChunkSize' => 100,
+            'flowTotalSize' => 200,
+            'flowIdentifier' => '200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt',
+            'flowFilename' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
+            'flowRelativePath' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
+            'flowCurrentChunkSize' => 100,
         ], [], [
             'file' => $file,
         ]);

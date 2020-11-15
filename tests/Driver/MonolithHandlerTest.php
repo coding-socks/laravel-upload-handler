@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use Mockery;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class MonolithUploadHandlerTest extends TestCase
+class MonolithHandlerTest extends TestCase
 {
     /**
      * @var UploadHandler

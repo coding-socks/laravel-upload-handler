@@ -2,7 +2,7 @@
 
 namespace CodingSocks\UploadHandler\Tests\Driver;
 
-use CodingSocks\UploadHandler\Driver\FlowJsHandler;
+use CodingSocks\UploadHandler\Driver\PluploadHandler;
 use CodingSocks\UploadHandler\Event\FileUploaded;
 use CodingSocks\UploadHandler\Exception\InternalServerErrorHttpException;
 use CodingSocks\UploadHandler\Tests\TestCase;
@@ -13,11 +13,10 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Mockery;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-class FlowJsUploadHandlerTest extends TestCase
+class PluploadHandlerTest extends TestCase
 {
     /**
      * @var UploadHandler
@@ -29,7 +28,7 @@ class FlowJsUploadHandlerTest extends TestCase
         parent::setUp();
 
         config()->set('upload-handler.identifier', 'nop');
-        config()->set('upload-handler.handler', 'flow-js');
+        config()->set('upload-handler.handler', 'plupload');
         config()->set('upload-handler.sweep', false);
         $this->handler = app()->make(UploadHandler::class);
 
@@ -41,12 +40,13 @@ class FlowJsUploadHandlerTest extends TestCase
     {
         $manager = app()->make('upload-handler.upload-manager');
 
-        $this->assertInstanceOf(FlowJsHandler::class, $manager->driver());
+        $this->assertInstanceOf(PluploadHandler::class, $manager->driver());
     }
 
     public function notAllowedRequestMethods()
     {
         return [
+            'GET' => [Request::METHOD_GET],
             'HEAD' => [Request::METHOD_HEAD],
             'PUT' => [Request::METHOD_PUT],
             'PATCH' => [Request::METHOD_PATCH],
@@ -68,44 +68,6 @@ class FlowJsUploadHandlerTest extends TestCase
         $this->expectException(MethodNotAllowedHttpException::class);
 
         $this->createTestResponse($this->handler->handle($request));
-    }
-
-    public function testResumeWhenChunkDoesNotExists()
-    {
-        $this->createFakeLocalFile('chunks/200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt', '000-099');
-
-        $request = Request::create('', Request::METHOD_GET, [
-            'flowChunkNumber' => 2,
-            'flowTotalChunks' => 2,
-            'flowChunkSize' => 100,
-            'flowTotalSize' => 200,
-            'flowIdentifier' => '200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt',
-            'flowFilename' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
-            'flowRelativePath' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
-            'flowCurrentChunkSize' => 100,
-        ]);
-
-        $response = $this->createTestResponse($this->handler->handle($request));
-        $response->assertStatus(Response::HTTP_NO_CONTENT);
-    }
-
-    public function testResume()
-    {
-        $this->createFakeLocalFile('chunks/200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt', '000-099');
-
-        $request = Request::create('', Request::METHOD_GET, [
-            'flowChunkNumber' => 1,
-            'flowTotalChunks' => 2,
-            'flowChunkSize' => 100,
-            'flowTotalSize' => 200,
-            'flowIdentifier' => '200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt',
-            'flowFilename' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
-            'flowRelativePath' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
-            'flowCurrentChunkSize' => 100,
-        ]);
-
-        $response = $this->createTestResponse($this->handler->handle($request));
-        $response->assertSuccessful();
     }
 
     public function testUploadWhenFileParameterIsEmpty()
@@ -136,14 +98,9 @@ class FlowJsUploadHandlerTest extends TestCase
     public function excludedPostParameterProvider()
     {
         return [
-            'flowChunkNumber' => ['flowChunkNumber'],
-            'flowTotalChunks' => ['flowTotalChunks'],
-            'flowChunkSize' => ['flowChunkSize'],
-            'flowTotalSize' => ['flowTotalSize'],
-            'flowIdentifier' => ['flowIdentifier'],
-            'flowFilename' => ['flowFilename'],
-            'flowRelativePath' => ['flowRelativePath'],
-            'flowCurrentChunkSize' => ['flowCurrentChunkSize'],
+            'name' => ['name'],
+            'chunk' => ['chunk'],
+            'chunks' => ['chunks'],
         ];
     }
 
@@ -153,14 +110,9 @@ class FlowJsUploadHandlerTest extends TestCase
     public function testPostParameterValidation($exclude)
     {
         $arr = [
-            'flowChunkNumber' => 1,
-            'flowTotalChunks' => 2,
-            'flowChunkSize' => 100,
-            'flowTotalSize' => 200,
-            'flowIdentifier' => '200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt',
-            'flowFilename' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
-            'flowRelativePath' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
-            'flowCurrentChunkSize' => 100,
+            'name' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
+            'chunk' => 1,
+            'chunks' => 2,
         ];
 
         unset($arr[$exclude]);
@@ -179,14 +131,9 @@ class FlowJsUploadHandlerTest extends TestCase
     {
         $file = UploadedFile::fake()->create('test.txt', 100);
         $request = Request::create('', Request::METHOD_POST, [
-            'flowChunkNumber' => 1,
-            'flowTotalChunks' => 2,
-            'flowChunkSize' => 100,
-            'flowTotalSize' => 200,
-            'flowIdentifier' => '200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt',
-            'flowFilename' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
-            'flowRelativePath' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
-            'flowCurrentChunkSize' => 100,
+            'name' => 'test.txt',
+            'chunk' => '0',
+            'chunks' => '2',
         ], [], [
             'file' => $file,
         ]);
@@ -195,7 +142,7 @@ class FlowJsUploadHandlerTest extends TestCase
         $response->assertSuccessful();
         $response->assertJson(['done' => 50]);
 
-        Storage::disk('local')->assertExists('chunks/200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt/000-099');
+        Storage::disk('local')->assertExists('chunks/2_test.txt/0-1');
 
         Event::assertNotDispatched(FileUploaded::class, function ($event) use ($file) {
             return $event->file = $file->hashName('merged');
@@ -206,14 +153,9 @@ class FlowJsUploadHandlerTest extends TestCase
     {
         $file = UploadedFile::fake()->create('test.txt', 100);
         $request = Request::create('', Request::METHOD_POST, [
-            'flowChunkNumber' => 1,
-            'flowTotalChunks' => 2,
-            'flowChunkSize' => 100,
-            'flowTotalSize' => 200,
-            'flowIdentifier' => '200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt',
-            'flowFilename' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
-            'flowRelativePath' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
-            'flowCurrentChunkSize' => 100,
+            'name' => 'test.txt',
+            'chunk' => '0',
+            'chunks' => '2',
         ], [], [
             'file' => $file,
         ]);
@@ -229,18 +171,13 @@ class FlowJsUploadHandlerTest extends TestCase
 
     public function testUploadLastChunk()
     {
-        $this->createFakeLocalFile('chunks/200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt', '000-099');
+        $this->createFakeLocalFile('chunks/2_test.txt', '0-1');
 
         $file = UploadedFile::fake()->create('test.txt', 100);
         $request = Request::create('', Request::METHOD_POST, [
-            'flowChunkNumber' => 2,
-            'flowTotalChunks' => 2,
-            'flowChunkSize' => 100,
-            'flowTotalSize' => 200,
-            'flowIdentifier' => '200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt',
-            'flowFilename' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
-            'flowRelativePath' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
-            'flowCurrentChunkSize' => 100,
+            'name' => 'test.txt',
+            'chunk' => '1',
+            'chunks' => '2',
         ], [], [
             'file' => $file,
         ]);
@@ -249,7 +186,7 @@ class FlowJsUploadHandlerTest extends TestCase
         $response->assertSuccessful();
         $response->assertJson(['done' => 100]);
 
-        Storage::disk('local')->assertExists('chunks/200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt/100-199');
+        Storage::disk('local')->assertExists('chunks/2_test.txt/1-2');
         Storage::disk('local')->assertExists($file->hashName('merged'));
 
         Event::assertDispatched(FileUploaded::class, function ($event) use ($file) {
@@ -259,18 +196,13 @@ class FlowJsUploadHandlerTest extends TestCase
 
     public function testUploadLastChunkWithCallback()
     {
-        $this->createFakeLocalFile('chunks/200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt', '000-099');
+        $this->createFakeLocalFile('chunks/2_test.txt', '0-1');
 
         $file = UploadedFile::fake()->create('test.txt', 100);
         $request = Request::create('', Request::METHOD_POST, [
-            'flowChunkNumber' => 2,
-            'flowTotalChunks' => 2,
-            'flowChunkSize' => 100,
-            'flowTotalSize' => 200,
-            'flowIdentifier' => '200-0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zftxt',
-            'flowFilename' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
-            'flowRelativePath' => '0jWZTB1ZDfRQU6VTcXy0mJnL9xKMeEz3HoSPU0Zf.txt',
-            'flowCurrentChunkSize' => 100,
+            'name' => 'test.txt',
+            'chunk' => '1',
+            'chunks' => '2',
         ], [], [
             'file' => $file,
         ]);

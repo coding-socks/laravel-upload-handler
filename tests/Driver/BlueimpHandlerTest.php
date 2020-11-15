@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use Mockery;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class BlueimpUploadHandlerTest extends TestCase
+class BlueimpHandlerTest extends TestCase
 {
     /**
      * @var UploadHandler
