@@ -4,10 +4,8 @@ namespace CodingSocks\UploadHandler\Range;
 
 use CodingSocks\UploadHandler\Exception\RequestEntityTooLargeHttpException;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\HeaderBag;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ContentRange implements Range
 {
