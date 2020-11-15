@@ -12,10 +12,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Mockery;
-use PHPUnit\Framework\Constraint\StringContains;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class BlueimpUploadHandlerTest extends TestCase
 {
@@ -56,37 +53,6 @@ class BlueimpUploadHandlerTest extends TestCase
         $response->assertHeader('Content-Disposition', 'inline; filename="files.json"');
         $response->assertHeader('X-Content-Type-Options', 'nosniff');
         $response->assertHeader('Vary', 'Accept');
-    }
-
-    public function testDownloadWhenFileNotFound()
-    {
-        $request = Request::create('', Request::METHOD_GET, [
-            'file' => 'local-test-file',
-            'download' => 1,
-        ]);
-
-        $this->expectException(NotFoundHttpException::class);
-
-        $this->handler->handle($request);
-    }
-
-    public function testDownload()
-    {
-        $this->createFakeLocalFile('merged', 'local-test-file');
-
-        $request = Request::create('', Request::METHOD_GET, [
-            'file' => 'local-test-file',
-            'download' => 1,
-        ]);
-
-        /** @var \Illuminate\Testing\TestResponse|\Symfony\Component\HttpFoundation\BinaryFileResponse $response */
-        $response = $this->createTestResponse($this->handler->handle($request));
-        $response->assertSuccessful();
-        $response->assertStatus(200);
-
-        $this->assertThat($response->headers->get('Content-Disposition'), new StringContains('attachment'));
-        $this->assertInstanceOf(BinaryFileResponse::class, $response->baseResponse);
-        $this->assertEquals('local-test-file', $response->getFile()->getFilename());
     }
 
     public function testResume()
@@ -217,19 +183,5 @@ class BlueimpUploadHandlerTest extends TestCase
         Event::assertDispatched(FileUploaded::class, function ($event) use ($file) {
             return $event->file = $file->hashName('merged');
         });
-    }
-
-    public function testDelete()
-    {
-        $this->createFakeLocalFile('merged', 'local-test-file');
-
-        $request = Request::create('', Request::METHOD_DELETE, [
-            'file' => 'local-test-file',
-        ]);
-
-        $response = $this->createTestResponse($this->handler->handle($request));
-        $response->assertSuccessful();
-
-        Storage::disk('local')->assertMissing('merged/local-test-file');
     }
 }

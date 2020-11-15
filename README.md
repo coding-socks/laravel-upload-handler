@@ -108,7 +108,7 @@ Method         | Description
 
 "Handle" is quite vague but there is a reason for that. This library tries to provide more functionality than just
 saving the uploaded chunks. It is also adds functionality for resumable uploads which depending on the client side
-library can differ very much. Also, when possible the library gives the opportunity to download the uploaded file.
+library can differ very much.
 
 ### Events
 

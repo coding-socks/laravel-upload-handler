@@ -11,7 +11,6 @@ use CodingSocks\UploadHandler\StorageConfig;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Response;
@@ -61,10 +60,6 @@ class BlueimpHandler extends BaseHandler
             return $this->save($request, $config, $fileUploaded);
         }
 
-        if ($this->isRequestMethodIn($request, [Request::METHOD_DELETE])) {
-            return $this->delete($request, $config);
-        }
-
         throw new MethodNotAllowedHttpException([
             Request::METHOD_HEAD,
             Request::METHOD_OPTIONS,
@@ -72,7 +67,6 @@ class BlueimpHandler extends BaseHandler
             Request::METHOD_POST,
             Request::METHOD_PUT,
             Request::METHOD_PATCH,
-            Request::METHOD_DELETE,
         ]);
     }
 
@@ -98,13 +92,6 @@ class BlueimpHandler extends BaseHandler
      */
     public function download(Request $request, StorageConfig $config): Response
     {
-        $download = $request->query('download', false);
-        if ($download !== false) {
-            $uid = $request->query($this->fileParam);
-
-            return $this->fileResponse($uid, $config);
-        }
-
         $request->validate([
             $this->fileParam => 'required',
             'totalSize' => 'required',
@@ -173,20 +160,5 @@ class BlueimpHandler extends BaseHandler
         $this->triggerFileUploadedEvent($config->getDisk(), $path, $fileUploaded);
 
         return new PercentageJsonResponse(100);
-    }
-
-    /**
-     * @param \Illuminate\Http\Request $request
-     * @param \CodingSocks\UploadHandler\StorageConfig $config
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function delete(Request $request, StorageConfig $config): Response
-    {
-        $filename = $request->post($this->fileParam);
-        $path = $config->getMergedDirectory() . '/' . $filename;
-        Storage::disk($config->getDisk())->delete($path);
-
-        return new Response();
     }
 }
