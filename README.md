@@ -23,7 +23,7 @@ wait for minutes or seconds to upload a large file and then receive a message th
 allowed.
 - Can include resume functionality which means an upload can be continued after a reconnection.
 
-However, there is not a single RFC about chunked uploads and this caused many different implementations. The most mature
+However, there is not a single RFC about chunked uploads and this caused many implementations. The most mature
 project at the moment is [tus](https://tus.io/).
 
 - [Installation](#installation)
@@ -36,11 +36,11 @@ project at the moment is [tus](https://tus.io/).
     - [Monolith](#monolith-driver)
     - [Blueimp](#blueimp-driver)
     - [DropzoneJS](#dropzonejs-driver)
-    - [Flow.js](#flow-js-driver)
+    - [Flow.js](#flowjs-driver)
     - [ng-file-upload](#ng-file-upload-driver)
     - [Plupload](#plupload-driver)
-    - [Resumable.js](#resumable-js-driver)
-    - [simple-uploader.js](#simple-uploader-js-driver)
+    - [Resumable.js](#resumablejs-driver)
+    - [simple-uploader.js](#simple-uploaderjs-driver)
 - [Identifiers](#identifiers)
     - [Session identifier](#session-identifier)
     - [Auth identifier](#auth-identifier)
@@ -159,11 +159,11 @@ Service                                          | Driver name          | Chunk 
 [Monolith](#monolith-driver)                     | `monolith`           | no           | no
 [Blueimp](#blueimp-driver)                       | `blueimp`            | yes          | yes
 [DropzoneJS](#dropzonejs-driver)                 | `dropzone`           | yes          | no
-[Flow.js](#flow-js-driver)                       | `flow-js`            | yes          | yes
+[Flow.js](#flowjs-driver)                       | `flow-js`            | yes          | yes
 [ng-file-upload](#ng-file-upload-driver)         | `ng-file-upload`     | yes          | no
 [Plupload](#plupload-driver)                     | `plupload`           | yes          | no
-[Resumable.js](#resumable-js-driver)             | `resumable-js`       | yes          | yes
-[simple-uploader.js](#simple-uploader-js-driver) | `simple-uploader-js` | yes          | yes
+[Resumable.js](#resumablejs-driver)             | `resumable-js`       | yes          | yes
+[simple-uploader.js](#simple-uploaderjs-driver) | `simple-uploader-js` | yes          | yes
 
 ### Monolith driver
 
@@ -240,7 +240,7 @@ This identifier uses the client session and the original file name to create an 
 
 This identifier uses the id of the authenticated user and the original file name to create an identifier for the upload file.
 
-It will throw `UnauthorizedException` when the user is unauthorized. However, it is still recommended to use the `auth` middleware.
+It will throw `UnauthorizedException` when the user is unauthorized. However, it is still recommended using the `auth` middleware.
 
 ### NOP identifier
 
