@@ -26,6 +26,19 @@ allowed.
 However, there is not a single RFC about chunked uploads and this caused many implementations. The most mature
 project at the moment is [tus](https://tus.io/).
 
+Similar projects:
+
+- Multiple library support:
+  [1up-lab/OneupUploaderBundle](https://github.com/1up-lab/OneupUploaderBundle),
+  [pionl/laravel-chunk-upload](https://github.com/pionl/laravel-chunk-upload)
+- Single library support:
+  [ankitpokhrel/tus-php](https://github.com/ankitpokhrel/tus-php),
+  [flowjs/flow-php-server](https://github.com/flowjs/flow-php-server),
+  [jildertmiedema/laravel-plupload](https://github.com/jildertmiedema/laravel-plupload),
+  [OneOffTech/laravel-tus-upload](https://github.com/OneOffTech/laravel-tus-upload)
+
+## Table of contents
+
 - [Installation](#installation)
     - [Requirements](#requirements)
 - [Usage](#usage)
