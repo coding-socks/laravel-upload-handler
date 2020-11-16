@@ -16,11 +16,11 @@ Uploading a large file in chunks can help reduce risks.
 
 - PHP from 5.3.4 limits the number of concurrent uploads and by uploading a file in one request can limit the
 availability of a service. ([max_file_uploads][php-max-file-uploads])
-- For security reasons the payload size and the uploadable file size is limited in many systems PHP is not an exception.
+- For security reasons many systems limit the payload size, and the uploadable file size. PHP is not an exception.
 ([upload_max_filesize][php-upload-max-filesize])
-- It can be useful to check the meta information of a file and decline an upload upfront so the user does not have to
-wait for minutes or seconds to upload a large file and then receive a message that the file type or mime type is not
-allowed.
+- It can be useful to check the meta information of a file and decline an upload upfront, so the user does not have to
+wait for minutes or seconds to upload a large file and then receive an error message for an invalid the file type
+or mime type.
 - Can include resume functionality which means an upload can be continued after a reconnection.
 
 However, there is not a single RFC about chunked uploads and this caused many implementations. The most mature
