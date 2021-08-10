@@ -1,10 +1,12 @@
 <?php
 
-namespace CodingSocks\UploadHandler\Response;
+namespace CodingSocks\UploadHandler\Tests\Response;
 
+use CodingSocks\UploadHandler\Response\PercentageJsonResponse;
 use Illuminate\Foundation\Testing\Concerns\MakesHttpRequests;
-use Illuminate\Http\Response;
+use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class PercentageJsonResponseTest extends TestCase
 {
@@ -28,7 +30,11 @@ class PercentageJsonResponseTest extends TestCase
      */
     public function testContent(int $percentage, array $expectedContent)
     {
-        $response = $this->createTestResponse(new PercentageJsonResponse($percentage));
+        if (class_exists('\Illuminate\Testing\TestResponse')) {
+            $response = TestResponse::fromBaseResponse(new PercentageJsonResponse($percentage));
+        } else {
+            $response = $this->createTestResponse(new PercentageJsonResponse($percentage));
+        }
 
         $response->assertSuccessful();
         $response->assertStatus(Response::HTTP_OK);
