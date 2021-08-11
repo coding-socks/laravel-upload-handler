@@ -5,7 +5,7 @@ Upload Handler Package For Laravel
 [![Github Actions Badge](https://github.com/coding-socks/laravel-upload-handler/workflows/run-tests/badge.svg)](https://github.com/coding-socks/laravel-upload-handler/actions?query=workflow%3A"run-tests")
 [![Downloads Badge](https://poser.pugx.org/coding-socks/laravel-upload-handler/downloads)](https://packagist.org/packages/coding-socks/laravel-upload-handler)
 [![Version Badge](https://poser.pugx.org/coding-socks/laravel-upload-handler/version)](https://packagist.org/packages/coding-socks/laravel-upload-handler)
-[![Coverage Badge](https://scrutinizer-ci.com/g/coding-socks/laravel-upload-handler/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/coding-socks/laravel-upload-handler/)
+[![Coverage Badge](https://scrutinizer-ci.com/g/coding-socks/laravel-upload-handler/badges/coverage.png?b=main)](https://scrutinizer-ci.com/g/coding-socks/laravel-upload-handler/)
 [![License Badge](https://poser.pugx.org/coding-socks/laravel-upload-handler/license)](https://packagist.org/packages/coding-socks/laravel-upload-handler)
 
 This package helps integrate a Laravel application with chunk uploader libraries eg.
