@@ -12,6 +12,10 @@ checks:
 build:
   nodes:
     coverage:
+      environment:
+        php:
+          ini:
+            "xdebug.mode": coverage
       tests:
         override:
           - command: ./vendor/bin/phpunit --coverage-clover=build/coverage.clover
