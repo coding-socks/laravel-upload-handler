@@ -78,9 +78,7 @@ class MonolithHandlerTest extends TestCase
 
     public function testUploadWhenFileParameterIsInvalid()
     {
-        $file = Mockery::mock(UploadedFile::class)->makePartial();
-        $file->shouldReceive('isValid')
-            ->andReturn(false);
+        $file = new UploadedFile('', '', null, \UPLOAD_ERR_INI_SIZE);
 
         $request = Request::create('', Request::METHOD_POST, [], [], [
             'file' => $file,
