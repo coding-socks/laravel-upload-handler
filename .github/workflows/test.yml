@@ -48,7 +48,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
-          coverage: none
+          coverage: xdebug
 
       - name: Validate composer.json
         run: composer validate
@@ -59,4 +59,4 @@ jobs:
           composer update --${{ matrix.dependency-version }}  --prefer-dist --no-interaction --no-suggest
 
       - name: Execute tests
-        run: vendor/bin/phpunit --verbose
+        run: vendor/bin/phpunit
