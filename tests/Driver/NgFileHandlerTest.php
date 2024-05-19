@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Testing\TestResponse;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -65,7 +66,7 @@ class NgFileHandlerTest extends TestCase
 
         $this->expectException(MethodNotAllowedHttpException::class);
 
-        $this->createTestResponse($this->handler->handle($request));
+        TestResponse::fromBaseResponse($this->handler->handle($request));
     }
 
     public function testResumeWhenChunkDoesNotExists()
@@ -75,7 +76,7 @@ class NgFileHandlerTest extends TestCase
             'totalSize' => '200',
         ]);
 
-        $response = $this->createTestResponse($this->handler->handle($request));
+        $response = TestResponse::fromBaseResponse($this->handler->handle($request));
         $response->assertSuccessful();
         $response->assertJson(['size' => 0]);
     }
@@ -89,7 +90,7 @@ class NgFileHandlerTest extends TestCase
             'totalSize' => '200',
         ]);
 
-        $response = $this->createTestResponse($this->handler->handle($request));
+        $response = TestResponse::fromBaseResponse($this->handler->handle($request));
         $response->assertSuccessful();
         $response->assertJson(['size' => 100]);
     }
@@ -123,7 +124,7 @@ class NgFileHandlerTest extends TestCase
             'file' => $file,
         ]);
 
-        $response = $this->createTestResponse($this->handler->handle($request));
+        $response = TestResponse::fromBaseResponse($this->handler->handle($request));
         $response->assertSuccessful();
         $response->assertJson(['done' => 100]);
 
@@ -200,7 +201,7 @@ class NgFileHandlerTest extends TestCase
             'file' => $file,
         ]);
 
-        $response = $this->createTestResponse($this->handler->handle($request));
+        $response = TestResponse::fromBaseResponse($this->handler->handle($request));
         $response->assertSuccessful();
         $response->assertJson(['done' => 50]);
 
@@ -246,7 +247,7 @@ class NgFileHandlerTest extends TestCase
             'file' => $file,
         ]);
 
-        $response = $this->createTestResponse($this->handler->handle($request));
+        $response = TestResponse::fromBaseResponse($this->handler->handle($request));
         $response->assertSuccessful();
         $response->assertJson(['done' => 100]);
 

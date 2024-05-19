@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Testing\TestResponse;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -65,7 +66,7 @@ class DropzoneHandlerTest extends TestCase
 
         $this->expectException(MethodNotAllowedHttpException::class);
 
-        $this->createTestResponse($this->handler->handle($request));
+        TestResponse::fromBaseResponse($this->handler->handle($request));
     }
 
     public function testUploadWhenFileParameterIsEmpty()
@@ -97,7 +98,7 @@ class DropzoneHandlerTest extends TestCase
             'file' => $file,
         ]);
 
-        $response = $this->createTestResponse($this->handler->handle($request));
+        $response = TestResponse::fromBaseResponse($this->handler->handle($request));
         $response->assertSuccessful();
         $response->assertJson(['done' => 100]);
 
@@ -179,7 +180,7 @@ class DropzoneHandlerTest extends TestCase
             'file' => $file,
         ]);
 
-        $response = $this->createTestResponse($this->handler->handle($request));
+        $response = TestResponse::fromBaseResponse($this->handler->handle($request));
         $response->assertSuccessful();
         $response->assertJson(['done' => 50]);
 
@@ -229,7 +230,7 @@ class DropzoneHandlerTest extends TestCase
             'file' => $file,
         ]);
 
-        $response = $this->createTestResponse($this->handler->handle($request));
+        $response = TestResponse::fromBaseResponse($this->handler->handle($request));
         $response->assertSuccessful();
         $response->assertJson(['done' => 100]);
 

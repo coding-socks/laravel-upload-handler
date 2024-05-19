@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 
 class NgFileUploadRangeTest extends TestCase
 {
-    public function invalidArgumentProvider()
+    public static function invalidArgumentProvider()
     {
         return [
             'Chunk number less than zero' => [-1, 10, 10, 100, '`_chunkNumber` must be greater than or equal to zero'],

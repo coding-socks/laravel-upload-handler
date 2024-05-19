@@ -29,7 +29,7 @@ class UploadManagerTest extends TestCase
         $this->manager = new UploadManager($this->app);
     }
 
-    public function availableDrivers()
+    public static function availableDrivers()
     {
         return [
             'monolith' => ['monolith', MonolithHandler::class],

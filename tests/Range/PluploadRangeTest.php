@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 
 class PluploadRangeTest extends TestCase
 {
-    public function invalidArgumentProvider()
+    public static function invalidArgumentProvider()
     {
         return [
             'Number of chunks size equal to zero' => [-1, 10, '`chunk` must be greater than or equal to zero'],

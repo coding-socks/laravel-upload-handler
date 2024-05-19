@@ -41,7 +41,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
     {
         /** @var \Closure|\PHPUnit\Framework\MockObject\MockObject $callback */
         $callback = $this->getMockBuilder(\stdClass::class)
-            ->setMethods(['__invoke'])
+            ->addMethods(['__invoke'])
             ->getMock();
         $callback->expects($expects)
             ->method('__invoke')

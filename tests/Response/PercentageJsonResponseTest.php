@@ -12,7 +12,7 @@ class PercentageJsonResponseTest extends TestCase
 {
     use MakesHttpRequests;
 
-    public function percentageProvider()
+    public static function percentageProvider()
     {
         return [
             [21, ['done' => 21]],
@@ -33,7 +33,7 @@ class PercentageJsonResponseTest extends TestCase
         if (class_exists('\Illuminate\Testing\TestResponse')) {
             $response = TestResponse::fromBaseResponse(new PercentageJsonResponse($percentage));
         } else {
-            $response = $this->createTestResponse(new PercentageJsonResponse($percentage));
+            $response = TestResponse::fromBaseResponse(new PercentageJsonResponse($percentage));
         }
 
         $response->assertSuccessful();
