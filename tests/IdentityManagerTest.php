@@ -24,7 +24,7 @@ class IdentityManagerTest extends TestCase
         $this->manager = new IdentityManager($this->app);
     }
 
-    public function availableDrivers()
+    public static function availableDrivers()
     {
         return [
             'auth' => ['auth', AuthIdentifier::class],

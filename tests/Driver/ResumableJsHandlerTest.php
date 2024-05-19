@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Testing\TestResponse;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -66,7 +67,7 @@ class ResumableJsHandlerTest extends TestCase
 
         $this->expectException(MethodNotAllowedHttpException::class);
 
-        $this->createTestResponse($this->handler->handle($request));
+        TestResponse::fromBaseResponse($this->handler->handle($request));
     }
 
     public function testResumeWhenChunkDoesNotExists()
@@ -85,7 +86,7 @@ class ResumableJsHandlerTest extends TestCase
             'resumableType' => 'text/plain',
         ]);
 
-        $response = $this->createTestResponse($this->handler->handle($request));
+        $response = TestResponse::fromBaseResponse($this->handler->handle($request));
         $response->assertStatus(Response::HTTP_NO_CONTENT);
     }
 
@@ -105,7 +106,7 @@ class ResumableJsHandlerTest extends TestCase
             'resumableType' => 'text/plain',
         ]);
 
-        $response = $this->createTestResponse($this->handler->handle($request));
+        $response = TestResponse::fromBaseResponse($this->handler->handle($request));
         $response->assertSuccessful();
     }
 
@@ -192,7 +193,7 @@ class ResumableJsHandlerTest extends TestCase
             'file' => $file,
         ]);
 
-        $response = $this->createTestResponse($this->handler->handle($request));
+        $response = TestResponse::fromBaseResponse($this->handler->handle($request));
         $response->assertSuccessful();
         $response->assertJson(['done' => 50]);
 
@@ -248,7 +249,7 @@ class ResumableJsHandlerTest extends TestCase
             'file' => $file,
         ]);
 
-        $response = $this->createTestResponse($this->handler->handle($request));
+        $response = TestResponse::fromBaseResponse($this->handler->handle($request));
         $response->assertSuccessful();
         $response->assertJson(['done' => 100]);
 

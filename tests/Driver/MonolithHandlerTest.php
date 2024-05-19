@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Testing\TestResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -63,7 +64,7 @@ class MonolithHandlerTest extends TestCase
 
         $this->expectException(MethodNotAllowedHttpException::class);
 
-        $this->createTestResponse($this->handler->handle($request));
+        TestResponse::fromBaseResponse($this->handler->handle($request));
     }
 
     public function testUploadWhenFileParameterIsEmpty()
@@ -95,7 +96,7 @@ class MonolithHandlerTest extends TestCase
             'file' => $file,
         ]);
 
-        $response = $this->createTestResponse($this->handler->handle($request));
+        $response = TestResponse::fromBaseResponse($this->handler->handle($request));
         $response->assertSuccessful();
 
         Storage::disk('local')->assertExists($file->hashName('merged'));

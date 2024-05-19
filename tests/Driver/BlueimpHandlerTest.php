@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Testing\TestResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -60,14 +61,14 @@ class BlueimpHandlerTest extends TestCase
 
         $this->expectException(MethodNotAllowedHttpException::class);
 
-        $this->createTestResponse($this->handler->handle($request));
+        TestResponse::fromBaseResponse($this->handler->handle($request));
     }
 
     public function testInfo()
     {
         $request = Request::create('', Request::METHOD_HEAD);
 
-        $response = $this->createTestResponse($this->handler->handle($request));
+        $response = TestResponse::fromBaseResponse($this->handler->handle($request));
         $response->assertSuccessful();
 
         $response->assertHeader('Pragma', 'no-cache');
@@ -86,7 +87,7 @@ class BlueimpHandlerTest extends TestCase
             'totalSize' => '200',
         ]);
 
-        $response = $this->createTestResponse($this->handler->handle($request));
+        $response = TestResponse::fromBaseResponse($this->handler->handle($request));
         $response->assertSuccessful();
 
         $response->assertJson([
@@ -128,7 +129,7 @@ class BlueimpHandlerTest extends TestCase
             'HTTP_CONTENT_RANGE' => 'bytes 0-99/200',
         ]);
 
-        $response = $this->createTestResponse($this->handler->handle($request));
+        $response = TestResponse::fromBaseResponse($this->handler->handle($request));
         $response->assertSuccessful();
         $response->assertJson(['done' => 50]);
 
@@ -168,7 +169,7 @@ class BlueimpHandlerTest extends TestCase
             'HTTP_CONTENT_RANGE' => 'bytes 100-199/200',
         ]);
 
-        $response = $this->createTestResponse($this->handler->handle($request));
+        $response = TestResponse::fromBaseResponse($this->handler->handle($request));
         $response->assertSuccessful();
         $response->assertJson(['done' => 100]);
 
