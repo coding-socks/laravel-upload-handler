@@ -43,7 +43,7 @@ class PluploadHandlerTest extends TestCase
         $this->assertInstanceOf(PluploadHandler::class, $manager->driver());
     }
 
-    public function notAllowedRequestMethods()
+    public static function notAllowedRequestMethods()
     {
         return [
             'GET' => [Request::METHOD_GET],
@@ -92,7 +92,7 @@ class PluploadHandlerTest extends TestCase
         $this->handler->handle($request);
     }
 
-    public function excludedPostParameterProvider()
+    public static function excludedPostParameterProvider()
     {
         return [
             'name' => ['name'],

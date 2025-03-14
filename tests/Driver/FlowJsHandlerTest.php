@@ -44,7 +44,7 @@ class FlowJsHandlerTest extends TestCase
         $this->assertInstanceOf(FlowJsHandler::class, $manager->driver());
     }
 
-    public function notAllowedRequestMethods()
+    public static function notAllowedRequestMethods()
     {
         return [
             'HEAD' => [Request::METHOD_HEAD],
@@ -130,7 +130,7 @@ class FlowJsHandlerTest extends TestCase
         $this->handler->handle($request);
     }
 
-    public function excludedPostParameterProvider()
+    public static function excludedPostParameterProvider()
     {
         return [
             'flowChunkNumber' => ['flowChunkNumber'],

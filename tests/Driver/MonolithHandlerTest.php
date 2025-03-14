@@ -40,7 +40,7 @@ class MonolithHandlerTest extends TestCase
         $this->assertInstanceOf(MonolithHandler::class, $manager->driver());
     }
 
-    public function notAllowedRequestMethods()
+    public static function notAllowedRequestMethods()
     {
         return [
             'HEAD' => [Request::METHOD_HEAD],

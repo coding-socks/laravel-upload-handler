@@ -42,7 +42,7 @@ class BlueimpHandlerTest extends TestCase
         $this->assertInstanceOf(BlueimpHandler::class, $manager->driver());
     }
 
-    public function notAllowedRequestMethods()
+    public static function notAllowedRequestMethods()
     {
         return [
             'DELETE' => [Request::METHOD_DELETE],

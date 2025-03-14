@@ -42,7 +42,7 @@ class DropzoneHandlerTest extends TestCase
         $this->assertInstanceOf(DropzoneHandler::class, $manager->driver());
     }
 
-    public function notAllowedRequestMethods()
+    public static function notAllowedRequestMethods()
     {
         return [
             'HEAD' => [Request::METHOD_HEAD],
@@ -129,7 +129,7 @@ class DropzoneHandlerTest extends TestCase
         });
     }
 
-    public function excludedPostParameterProvider()
+    public static function excludedPostParameterProvider()
     {
         return [
             'dzuuid' => ['dzuuid'],

@@ -43,7 +43,7 @@ class NgFileHandlerTest extends TestCase
         $this->assertInstanceOf(NgFileHandler::class, $manager->driver());
     }
 
-    public function notAllowedRequestMethods()
+    public static function notAllowedRequestMethods()
     {
         return [
             'HEAD' => [Request::METHOD_HEAD],
@@ -155,7 +155,7 @@ class NgFileHandlerTest extends TestCase
         });
     }
 
-    public function excludedPostParameterProvider()
+    public static function excludedPostParameterProvider()
     {
         return [
             '_chunkNumber' => ['_chunkNumber'],

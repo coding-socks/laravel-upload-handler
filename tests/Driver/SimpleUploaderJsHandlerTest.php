@@ -44,7 +44,7 @@ class SimpleUploaderJsHandlerTest extends TestCase
         $this->assertInstanceOf(SimpleUploaderJsHandler::class, $manager->driver());
     }
 
-    public function notAllowedRequestMethods()
+    public static function notAllowedRequestMethods()
     {
         return [
             'HEAD' => [Request::METHOD_HEAD],
@@ -130,7 +130,7 @@ class SimpleUploaderJsHandlerTest extends TestCase
         $this->handler->handle($request);
     }
 
-    public function excludedPostParameterProvider()
+    public static function excludedPostParameterProvider()
     {
         return [
             'chunkNumber' => ['chunkNumber'],

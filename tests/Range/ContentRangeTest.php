@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\HeaderBag;
 
 class ContentRangeTest extends TestCase
 {
-    public function invalidArgumentProvider()
+    public static function invalidArgumentProvider()
     {
         return [
             'Null' => [null, 'Content Range header is missing or invalid'],

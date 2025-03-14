@@ -44,7 +44,7 @@ class ResumableJsHandlerTest extends TestCase
         $this->assertInstanceOf(ResumableJsHandler::class, $manager->driver());
     }
 
-    public function notAllowedRequestMethods()
+    public static function notAllowedRequestMethods()
     {
         return [
             'HEAD' => [Request::METHOD_HEAD],
@@ -132,7 +132,7 @@ class ResumableJsHandlerTest extends TestCase
         $this->handler->handle($request);
     }
 
-    public function excludedPostParameterProvider()
+    public static function excludedPostParameterProvider()
     {
         return [
             'resumableChunkNumber' => ['resumableChunkNumber'],

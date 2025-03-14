@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 
 class DropzoneRangeTest extends TestCase
 {
-    public function invalidArgumentProvider()
+    public static function invalidArgumentProvider()
     {
         return [
             'Number of chunks size equal to zero' => [4, 0, 20, 190, '`numberOfChunks` must be greater than zero'],
